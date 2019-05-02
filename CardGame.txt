@@ -1,0 +1,238 @@
+Dim btnText
+Dim screenX, screenY
+Dim intX, intY
+Dim temp, posTempX, posTempY
+
+screenX = GetScreenX()
+screenY = GetScreenY()
+TracePrint screenX, screenY
+
+'run the app
+'RunApp "com.tetherstudios.solitaire.klondike"
+Delay 10000
+
+'Tap Play Now
+Tap screenX / 2, 1700
+
+'Delay 30000
+
+'Start game
+//Tap 1021, 1125
+//Delay 10000
+Dim bolFound 
+Dim cardArray
+
+Dim sArr, hArr, cArr, dArr, allCardArr
+Dim curCardArr
+Dim x1, y1, x2, y2
+bolFound = False
+
+cardArray = Array("sA.png", "hA.png", "cA.png", "dA.png")
+sArr = Array("sA.png", "s2.png", "s3.png", "s4.png", "s5.png", "s6.png", "s7.png", "s8.png", "s9.png", "s10.png", "sJ.png", "sQ.png", "sK.png")
+hArr = Array("hA.png", "h2.png", "h3.png", "h4.png", "h5.png", "h6.png", "h7.png", "h8.png", "h9.png", "h10.png", "hJ.png", "hQ.png", "hK.png")
+cArr = Array("cA.png", "c2.png", "c3.png", "c4.png", "c5.png", "c6.png", "c7.png", "c8.png", "c9.png", "c10.png", "cJ.png", "cQ.png", "cK.png")
+dArr = Array("dA.png", "d2.png", "d3.png", "d4.png", "d5.png", "d6.png", "d7.png", "d8.png", "d9.png", "d10.png", "dJ.png", "dQ.png", "dK.png")
+allCardArr = Array("sA.png", "s2.png", "s3.png", "s4.png", "s5.png", "s6.png", "s7.png", "s8.png", "s9.png", "s10.png", "sJ.png", "sQ.png", "sK.png", _
+"hA.png", "h2.png", "h3.png", "h4.png", "h5.png", "h6.png", "h7.png", "h8.png", "h9.png", "h10.png", "hJ.png", "hQ.png", "hK.png", _
+"cA.png", "c2.png", "c3.png", "c4.png", "c5.png", "c6.png", "c7.png", "c8.png", "c9.png", "c10.png", "cJ.png", "cQ.png", "cK.png", _
+"dA.png", "d2.png", "d3.png", "d4.png", "d5.png", "d6.png", "d7.png", "d8.png", "d9.png", "d10.png", "dJ.png", "dQ.png", "dK.png")
+
+x1 = 0
+y1 = 0
+x2 = 0
+y2 = 0
+
+//FindPic 0, 0, 0, 0, "D:\\Personal\\cardautomation\\pic\\entryz1.png", "000000", 0, 0.9, intX, intY
+//FindPic 0, 0, 0, 0, "Attachment:entryz1.png", "000000", 0, 0.9, intX, intY
+//TracePrint intX, intY
+'如果没有找到，intX和intY的值都会被置为-1
+//If intX > -1 And intY > -1 Then 
+//    Tap intX, intY
+//    Delay 20000
+    
+//    For j = 0 To 3    
+	
+// Tap A...K in tableau if found
+findCardInTableau 0, 400, 1080, 1000, sArr
+findCardInTableau 0, 400, 1080, 1000, hArr
+findCardInTableau 0, 400, 1080, 1000, cArr
+findCardInTableau 0, 400, 1080, 1000, dArr
+       	
+Dim tempStr, tempStr2    	
+Dim cardInfoArr(6, 1)
+Dim cardPosArr(6,1)
+Dim offset, offset2, count, distance, leftcorner
+offset = 146
+offset2 = 0
+count = 1
+leftcorner = 4
+
+For i = 0 To 6
+	If i = 0 Then 
+		distance = 155
+	ElseIf i=1 Then
+		distance = count * offset + 10
+	Else
+		distance = count * offset
+	End If
+//	
+	TracePrint i+1, leftcorner, 400, distance+offset2, 750
+	
+	For j = 0 To 51
+		//Find blank in the position
+//		FindPic leftcorner, 400, distance + offset2, 750, "Attachment:blankInTableau.png", "000000", 0, 0.7, intX, intY
+//		If intX > 0 And intY > 0 Then 
+//			Exit For
+//		End If
+		
+		FindPic leftcorner, 410, distance + offset2, 750, "Attachment:" & allCardArr(j), "000000", 0, 0.7, intX, intY
+		//Save position
+		cardPosArr(i, 0) = leftcorner + 75
+		cardPosArr(i, 1) = 510
+		
+//		TracePrint i+1, allCardArr(j)
+		If intX > 0 And intY > 0 Then 
+		 	TracePrint "Found it:", allCardArr(j), "coordinates:", intX, intY
+		 	Delay 100
+		 	tempStr = Mid(allCardArr(j), 2, InStr(1, allCardArr(j), ".") - 2)
+		 	tempStr2 = Mid(allCardArr(j), 1, 1)
+		 	TracePrint "Card is:", tempStr
+		 	TracePrint "Suit is:", tempStr2
+		 	
+		 	cardInfoArr(i, 0) = convertBigCards(tempStr)
+		 	cardInfoArr(i, 1) = convertSuitColor(tempStr2)
+//			cardInfoArr(i)
+			Exit For
+		End If
+	Next
+	leftcorner = distance + offset2
+	count = count + 1
+	offset2 = offset2 + 10
+	TracePrint i+1, "Ending"
+Next
+//    Wend
+//End If
+
+//Sort from min to max
+Call sortMinToMax()
+
+//Print out the array
+TracePrint "After sorting, array is"
+For i = 0 To 6
+
+	TracePrint i+1, ":", cardInfoArr(i,0), cardInfoArr(i,1)
+		
+Next
+
+Dim hasMovedCard(0,1)
+For i = 0 To 5
+	
+	TracePrint cardInfoArr(i,0), cardInfoArr(i, 1)
+	If hasMovedCard(0, 0) <> cardInfoArr(i,0) And hasMovedCard(0,1) <> cardInfoArr(i,1) Then 
+		For j = i + 1 To 6
+			If CInt(cardInfoArr(i, 0)) + 1 = CInt(cardInfoArr(j, 0)) And cardInfoArr(i, 1) <> cardInfoArr(j, 1) Then 
+				TracePrint "Meet condition", cardInfoArr(i,0), cardInfoArr(j,0)
+				TracePrint "Coodinates:", cardPosArr(i, 0), cardPosArr(i,1), cardPosArr(j, 0), cardPosArr(j,1)
+				Swipe cardPosArr(i, 0), cardPosArr(i, 1), cardPosArr(j, 0), cardPosArr(j, 1), 200
+				
+				hasMovedCard(0, 0) = cardInfoArr(i, 0)
+				hasMovedCard(0, 1) = cardInfoArr(i, 1)
+			End If
+		Next
+	End If
+Next
+
+//KillApp "com.tetherstudios.solitaire.klondike"
+
+'Tap 1025, 1126
+
+
+'Tap >
+//Tap 985, 585
+//
+//Delay 5000
+
+'Finish tour
+//For i = 1 To 6
+//	Tap 545, 1620
+//	Delay 200
+//Next
+
+
+
+'Delay 30000
+
+'Tap Next
+'Tap 540,1372
+Function convertBigCards(tempStr)
+	If tempStr = "A" Then 
+		tempStr = "1"
+	ElseIf tempStr = "J" Then
+		tempStr = "11"
+	ElseIf tempStr = "Q" Then
+		tempStr = "12"
+	ElseIf tempStr = "K" Then
+		tempStr = "13"
+	End If
+		
+	convertBigCards = tempStr
+End Function
+
+Function convertSuitColor(strSuit)
+	If strSuit = "s" Or strSuit = "c" Then
+		strSuit = "0"
+	ElseIf strSuit = "h" Or strSuit = "d" Then
+		strSuit = "1"
+	End If
+	
+	convertSuitColor = strSuit
+End Function
+
+Sub findCardInTableau(x1, y1, x2, y2, arr)
+	For i=0 to 12   
+    	FindPic x1, y1, x2, y2, "Attachment:" & arr(i), "000000", 0, 0.7, intX, intY
+    	If intX > 0 And intY > 0 Then 
+    		TracePrint intX, intY
+    		Tap intX, intY
+    	Else 
+    		Exit For
+    	End If
+    Next	
+End Sub
+
+Sub sortMinToMax()
+	Dim a, b
+	Dim posx, posy
+	Dim temp
+	
+	For i = 0 To 5
+		For j = i + 1 To 6
+			a = CInt(cardInfoArr(i, 0))
+			b = CInt(cardInfoArr(j, 0))
+			
+			If a > b Then 
+				
+				TracePrint "aaa:", cardInfoArr(i,0), cardInfoArr(j,0)
+				temp = cardInfoArr(i, 0)
+				cardInfoArr(i, 0) = cardInfoArr(j, 0)
+				cardInfoArr(j, 0) = temp
+				// Update position array
+				posx = cardPosArr(i, 0)
+				posy = cardPosArr(i, 1)
+				cardPosArr(i, 0) = cardPosArr(j, 0)
+				cardPosArr(i, 1) = cardPosArr(j, 1)
+				cardPosArr(j,0)=posx
+				cardPosArr(j,1) = posy
+					
+					
+	
+			End If
+		Next 
+	Next 
+End Sub
+
+
+
+
+
+
