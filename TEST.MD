@@ -1,3 +1,1 @@
-test
-test
-ABC test
+abc
