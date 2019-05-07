@@ -1,0 +1,63 @@
+Dim allCardArr, suitArr
+
+allCardArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
+"r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
+
+suitArr = Array("spade.png", "heart.png", "club.png", "diamond.png")
+
+Sub moveCardToFoundation(cardNumber, suitColor)
+	Dim firstUlCoordinateX, firstUlCoordinateY
+	Dim firstLrCoordinateX, firstLrCoordinateY
+	Dim offset
+	
+	offset = 0
+	
+	//Area of Foundation £¨split into 4 parts) 
+	firstUlCoordinateX = 2
+	firstUlCoordinateY = 160
+	firstLrCoordinateX = 156
+	firstLrCoordinateY = 385
+	
+	//Save the card array
+	Dim cardInfoPosAndPoint(3)
+	
+	For i = 1 To 4
+		For count = 0 To 25
+			findCardPosAndPointInPic(firstUlCoordinateX + offset, firstUlCoordinateY, firstLrCoordinateX + offset, firstLrCoordinateY, allCardArr(count))
+	Next
+	
+	//Check card number and color of suit
+	
+End Sub
+
+Function findCardPosAndPointInPic(startX, startY, endX, endY, picName)
+	Dim cardInfoPosAndPoint(3)
+	
+	FindPic startX, startY, endX, endY, "Attachment:" & picName, "000000", 0, 0.7, intX, intY
+	If intX > 0 And intY > 0 Then 
+
+		findPicture = cardInfoPosAndPoint
+	Else 
+		TracePrint "Cannot find specified pic:" & picName
+	End If
+End Function
+
+Function findSuitInPic(startX, startY, endX, endY, suitColorName)
+	Dim cardSuitColor
+	
+	FindPic startX, startY, endX, endY, "Attachment:" & suitColorName, "000000", 0, 0.7, intX, intY
+	If intX > 0 And intY > 0 Then 
+		If suitColorName = "spade.png" Then
+			cardSuitColor = 1
+		ElseIf suitColorName = "heart.png" Then
+			cardSuitColor = 2
+		ElseIf suitColorName = "club.png" Then
+			cardSuitColor = 3
+		ElseIf suitColorName = "diamond.png" Then
+			cardSuitColor = 4
+		End If
+		findSuitInPic = cardSuitColor
+	Else 
+		TracePrint "Cannot find specified suit:" & suitColorName
+	End If	
+End Function
