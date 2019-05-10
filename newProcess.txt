@@ -7,6 +7,43 @@ suitArr = Array("spade.png", "heart.png", "club.png", "diamond.png")
 
 Dim cardInfoPosAndPoint(3)
 
+Sub findCardInWastePile()
+	//Click card
+	Tap 1000, 260
+	
+	Dim threeCardPosAndPoint(3,3), offset
+	Dim findRangeX1, findRangeY1
+	Dim findRangeX2, findRangeY2
+	Dim foundCardInWastePile£¨3, 3)
+	
+	findRangeX1 = 752
+	findRangeY1 = 160
+	findRangeX2 = 917
+	findRangeY2 = 233
+	offset = 0
+	
+	//Save 3 cards position
+//	threeCardPosAndPoint(0,0) = 662
+//	threeCardPosAndPoint(0,1) = 200
+//	threeCardPosAndPoint(1,0) = 720
+//	threeCardPosAndPoint(1,1) = 200
+//	threeCardPosAndPoint(2,0) = 785
+//	threeCardPosAndPoint(2,1) = 200
+	
+	//Find card point
+	For i = 0 To 2
+		For j = 0 To 25
+			findCardPosAndPointInPic findRangeX1 + offset, findRangeY1, findRangeX2 + offset, findRangeY2, allCardArr(j)
+			If cardInfoPosAndPoint(0) > 0 Then 
+				foundCardInWastePile£¨i, 0) = cardInfoPosAndPoint(0)
+				foundCardInWastePile£¨i, 1) = cardInfoPosAndPoint(1)
+				foundCardInWastePile£¨i, 2) = cardInfoPosAndPoint(2)
+				Exit For
+			End If
+		Next
+	Next
+End Sub
+
 Sub moveCardToFoundation(cardPosArr, cardNumber, suitColor)
 	Dim firstUlCoordinateX, firstUlCoordinateY
 	Dim firstLrCoordinateX, firstLrCoordinateY
