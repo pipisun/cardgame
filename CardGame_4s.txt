@@ -1,0 +1,33 @@
+Dim screenX, screenY
+
+screenX = GetScreenX()
+screenY = GetScreenY()
+TracePrint "Screen size:", screenX, screenY
+
+'Run app
+RunApp "com.tether.solitaire.klondike"
+
+Delay 10000
+
+'Tap Play Now
+Tap screenX / 2, screenY - 60
+
+Delay 30000
+
+'Choose game
+Dim intX, intY
+TracePrint "Searching entry z1"
+FindPic 0, 0, 0, 0, "Attachment:entryz1.png", "000000", 0, 0.7, intX, intY
+If intX > 0 And intY > 0 Then 
+	TracePrint "Found entry z1"
+	Tap intX, intY
+Else 
+	TracePrint "Not Found entry z1"	
+End If
+
+'Tap Start Game
+Tap screenX / 2, screenY - 60
+
+Delay 8000
+
+
