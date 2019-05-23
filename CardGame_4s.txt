@@ -7,22 +7,41 @@ TracePrint "Screen size:", screenX, screenY
 'Run app
 RunApp "com.tether.solitaire.klondike"
 
-Delay 10000
+Delay 30000
 
 'Tap Play Now
 Tap screenX / 2, screenY - 60
 
-Delay 30000
+'Delay 30000
 
 'Choose game
 Dim intX, intY
+
+Dim count, isFound 
+
+count = 30
+isFound = False
+
 TracePrint "Searching entry z1"
-FindPic 0, 0, 0, 0, "Attachment:entryz1.png", "000000", 0, 0.7, intX, intY
-If intX > 0 And intY > 0 Then 
-	TracePrint "Found entry z1"
-	Tap intX, intY
+While count > 0 
+	FindPic 0, 0, 0, 0, "Attachment:entryz1.png", "000000", 0, 0.7, intX, intY
+	If intX > 0 And intY > 0 Then 
+		TracePrint "Found entry z1"
+
+		isFound = True
+		Exit While
+	Else 
+		TracePrint "Continue searching..."	
+	End If
+	count = count - 1
+	Delay 1000
+Wend
+
+If Not isFound Then 
+	TracePrint "Not found entryz1"
 Else 
-	TracePrint "Not Found entry z1"	
+	Delay 2000
+	Tap intX, intY	
 End If
 
 'Tap Start Game
@@ -31,3 +50,76 @@ Tap screenX / 2, screenY - 60
 Delay 8000
 
 
+'Save card info(point, suit) and card position
+Dim cardInfoArr(7,2), cardPosArr(7,2)
+Dim allCardPicArr, suitPicArr
+
+allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
+"r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
+
+suitPicArr = Array("spade.png", "heart.png", "club.png", "diamond.png")
+
+Dim leftUpperCornerX, leftUpperCornerY
+Dim rightUpperCornerX, rightUpperCornerY
+leftUpperCornerX = 2
+leftUpperCornerY = 215
+rightUpperCornerX = 45
+rightUpperCornerY = 332
+
+Dim leftUpperCornerXForSuit, leftUpperCornerYForSuit
+Dim rightUpperCornerXForSuit, rightUpperCornerYForSuit
+leftUpperCornerXForSuit = 45
+leftUpperCornerYForSuit = 215
+rightUpperCornerXForSuit = 93
+rightUpperCornerYForSuit = 332
+
+Dim offsetX1, offsetX2
+offsetX1 = 91
+offsetX2 = 95
+
+Dim cardPoint
+
+For i = 0 To 6
+	For j = 0 To 25
+		FindPic leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, "Attachment:" & allCardPicArr(j), "000000", 0, 0.7, intX, intY
+		TracePrint "Finding ", allCardPicArr(j), " in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
+		If intX > 0 And intY > 0 Then 
+			'Get card point
+			cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
+			TracePrint "Found card: " + cardPoint
+			'Save card info
+			cardInfoArr(i, 0) = cardPoint
+			cardPosArr(i, 0) = intX
+			cardPosArr(i, 1) = intY
+			
+			For m = 0 To 3
+				//Search suit
+				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(j), "000000", 0, 0.7, intX, intY
+				If intX > 0 And intY > 0 Then 
+					TracePrint "Found suit: " + suitPicArr(j)
+					'Save suit info
+					cardInfoArr(i, 1) = convertSuitColorToNumber(suitPicArr(j))
+					
+					Exit For
+				End If
+			Next
+			Exit For
+		End If
+	Next
+	leftUpperCornerX = leftUpperCornerX + offsetX1
+	rightUpperCornerX = rightUpperCornerX + offsetX2
+Next
+
+Function convertSuitColorToNumber(strSuit)
+	If strSuit = "spade.png" Then
+		strSuit = "1"
+	ElseIf strSuit = "heart.png" Then
+		strSuit = "2"
+	ElseIf strSuit = "club.png" Then
+		strSuit = "3"
+	ElseIf strSuit = "diamond.png" Then
+		strSuit = "4"
+	End If
+	
+	convertSuitColorToNumber = strSuit
+End Function
