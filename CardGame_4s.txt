@@ -78,6 +78,7 @@ offsetX1 = 91
 offsetX2 = 95
 
 Dim cardPoint
+Dim cardSearchArea(7,4), suitSearchArea(7,4)
 
 For i = 0 To 6
 	For j = 0 To 25
@@ -91,6 +92,10 @@ For i = 0 To 6
 			cardInfoArr(i, 0) = cardPoint
 			cardPosArr(i, 0) = intX
 			cardPosArr(i, 1) = intY
+			cardSearchArea(i,0) = leftUpperCornerX
+			cardSearchArea(i,1) = leftUpperCornerY
+			cardSearchArea(i,2) = rightUpperCornerX
+			cardSearchArea(i,3) = rightUpperCornerY
 			
 			For m = 0 To 3
 				//Search suit
@@ -98,7 +103,12 @@ For i = 0 To 6
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: " + suitPicArr(j)
 					'Save suit info
-					cardInfoArr(i, 1) = convertSuitColorToNumber(suitPicArr(j))
+					cardInfoArr(i, 1) = convertSuitColorToSign(suitPicArr(j))
+					
+					suitSearchArea(i,0) = leftUpperCornerXForSuit
+					suitSearchArea(i,1) = leftUpperCornerYForSuit
+					suitSearchArea(i,2) = rightUpperCornerXForSuit
+					suitSearchArea(i,3) = rightUpperCornerYForSuit
 					
 					Exit For
 				End If
@@ -110,16 +120,75 @@ For i = 0 To 6
 	rightUpperCornerX = rightUpperCornerX + offsetX2
 Next
 
-Function convertSuitColorToNumber(strSuit)
-	If strSuit = "spade.png" Then
-		strSuit = "1"
-	ElseIf strSuit = "heart.png" Then
-		strSuit = "2"
-	ElseIf strSuit = "club.png" Then
-		strSuit = "3"
-	ElseIf strSuit = "diamond.png" Then
-		strSuit = "4"
+Call sortMaxToMin()
+
+'Comparison
+Dim number1, number2
+Dim compareCounter 
+compareCounter = 1
+For i = 0 To 5
+	If cardInfoArr(i,0) <> "?" Then
+		number1 = CInt(cardInfoArr(i,0))
+		For j = i+1 To 6
+				If cardInfoArr(j,0) <> "?" Then
+					If number1 - compareCounter = number2 And cardInfoArr(i,1) <> cardInfoArr(j,1) Then
+						cardInfoArr(i,0) = cardInfoArr(i,0) + "|" + cardInfoArr(j,0)
+						cardInfoArr(j,0) = "?"
+						Swipe cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1)
+						compareCounter = compareCounter + 1
+						For m = 0 To 25
+							'Search again after the card is moved
+							FindPic cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), "Attachment:" & allCardPicArr(j), "000000", 0, 0.7, intX, intY
+							If intX > 0 And intY > 0 Then
+								'Get card point
+								cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
+								TracePrint "Found card: " + cardPoint
+								
+								cardInfoArr(j,0) = cardInfoArr(j,0) + cardPoint		
+							End If 
+						Next m 
+					Else
+						Exit For
+					End If
+				End If
+		Next
+		compareCounter = 1
+	End If
+Next
+
+Function convertSuitColorToSign(strSuit)
+	If strSuit = "spade.png" Or strSuit = "club.png" Then
+		strSuit = "Black"
+	ElseIf strSuit = "heart.png" Or strSuit = "diamond.png" Then
+		strSuit = "Red"
 	End If
 	
-	convertSuitColorToNumber = strSuit
+	convertSuitColorToSign = strSuit
 End Function
+
+Sub sortMaxToMin()
+	Dim a, b
+	Dim posx, posy
+	Dim temp
+	
+	For i = 0 To 5
+		For j = i + 1 To 6
+			a = CInt(cardInfoArr(i, 0))
+			b = CInt(cardInfoArr(j, 0))
+			
+			If a < b Then 
+				temp = cardInfoArr(i, 0)
+				cardInfoArr(i, 0) = cardInfoArr(j, 0)
+				cardInfoArr(j, 0) = temp
+				
+				'Update position array
+				posx = cardPosArr(i, 0)
+				posy = cardPosArr(i, 1)
+				cardPosArr(i, 0) = cardPosArr(j, 0)
+				cardPosArr(i, 1) = cardPosArr(j, 1)
+				cardPosArr(j,0)=posx
+				cardPosArr(j,1) = posy
+			End If
+		Next 
+	Next 
+End Sub
