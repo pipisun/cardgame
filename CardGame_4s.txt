@@ -98,7 +98,7 @@ For i = 0 To 6
 			cardSearchArea(i,3) = rightUpperCornerY
 			
 			For m = 0 To 3
-				//Search suit
+				'Search suit
 				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(j), "000000", 0, 0.7, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: " + suitPicArr(j)
@@ -136,17 +136,10 @@ For i = 0 To 5
 						cardInfoArr(j,0) = "?"
 						Swipe cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1)
 						compareCounter = compareCounter + 1
-						For m = 0 To 25
-							'Search again after the card is moved
-							FindPic cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), "Attachment:" & allCardPicArr(j), "000000", 0, 0.7, intX, intY
-							If intX > 0 And intY > 0 Then
-								'Get card point
-								cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
-								TracePrint "Found card: " + cardPoint
-								
-								cardInfoArr(j,0) = cardInfoArr(j,0) + cardPoint		
-							End If 
-						Next m 
+						
+						'Identify the new card
+						Call identifyNewCard(j)
+
 					Else
 						Exit For
 					End If
@@ -155,6 +148,31 @@ For i = 0 To 5
 		compareCounter = 1
 	End If
 Next
+
+Sub identifyNewCard(j)
+	Dim intX, intY
+	Dim cardPoint
+	
+	For m = 0 To 25
+		'Search again after the card is moved
+		FindPic cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), "Attachment:" & allCardPicArr(j), "000000", 0, 0.7, intX, intY
+		If intX > 0 And intY > 0 Then
+			'Get card point
+			cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
+			TracePrint "Found card: " + cardPoint
+			
+			cardInfoArr(j,0) = cardInfoArr(j,0) + cardPoint
+			'Search suit
+			For s = 0 To 3
+				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.7, intX, intY
+				If intX > 0 And intY > 0 Then 
+					TracePrint "Found suit: " + suitPicArr(s)
+					'Save suit info
+					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
+			Next
+		End If 
+	Next 
+End Sub
 
 Function convertSuitColorToSign(strSuit)
 	If strSuit = "spade.png" Or strSuit = "club.png" Then
