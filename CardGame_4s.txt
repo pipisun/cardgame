@@ -1,4 +1,7 @@
 Dim screenX, screenY
+Dim intX, intY
+
+Dim count, isFound 
 
 screenX = GetScreenX()
 screenY = GetScreenY()
@@ -7,18 +10,25 @@ TracePrint "Screen size:", screenX, screenY
 'Run app
 RunApp "com.tether.solitaire.klondike"
 
-Delay 30000
+count = 30
+While count > 0 
+	FindPic 0, 0, 0, 0, "Attachment:playnow.png", "000000", 0, 0.7, intX, intY
+	If intX > 0 And intY > 0 Then 
+		TracePrint "Found Playnow button"
+	
+		Tap intX, intY
+		Exit While
+	Else 
+		TracePrint "Continue searching playnow..."	
+	End If
+	count = count - 1
+	Delay 1000
+Wend
 
 'Tap Play Now
-Tap screenX / 2, screenY - 60
-
-'Delay 30000
+'Tap screenX / 2, screenY - 60
 
 'Choose game
-Dim intX, intY
-
-Dim count, isFound 
-
 count = 30
 isFound = False
 
@@ -31,7 +41,7 @@ While count > 0
 		isFound = True
 		Exit While
 	Else 
-		TracePrint "Continue searching..."	
+		TracePrint "Continue searching z1..."	
 	End If
 	count = count - 1
 	Delay 1000
@@ -45,10 +55,36 @@ Else
 End If
 
 'Tap Start Game
-Tap screenX / 2, screenY - 60
+count = 30
+While count > 0 
+	FindPic 0, 0, 0, 0, "Attachment:startgame.png", "000000", 0, 0.7, intX, intY
+	If intX > 0 And intY > 0 Then 
+		TracePrint "Found Startgame button"
 
-Delay 8000
+		Tap intX, intY
+		Exit While
+	Else 
+		TracePrint "Continue searching startgame..."	
+	End If
+	count = count - 1
+	Delay 1000
+Wend
 
+'Waiting game to start
+count = 120
+While count > 0 
+	FindPic 0, 0, 0, 0, "Attachment:endbutton.png", "000000", 0, 0.7, intX, intY
+	If intX > 0 And intY > 0 Then 
+		TracePrint "Found Endbutton button"
+
+		Delay 5000
+		Exit While
+	Else 
+		TracePrint "Continue searching Endbutton..."	
+	End If
+	count = count - 1
+	Delay 1000
+Wend
 
 'Save card info(point, suit) and card position
 Dim cardInfoArr(7,2), cardPosArr(7,2)
@@ -87,7 +123,7 @@ For i = 0 To 6
 		If intX > 0 And intY > 0 Then 
 			'Get card point
 			cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
-			TracePrint "Found card: " + cardPoint
+			TracePrint "Found card: ", cardPoint
 			'Save card info
 			cardInfoArr(i, 0) = cardPoint
 			cardPosArr(i, 0) = intX
@@ -101,7 +137,7 @@ For i = 0 To 6
 				'Search suit
 				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(j), "000000", 0, 0.7, intX, intY
 				If intX > 0 And intY > 0 Then 
-					TracePrint "Found suit: " + suitPicArr(j)
+					TracePrint "Found suit: ", suitPicArr(j)
 					'Save suit info
 					cardInfoArr(i, 1) = convertSuitColorToSign(suitPicArr(j))
 					
@@ -118,6 +154,8 @@ For i = 0 To 6
 	Next
 	leftUpperCornerX = leftUpperCornerX + offsetX1
 	rightUpperCornerX = rightUpperCornerX + offsetX2
+	leftUpperCornerXForSuit = leftUpperCornerXForSuit + offsetX1
+	rightUpperCornerXForSuit = rightUpperCornerXForSuit + offsetX2
 Next
 
 Call sortMaxToMin()
@@ -133,7 +171,6 @@ For i = 0 To 5
 				If cardInfoArr(j,0) <> "?" Then
 					If number1 - compareCounter = number2 And cardInfoArr(i,1) <> cardInfoArr(j,1) Then
 						cardInfoArr(i,0) = cardInfoArr(i,0) + "|" + cardInfoArr(j,0)
-						cardInfoArr(j,0) = "?"
 						Swipe cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1)
 						compareCounter = compareCounter + 1
 						
@@ -159,16 +196,17 @@ Sub identifyNewCard(j)
 		If intX > 0 And intY > 0 Then
 			'Get card point
 			cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
-			TracePrint "Found card: " + cardPoint
+			TracePrint "Found card: ", cardPoint
 			
-			cardInfoArr(j,0) = cardInfoArr(j,0) + cardPoint
+			cardInfoArr(j,0) = cardPoint
 			'Search suit
 			For s = 0 To 3
 				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.7, intX, intY
 				If intX > 0 And intY > 0 Then 
-					TracePrint "Found suit: " + suitPicArr(s)
+					TracePrint "Found suit: ", suitPicArr(s)
 					'Save suit info
 					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
+				End If
 			Next
 		End If 
 	Next 
