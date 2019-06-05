@@ -94,7 +94,7 @@ Dim intX, intY
 allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 "r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
 
-suitPicArr = Array("spade.png", "heart.png", "club.png", "diamond.png")
+suitPicArr = Array("spade.png", "spade2.png", "heart.png", "club.png", "diamond.png")
 
 Dim leftUpperCornerX, leftUpperCornerY
 Dim rightUpperCornerX, rightUpperCornerY
@@ -124,7 +124,7 @@ For i = 0 To 6
 //		TracePrint "Finding ", allCardPicArr(j), " in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
 		If intX > 0 And intY > 0 Then 
 			'Get card point
-			cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
+			cardPoint = Mid(allCardPicArr(j), 2, InStr(1, allCardPicArr(j), ".") - 2) 
 			TracePrint "Found card: ", cardPoint
 			'Save card info
 			cardInfoArr(i, 0) = cardPoint
@@ -137,7 +137,7 @@ For i = 0 To 6
 			
 			TracePrint "Finding suit in (", leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, ") area"
 			
-			For m = 0 To 3
+			For m = 0 To 4
 				'Search suit
 				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.7, intX, intY
 				If intX > 0 And intY > 0 Then 
@@ -163,6 +163,11 @@ For i = 0 To 6
 Next
 
 Call sortMaxToMin()
+For i = 0 To 6
+	TracePrint "Card point:", cardInfoArr(i,0)
+	TracePrint "Card position(x,y):", cardPosArr(i,0), ",", cardPosArr(i,1)
+	TracePrint "Card suit color:", cardInfoArr(i,1)
+Next
 
 'Comparison
 Dim number1, number2
@@ -217,7 +222,7 @@ Sub identifyNewCard(j)
 End Sub
 
 Function convertSuitColorToSign(strSuit)
-	If strSuit = "spade.png" Or strSuit = "club.png" Then
+	If strSuit = "spade.png" Or strSuit = "spade2.png" Or strSuit = "club.png" Then
 		strSuit = "Black"
 	ElseIf strSuit = "heart.png" Or strSuit = "diamond.png" Then
 		strSuit = "Red"
@@ -229,12 +234,14 @@ End Function
 Sub sortMaxToMin()
 	Dim a, b
 	Dim posx, posy
-	Dim temp
+	Dim temp, suitTemp
 	
 	For i = 0 To 5
 		For j = i + 1 To 6
 			a = CInt(cardInfoArr(i, 0))
 			b = CInt(cardInfoArr(j, 0))
+			
+			'TracePrint "a:", a, ", b:", b
 			
 			If a < b Then 
 				temp = cardInfoArr(i, 0)
@@ -247,7 +254,12 @@ Sub sortMaxToMin()
 				cardPosArr(i, 0) = cardPosArr(j, 0)
 				cardPosArr(i, 1) = cardPosArr(j, 1)
 				cardPosArr(j,0)=posx
-				cardPosArr(j,1) = posy
+				cardPosArr(j, 1) = posy
+				
+				'Update suit info
+				suitTemp = cardInfoArr(i, 1)
+				cardInfoArr(i, 1) = cardInfoArr(j, 1)
+				cardInfoArr(j, 1) = suitTemp
 			End If
 		Next 
 	Next 
