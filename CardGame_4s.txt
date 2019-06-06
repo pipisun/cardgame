@@ -94,7 +94,7 @@ Dim intX, intY
 allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 "r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
 
-suitPicArr = Array("spade.png", "spade2.png", "heart.png", "club.png", "diamond.png")
+suitPicArr = Array("spade.png", "heart.png", "club.png", "diamond.png")
 
 Dim leftUpperCornerX, leftUpperCornerY
 Dim rightUpperCornerX, rightUpperCornerY
@@ -119,8 +119,8 @@ Dim cardSearchArea(7,4), suitSearchArea(7,4)
 
 For i = 0 To 6
 	TracePrint "Finding card in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
-	For j = 0 To 25
-		FindPic leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, "Attachment:" & allCardPicArr(j), "000000", 0, 0.7, intX, intY
+	For j = 0 To UBound(allCardPicArr)
+		FindPic leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, "Attachment:" & allCardPicArr(j), "000000", 0, 0.5, intX, intY
 //		TracePrint "Finding ", allCardPicArr(j), " in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
 		If intX > 0 And intY > 0 Then 
 			'Get card point
@@ -137,9 +137,9 @@ For i = 0 To 6
 			
 			TracePrint "Finding suit in (", leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, ") area"
 			
-			For m = 0 To 4
+			For m = 0 To UBound(suitPicArr)
 				'Search suit
-				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.7, intX, intY
+				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.5, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: ", suitPicArr(m)
 					'Save suit info
@@ -175,11 +175,15 @@ Dim compareCounter
 compareCounter = 1
 For i = 0 To 5
 	If cardInfoArr(i,0) <> "?" Then
-		number1 = CInt(cardInfoArr(i,0))
-		For j = i+1 To 6
-				If cardInfoArr(j,0) <> "?" Then
+		number1 = CInt(cardInfoArr(i, 0))
+		TracePrint "number1:", number1
+		For j = i + 1 To 6
+			number2 = CInt(cardInfoArr(j, 0))
+			TracePrint "number2:", number2
+			If number1 <> number2 Then 
+//				If cardInfoArr(j,0) <> "?" Then
 					If number1 - compareCounter = number2 And cardInfoArr(i,1) <> cardInfoArr(j,1) Then
-						cardInfoArr(i,0) = cardInfoArr(i,0) + "|" + cardInfoArr(j,0)
+						cardInfoArr(i,0) = cardInfoArr(i,0) & "%"+ cardInfoArr(i,1) & "|" & cardInfoArr(j,0) & "%" & cardInfoArr(j,1)
 						Swipe cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1)
 						compareCounter = compareCounter + 1
 						
@@ -189,7 +193,8 @@ For i = 0 To 5
 					Else
 						Exit For
 					End If
-				End If
+//				End If
+			End If
 		Next
 		compareCounter = 1
 	End If
@@ -199,18 +204,18 @@ Sub identifyNewCard(j)
 	Dim intX, intY
 	Dim cardPoint
 	
-	For m = 0 To 25
+	For m = 0 To UBound(allCardPicArr)
 		'Search again after the card is moved
-		FindPic cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), "Attachment:" & allCardPicArr(j), "000000", 0, 0.7, intX, intY
+		FindPic cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), "Attachment:" & allCardPicArr(m), "000000", 0, 0.5, intX, intY
 		If intX > 0 And intY > 0 Then
 			'Get card point
-			cardPoint = Mid(allCardPicArr(j), 2, Len(allCardPicArr(j))) 
+			cardPoint = Mid(allCardPicArr(m), 2, InStr(1, allCardPicArr(m), ".") - 2)
 			TracePrint "Found card: ", cardPoint
 			
 			cardInfoArr(j,0) = cardPoint
 			'Search suit
-			For s = 0 To 3
-				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.7, intX, intY
+			For s = 0 To UBound(suitPicArr)
+				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.5, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: ", suitPicArr(s)
 					'Save suit info
@@ -222,9 +227,9 @@ Sub identifyNewCard(j)
 End Sub
 
 Function convertSuitColorToSign(strSuit)
-	If strSuit = "spade.png" Or strSuit = "spade2.png" Or strSuit = "club.png" Then
+	If strSuit.startsWith("spade") Or strSuit.startsWith("club") Then
 		strSuit = "Black"
-	ElseIf strSuit = "heart.png" Or strSuit = "diamond.png" Then
+	ElseIf strSuit.startsWith("heart") Or strSuit.startsWith("diamond") Then
 		strSuit = "Red"
 	End If
 	
