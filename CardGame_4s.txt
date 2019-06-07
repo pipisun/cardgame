@@ -171,39 +171,47 @@ Next
 
 'Comparison
 Dim number1, number2
-Dim compareCounter 
+Dim compareCounter
+Dim cardPileLastCardSuitColor
 compareCounter = 1
+
 For i = 0 To 5
-	If cardInfoArr(i,0) <> "?" Then
+//	If cardInfoArr(i,0) <> "?" Then
 		number1 = CInt(cardInfoArr(i, 0))
 		TracePrint "number1:", number1
 		For j = i + 1 To 6
 			number2 = CInt(cardInfoArr(j, 0))
 			TracePrint "number2:", number2
 			If number1 <> number2 Then 
+//			 	If j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 //				If cardInfoArr(j,0) <> "?" Then
 					If number1 - compareCounter = number2 And cardInfoArr(i,1) <> cardInfoArr(j,1) Then
-						cardInfoArr(i,0) = cardInfoArr(i,0) & "%"+ cardInfoArr(i,1) & "|" & cardInfoArr(j,0) & "%" & cardInfoArr(j,1)
-						Swipe cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1)
+						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
+						cardInfoArr(i,1) = cardInfoArr(j, 1)
+						Swipe cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1),200
 						compareCounter = compareCounter + 1
+						
+						'Waiting for new card appears
+						Delay 500
 						
 						'Identify the new card
 						Call identifyNewCard(j)
 
-					Else
+					ElseIf j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 						Exit For
 					End If
 //				End If
 			End If
 		Next
 		compareCounter = 1
-	End If
+//	End If
 Next
 
 Sub identifyNewCard(j)
 	Dim intX, intY
 	Dim cardPoint
 	
+	TracePrint "Finding card in (", cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), ") area"
 	For m = 0 To UBound(allCardPicArr)
 		'Search again after the card is moved
 		FindPic cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), "Attachment:" & allCardPicArr(m), "000000", 0, 0.5, intX, intY
@@ -222,15 +230,16 @@ Sub identifyNewCard(j)
 					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
 				End If
 			Next
+			Exit For
 		End If 
 	Next 
 End Sub
 
 Function convertSuitColorToSign(strSuit)
-	If strSuit.startsWith("spade") Or strSuit.startsWith("club") Then
-		strSuit = "Black"
-	ElseIf strSuit.startsWith("heart") Or strSuit.startsWith("diamond") Then
-		strSuit = "Red"
+	If strSuit = "spade.png" Or strSuit = "club.png" Then
+		strSuit = "B"
+	ElseIf strSuit = "heart.png" Or strSuit = "diamond.png" Then
+		strSuit = "R"
 	End If
 	
 	convertSuitColorToSign = strSuit
@@ -240,6 +249,7 @@ Sub sortMaxToMin()
 	Dim a, b
 	Dim posx, posy
 	Dim temp, suitTemp
+	Dim tempCardPointSearchArea(4), tempCardSuitSearchArea(4)
 	
 	For i = 0 To 5
 		For j = i + 1 To 6
@@ -265,6 +275,34 @@ Sub sortMaxToMin()
 				suitTemp = cardInfoArr(i, 1)
 				cardInfoArr(i, 1) = cardInfoArr(j, 1)
 				cardInfoArr(j, 1) = suitTemp
+				
+				'Update search area for card point
+				tempCardPointSearchArea(0) = cardSearchArea(i,0)
+				tempCardPointSearchArea(1) = cardSearchArea(i,1)
+				tempCardPointSearchArea(2) = cardSearchArea(i,2)
+				tempCardPointSearchArea(3) = cardSearchArea(i,3)
+				cardSearchArea(i,0) = cardSearchArea(j,0)
+				cardSearchArea(i,1) = cardSearchArea(j,1)
+				cardSearchArea(i,2) = cardSearchArea(j,2)
+				cardSearchArea(i, 3) = cardSearchArea(j, 3)
+				cardSearchArea(j, 0) = tempCardPointSearchArea(0)
+				cardSearchArea(j, 1) = tempCardPointSearchArea(1)
+				cardSearchArea(j, 2) = tempCardPointSearchArea(2)
+				cardSearchArea(j, 3) = tempCardPointSearchArea(3)
+				
+				'Update search area for card suit
+				tempCardSuitSearchArea(0) = suitSearchArea(i,0)
+				tempCardSuitSearchArea(1) = suitSearchArea(i,1)
+				tempCardSuitSearchArea(2) = suitSearchArea(i,2)
+				tempCardSuitSearchArea(3) = suitSearchArea(i,3)
+				suitSearchArea(i,0) = suitSearchArea(j,0)
+				suitSearchArea(i,1) = suitSearchArea(j,1)
+				suitSearchArea(i,2) = suitSearchArea(j,2)
+				suitSearchArea(i, 3) = suitSearchArea(j, 3)
+				suitSearchArea(j, 0) = tempCardSuitSearchArea(0)
+				suitSearchArea(j, 1) = tempCardSuitSearchArea(1)
+				suitSearchArea(j, 2) = tempCardSuitSearchArea(2)
+				suitSearchArea(j, 3) = tempCardSuitSearchArea(3)
 			End If
 		Next 
 	Next 
