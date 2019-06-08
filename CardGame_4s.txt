@@ -196,7 +196,11 @@ For i = 0 To 5
 						
 						'Identify the new card
 						Call identifyNewCard(j)
-
+						
+						'Check if there is a match
+						While cardInfoArr(j, 0) <> "0"
+							Call moveCardAfterIdentify(j)
+						Wend
 					ElseIf j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 						Exit For
 					End If
@@ -206,6 +210,52 @@ For i = 0 To 5
 		compareCounter = 1
 //	End If
 Next
+
+Function moveCardAfterIdentify(pos)
+	Dim needRefindPos
+	Dim intNewCardNumber, intCardNumber
+	Dim strNewCardSuit, strCardSuit
+	intNewCardNumber = CInt(cardInfoArr(pos, 0))
+	strNewCardSuit = cardInfoArr(pos, 1)
+	If pos = 0 Then 
+		For p = 1 To 6
+			'If there is | in the string
+			Dim pipePos 
+			pipePos = InStr(1, cardInfoArr(p, 0), "|")
+			TracePrint "Pipe pos:", pipePos
+			If pipePos < 0 Then
+				intCardNumber = CInt(cardInfoArr(p, 0))
+			Else 
+				Dim newArr
+				newArr = Split(cardInfoArr(p,0),"|")
+				intCardNumber = CInt(Mid(newArr(UBOUND(newArr)), 1, Len(newArr(UBOUND(newArr)) - 1)))
+				TracePrint "intCardNumber:", intCardNumber
+			End If
+			strCardSuit = cardInfoArr(p,1)
+			If intNewCardNumber - 1 = intCardNumber And pipePos < 0 And strNewCardSuit <> strCardSuit Then 
+				cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(p, 0) & cardInfoArr(p, 1)
+				cardInfoArr(pos,1) = cardInfoArr(p, 1)
+				Swipe cardPosArr(p, 0), cardPosArr(p, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), 200
+				needRefindPos = p
+				Exit For
+			Else intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit Then
+				If pipePos < 0 Then 
+					cardInfoArr(p, 0) = cardInfoArr(p, 0) & cardInfoArr(p, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+				Else 
+					cardInfoArr(p, 0) = cardInfoArr(p, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+				End If
+				cardInfoArr(p,1) = cardInfoArr(pos, 1)
+				Swipe cardPosArr(pos, 0), cardPosArr(pos, 1), cardPosArr(p, 0), cardPosArr(p, 1), 200
+				needRefindPos = pos
+				Exit For
+			End If
+		Next
+	ElseIf pos = 6 Then
+	
+	Else 
+	
+	End If
+End Function
 
 Sub identifyNewCard(j)
 	Dim intX, intY
@@ -231,6 +281,8 @@ Sub identifyNewCard(j)
 				End If
 			Next
 			Exit For
+		Else 
+			cardInfoArr(j, 0) = "0"
 		End If 
 	Next 
 End Sub
