@@ -174,6 +174,7 @@ Dim number1, number2
 Dim compareCounter
 Dim cardPileLastCardSuitColor
 compareCounter = 1
+Dim delayTime
 
 For i = 0 To 5
 //	If cardInfoArr(i,0) <> "?" Then
@@ -187,8 +188,14 @@ For i = 0 To 5
 //				If cardInfoArr(j,0) <> "?" Then
 					If number1 - compareCounter = number2 And cardInfoArr(i,1) <> cardInfoArr(j,1) Then
 						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
-						cardInfoArr(i,1) = cardInfoArr(j, 1)
-						Swipe cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1),200
+						cardInfoArr(i, 1) = cardInfoArr(j, 1)
+						Delay 100
+						If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 500 Then 
+							delayTime = 800
+						Else 
+							delayTime = 400
+						End If
+						Swipe cardPosArr(j,0)+50, cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1),delayTime
 						compareCounter = compareCounter + 1
 						
 						'Waiting for new card appears
@@ -197,9 +204,16 @@ For i = 0 To 5
 						'Identify the new card
 						Call identifyNewCard(j)
 						
+						Dim newPosition
+						newPosition = j
 						'Check if there is a match
-						While cardInfoArr(j, 0) <> "0"
-							Call moveCardAfterIdentify(j)
+						While cardInfoArr(newPosition, 0) <> "0"
+							newPosition = moveCardAfterIdentify(newPosition)
+							If newPosition <> -1 Then 
+								Call identifyNewCard(newPosition)
+							Else 
+								Exit While
+							End If
 						Wend
 					ElseIf j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 						Exit For
@@ -211,50 +225,108 @@ For i = 0 To 5
 //	End If
 Next
 
+Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
+	Dim suitRule, intCardNumber, intTopCardNumber, strCardSuit, strTopCardSuit
+	suitRule = -1
+	'If there is | in the string
+	Dim pipePos 
+	pipePos = InStr(1, cardInfoArr(searchPos, 0), "|")
+	TracePrint "Pipe pos:", pipePos
+	If pipePos = 0 Then
+		intCardNumber = CInt(cardInfoArr(searchPos, 0))
+		intTopCardNumber = intCardNumber
+		strCardSuit = cardInfoArr(searchPos, 1)
+		strTopCardSuit = strCardSuit
+		TracePrint "Searching card:", intCardNumber
+	Else 
+		Dim newArr
+		newArr = Split(cardInfoArr(searchPos,0),"|")
+		intCardNumber = CInt(Mid(newArr(Len(newArr) - 1), 1, Len(newArr(Len(newArr) - 1)) - 1))
+		intTopCardNumber = CInt(Mid(newArr(0), 1, Len(newArr(0)) - 1))
+		strCardSuit = Right(cardInfoArr(searchPos,0), 1)
+		strTopCardSuit = Right(newArr(0), 1)
+		TracePrint "Searching card(Big):", intTopCardNumber
+		TracePrint "Searching card(Small):", intCardNumber
+	End If
+	TracePrint "newCardNumber-1", intNewCardNumber-1,":=", intTopCardNumber
+	TracePrint "newCardNumber+1", intNewCardNumber+1,":", intCardNumber
+	If intNewCardNumber - 1 = intTopCardNumber And strNewCardSuit <> strTopCardSuit Then 
+		If pipePos = 0 Then 
+			cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
+		Else 
+			cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0)
+		End If
+		cardInfoArr(pos, 1) = cardInfoArr(searchPos, 1)
+		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(pos,0)
+		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(pos,1)
+		Swipe cardPosArr(searchPos, 0)+50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), 200
+		suitRule = searchPos
+	ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit Then
+		If pipePos = 0 Then 
+			cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+		Else 
+			cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+		End If
+		cardInfoArr(searchPos, 1) = cardInfoArr(pos, 1)
+		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(searchPos,0)
+		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(searchPos,1)
+		Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), 200
+		suitRule = pos
+	End If
+	moveCardRule = suitRule
+End Function
+
 Function moveCardAfterIdentify(pos)
-	Dim needRefindPos
-	Dim intNewCardNumber, intCardNumber
-	Dim strNewCardSuit, strCardSuit
+	TracePrint "Position is:", pos
+	Dim newPos
+	Dim intNewCardNumber, strNewCardSuit
 	intNewCardNumber = CInt(cardInfoArr(pos, 0))
 	strNewCardSuit = cardInfoArr(pos, 1)
-	If pos = 0 Then 
-		For p = 1 To 6
-			'If there is | in the string
-			Dim pipePos 
-			pipePos = InStr(1, cardInfoArr(p, 0), "|")
-			TracePrint "Pipe pos:", pipePos
-			If pipePos < 0 Then
-				intCardNumber = CInt(cardInfoArr(p, 0))
-			Else 
-				Dim newArr
-				newArr = Split(cardInfoArr(p,0),"|")
-				intCardNumber = CInt(Mid(newArr(UBOUND(newArr)), 1, Len(newArr(UBOUND(newArr)) - 1)))
-				TracePrint "intCardNumber:", intCardNumber
-			End If
-			strCardSuit = cardInfoArr(p,1)
-			If intNewCardNumber - 1 = intCardNumber And pipePos < 0 And strNewCardSuit <> strCardSuit Then 
-				cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(p, 0) & cardInfoArr(p, 1)
-				cardInfoArr(pos,1) = cardInfoArr(p, 1)
-				Swipe cardPosArr(p, 0), cardPosArr(p, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), 200
-				needRefindPos = p
-				Exit For
-			Else intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit Then
-				If pipePos < 0 Then 
-					cardInfoArr(p, 0) = cardInfoArr(p, 0) & cardInfoArr(p, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
-				Else 
-					cardInfoArr(p, 0) = cardInfoArr(p, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+	If pos = 0 Or pos = 6 Then 
+		Dim startStep, endStep
+		If pos = 0 Then 
+			startStep = 1
+			endStep = 6
+			For p = startStep To endStep
+				newPos = moveCardRule(pos, p, intNewCardNumber, strNewCardSuit)
+				If newPos <> -1 Then 
+					Exit For
 				End If
-				cardInfoArr(p,1) = cardInfoArr(pos, 1)
-				Swipe cardPosArr(pos, 0), cardPosArr(pos, 1), cardPosArr(p, 0), cardPosArr(p, 1), 200
-				needRefindPos = pos
+			Next
+		ElseIf pos = 6 Then
+			startStep = 5
+			endStep = 0
+			For p = startStep To endStep Step -1
+				newPos = moveCardRule(pos, p, intNewCardNumber, strNewCardSuit)
+				If newPos <> -1 Then 
+					Exit For
+				End If
+			Next
+		End If
+		
+		For p = startStep To endStep
+			newPos = moveCardRule(pos, p, intNewCardNumber, strNewCardSuit)
+			If newPos <> -1 Then 
+				Exit For
+			End If
+		Next 
+	Else 
+		For k = pos + 1 To 6
+			newPos = moveCardRule(pos, k, intNewCardNumber, strNewCardSuit)
+		Next
+		TracePrint "newPos:", newPos
+		For j = 0 To pos - 1
+			newPos = moveCardRule(pos, j, intNewCardNumber, strNewCardSuit)
+			If newPos <> -1 Then 
 				Exit For
 			End If
 		Next
-	ElseIf pos = 6 Then
-	
-	Else 
-	
+
+//		If newPos = -1 Then
+
+//		End If
 	End If
+	moveCardAfterIdentify = newPos
 End Function
 
 Sub identifyNewCard(j)
