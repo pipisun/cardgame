@@ -86,8 +86,8 @@
 //	Delay 1000
 //Wend
 
-'Save card info(point, suit) and card position
-Dim cardInfoArr(7,2), cardPosArr(7,2)
+'Save card info(point, suit,suitColor) and card position
+Dim cardInfoArr(7,3), cardPosArr(7,2)
 Dim allCardPicArr, suitPicArr
 Dim intX, intY
 
@@ -144,6 +144,8 @@ For i = 0 To 6
 					TracePrint "Found suit: ", suitPicArr(m)
 					'Save suit info
 					cardInfoArr(i, 1) = convertSuitColorToSign(suitPicArr(m))
+					'Save suit color(Black/Red)
+					cardInfoArr(i, 2) = checkSuitBlackOrRed(suitPicArr(m))
 					
 					suitSearchArea(i,0) = leftUpperCornerXForSuit
 					suitSearchArea(i,1) = leftUpperCornerYForSuit
@@ -166,7 +168,8 @@ Call sortMaxToMin()
 For i = 0 To 6
 	TracePrint "Card point:", cardInfoArr(i,0)
 	TracePrint "Card position(x,y):", cardPosArr(i,0), ",", cardPosArr(i,1)
-	TracePrint "Card suit color:", cardInfoArr(i,1)
+	TracePrint "Card suit type:", cardInfoArr(i,1)
+	TracePrint "Card suit color:", cardInfoArr(i,2)
 Next
 
 'Comparison
@@ -186,9 +189,10 @@ For i = 0 To 5
 			If number1 <> number2 Then 
 //			 	If j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 //				If cardInfoArr(j,0) <> "?" Then
-					If number1 - compareCounter = number2 And cardInfoArr(i,1) <> cardInfoArr(j,1) Then
+					If number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Then
 						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
 						cardInfoArr(i, 1) = cardInfoArr(j, 1)
+						cardInfoArr(i, 2) = cardInfoArr(j, 2)
 						Delay 100
 						If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 500 Then 
 							delayTime = 800
@@ -235,7 +239,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	If pipePos = 0 Then
 		intCardNumber = CInt(cardInfoArr(searchPos, 0))
 		intTopCardNumber = intCardNumber
-		strCardSuit = cardInfoArr(searchPos, 1)
+		strCardSuit = cardInfoArr(searchPos, 2)
 		strTopCardSuit = strCardSuit
 		TracePrint "Searching card:", intCardNumber
 	Else 
@@ -243,8 +247,8 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		newArr = Split(cardInfoArr(searchPos,0),"|")
 		intCardNumber = CInt(Mid(newArr(Len(newArr) - 1), 1, Len(newArr(Len(newArr) - 1)) - 1))
 		intTopCardNumber = CInt(Mid(newArr(0), 1, Len(newArr(0)) - 1))
-		strCardSuit = Right(cardInfoArr(searchPos,0), 1)
-		strTopCardSuit = Right(newArr(0), 1)
+		strCardSuit = getSuitColor(Right(cardInfoArr(searchPos,0), 1))
+		strTopCardSuit = getSuitColor(Right(newArr(0), 1))
 		TracePrint "Searching card(Big):", intTopCardNumber
 		TracePrint "Searching card(Small):", intCardNumber
 	End If
@@ -281,7 +285,7 @@ Function moveCardAfterIdentify(pos)
 	Dim newPos
 	Dim intNewCardNumber, strNewCardSuit
 	intNewCardNumber = CInt(cardInfoArr(pos, 0))
-	strNewCardSuit = cardInfoArr(pos, 1)
+	strNewCardSuit = cardInfoArr(pos, 2)
 	If pos = 0 Or pos = 6 Then 
 		Dim startStep, endStep
 		If pos = 0 Then 
@@ -315,7 +319,8 @@ Function moveCardAfterIdentify(pos)
 			newPos = moveCardRule(pos, k, intNewCardNumber, strNewCardSuit)
 		Next
 		TracePrint "newPos:", newPos
-		For j = 0 To pos - 1
+
+		For j = pos - 1 To 0 Step -1
 			newPos = moveCardRule(pos, j, intNewCardNumber, strNewCardSuit)
 			If newPos <> -1 Then 
 				Exit For
@@ -348,8 +353,11 @@ Sub identifyNewCard(j)
 				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.5, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: ", suitPicArr(s)
+					
 					'Save suit info
 					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
+					'Save suit color(Black/Red)
+					cardInfoArr(j, 2) = checkSuitBlackOrRed(suitPicArr(s))
 				End If
 			Next
 			Exit For
@@ -359,14 +367,41 @@ Sub identifyNewCard(j)
 	Next 
 End Sub
 
-Function convertSuitColorToSign(strSuit)
-	If strSuit = "spade.png" Or strSuit = "club.png" Then
-		strSuit = "B"
-	ElseIf strSuit = "heart.png" Or strSuit = "diamond.png" Then
-		strSuit = "R"
+Function getSuitColor(strSuit)
+	Dim strSuitSign
+	If strSuit = "S" Or strSuit = "C" Then 
+		strSuitSign = "B"
+	ElseIf strSuit = "H" Or  strSuit = "D" Then
+		strSuitSign = "R"
 	End If
 	
-	convertSuitColorToSign = strSuit
+	getSuitColor = strSuitSign	
+End Function
+
+Function checkSuitBlackOrRed(strSuit)
+	Dim strSuitColor
+	If strSuit = "spade.png" Or strSuit = "club.png" Then 
+		strSuitColor = "B"
+	ElseIf strSuit = "heart.png" Or strSuit = "diamond.png" Then
+		strSuitColor = "R"
+	End If
+	
+	checkSuitBlackOrRed = strSuitColor	
+End Function
+
+Function convertSuitColorToSign(strSuit)
+	Dim strSuitSign
+	If strSuit = "spade.png" Then 
+		strSuitSign = "S"
+	ElseIf strSuit = "club.png" Then
+		strSuitSign = "C"
+	ElseIf strSuit = "heart.png" Then
+		strSuitSign = "H"
+	ElseIf strSuit = "diamond.png" Then
+		strSuitSign = "D"
+	End If
+	
+	convertSuitColorToSign = strSuitSign
 End Function
 
 Sub sortMaxToMin()
