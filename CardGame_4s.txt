@@ -146,6 +146,7 @@ For i = 0 To 6
 					cardInfoArr(i, 1) = convertSuitColorToSign(suitPicArr(m))
 					'Save suit color(Black/Red)
 					cardInfoArr(i, 2) = checkSuitBlackOrRed(suitPicArr(m))
+					TracePrint "Found suit color: ", cardInfoArr(i, 2)
 					
 					suitSearchArea(i,0) = leftUpperCornerXForSuit
 					suitSearchArea(i,1) = leftUpperCornerYForSuit
@@ -193,7 +194,7 @@ For i = 0 To 5
 						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
 						cardInfoArr(i, 1) = cardInfoArr(j, 1)
 						cardInfoArr(i, 2) = cardInfoArr(j, 2)
-						Delay 100
+						Delay 300
 						If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 500 Then 
 							delayTime = 800
 						Else 
@@ -208,8 +209,13 @@ For i = 0 To 5
 						'Identify the new card
 						Call identifyNewCard(j)
 						
-						Dim newPosition
+						Dim newPosition, multiPositionArr, firstPos, secondPos
+						Dim firstValue, secondValue
+						Dim firstEnter
+												
+						firstEnter = True
 						newPosition = j
+
 						'Check if there is a match
 						While cardInfoArr(newPosition, 0) <> "0"
 							newPosition = moveCardAfterIdentify(newPosition)
@@ -240,7 +246,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		intCardNumber = CInt(cardInfoArr(searchPos, 0))
 		intTopCardNumber = intCardNumber
 		strCardSuit = cardInfoArr(searchPos, 2)
-		strTopCardSuit = strCardSuit
+		strTopCardSuit = cardInfoArr(pos, 2)
 		TracePrint "Searching card:", intCardNumber
 	Else 
 		Dim newArr
@@ -254,6 +260,8 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	End If
 	TracePrint "newCardNumber-1", intNewCardNumber-1,":=", intTopCardNumber
 	TracePrint "newCardNumber+1", intNewCardNumber+1,":", intCardNumber
+	TracePrint "strNewCardSuit", strNewCardSuit
+	TracePrint "strTopCardSuit", strTopCardSuit
 	If intNewCardNumber - 1 = intTopCardNumber And strNewCardSuit <> strTopCardSuit Then 
 		If pipePos = 0 Then 
 			cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
@@ -282,7 +290,7 @@ End Function
 
 Function moveCardAfterIdentify(pos)
 	TracePrint "Position is:", pos
-	Dim newPos
+	Dim newPos, newPos1, newPos2
 	Dim intNewCardNumber, strNewCardSuit
 	intNewCardNumber = CInt(cardInfoArr(pos, 0))
 	strNewCardSuit = cardInfoArr(pos, 2)
@@ -316,20 +324,31 @@ Function moveCardAfterIdentify(pos)
 		Next 
 	Else 
 		For k = pos + 1 To 6
-			newPos = moveCardRule(pos, k, intNewCardNumber, strNewCardSuit)
+			newPos1 = moveCardRule(pos, k, intNewCardNumber, strNewCardSuit)
+			If newPos1 <> -1 Then 
+				Exit For
+			End If
 		Next
-		TracePrint "newPos:", newPos
+		TracePrint "newPos1:", newPos1
 
 		For j = pos - 1 To 0 Step -1
-			newPos = moveCardRule(pos, j, intNewCardNumber, strNewCardSuit)
-			If newPos <> -1 Then 
+			newPos2 = moveCardRule(pos, j, intNewCardNumber, strNewCardSuit)
+			If newPos2 <> -1 Then 
 				Exit For
 			End If
 		Next
 
-//		If newPos = -1 Then
-
-//		End If
+		If newPos1 <> -1 And newPos2 <> -1 Then 
+			newPos1 = moveCardAfterIdentify(newPos1)
+			newPos2 = moveCardAfterIdentify(newPos2)
+//			newPos = CStr(newPos1) & "|" & CStr(newPos2)
+		ElseIf newPos1 = -1 And newPos2 <> -1 Then
+			newPos = newPos2
+		ElseIf newPos2 = -1 And newPos1 <> -1 Then
+			newPos = newPos1
+		Else 
+			newPos = -1
+		End If
 	End If
 	moveCardAfterIdentify = newPos
 End Function
@@ -358,6 +377,7 @@ Sub identifyNewCard(j)
 					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
 					'Save suit color(Black/Red)
 					cardInfoArr(j, 2) = checkSuitBlackOrRed(suitPicArr(s))
+					TracePrint "Found suit color:", cardInfoArr(j,2)
 				End If
 			Next
 			Exit For
@@ -407,7 +427,7 @@ End Function
 Sub sortMaxToMin()
 	Dim a, b
 	Dim posx, posy
-	Dim temp, suitTemp
+	Dim temp, suitTemp, suitColorTemp
 	Dim tempCardPointSearchArea(4), tempCardSuitSearchArea(4)
 	
 	For i = 0 To 5
@@ -434,6 +454,11 @@ Sub sortMaxToMin()
 				suitTemp = cardInfoArr(i, 1)
 				cardInfoArr(i, 1) = cardInfoArr(j, 1)
 				cardInfoArr(j, 1) = suitTemp
+				
+				'Update suit color info
+				suitColorTemp = cardInfoArr(i, 2)
+				cardInfoArr(i, 2) = cardInfoArr(j, 2)
+				cardInfoArr(j, 2) = suitColorTemp
 				
 				'Update search area for card point
 				tempCardPointSearchArea(0) = cardSearchArea(i,0)
