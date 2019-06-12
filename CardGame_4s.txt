@@ -191,17 +191,18 @@ For i = 0 To 5
 //			 	If j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 //				If cardInfoArr(j,0) <> "?" Then
 					If number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Then
-						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
-						cardInfoArr(i, 1) = cardInfoArr(j, 1)
-						cardInfoArr(i, 2) = cardInfoArr(j, 2)
-						Delay 300
-						If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 500 Then 
+						Delay 500
+						TracePrint "Abs(cardPosArr(j, 0) - cardPosArr(i, 0)):", Abs(cardPosArr(j, 0) - cardPosArr(i, 0))
+						If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 300 Then 
 							delayTime = 800
 						Else 
-							delayTime = 400
+							delayTime = 500
 						End If
 						Swipe cardPosArr(j,0)+50, cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i, 1),delayTime
 						compareCounter = compareCounter + 1
+						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
+						cardInfoArr(i, 1) = cardInfoArr(j, 1)
+						cardInfoArr(i, 2) = cardInfoArr(j, 2)
 						
 						'Waiting for new card appears
 						Delay 500
@@ -211,9 +212,7 @@ For i = 0 To 5
 						
 						Dim newPosition, multiPositionArr, firstPos, secondPos
 						Dim firstValue, secondValue
-						Dim firstEnter
-												
-						firstEnter = True
+
 						newPosition = j
 
 						'Check if there is a match
@@ -271,7 +270,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		cardInfoArr(pos, 1) = cardInfoArr(searchPos, 1)
 		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(pos,0)
 		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(pos,1)
-		Swipe cardPosArr(searchPos, 0)+50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), 200
+		Swipe cardPosArr(searchPos, 0)+50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), 400
 		suitRule = searchPos
 	ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit Then
 		If pipePos = 0 Then 
@@ -282,7 +281,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		cardInfoArr(searchPos, 1) = cardInfoArr(pos, 1)
 		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(searchPos,0)
 		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(searchPos,1)
-		Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), 200
+		Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), 400
 		suitRule = pos
 	End If
 	moveCardRule = suitRule
@@ -316,12 +315,12 @@ Function moveCardAfterIdentify(pos)
 			Next
 		End If
 		
-		For p = startStep To endStep
-			newPos = moveCardRule(pos, p, intNewCardNumber, strNewCardSuit)
-			If newPos <> -1 Then 
-				Exit For
-			End If
-		Next 
+//		For p = startStep To endStep
+//			newPos = moveCardRule(pos, p, intNewCardNumber, strNewCardSuit)
+//			If newPos <> -1 Then 
+//				Exit For
+//			End If
+//		Next 
 	Else 
 		For k = pos + 1 To 6
 			newPos1 = moveCardRule(pos, k, intNewCardNumber, strNewCardSuit)
@@ -330,25 +329,29 @@ Function moveCardAfterIdentify(pos)
 			End If
 		Next
 		TracePrint "newPos1:", newPos1
-
+		While newPos1 <> -1
+			Call identifyNewCard(newPos1)
+			newPos1 = moveCardAfterIdentify(newPos1)
+		Wend
+		
 		For j = pos - 1 To 0 Step -1
 			newPos2 = moveCardRule(pos, j, intNewCardNumber, strNewCardSuit)
 			If newPos2 <> -1 Then 
 				Exit For
 			End If
 		Next
-
-		If newPos1 <> -1 And newPos2 <> -1 Then 
-			newPos1 = moveCardAfterIdentify(newPos1)
-			newPos2 = moveCardAfterIdentify(newPos2)
+		newPos = newPos2
+//		If newPos1 <> -1 And newPos2 <> -1 Then 
+//			newPos1 = moveCardAfterIdentify(newPos1)
+//			newPos2 = moveCardAfterIdentify(newPos2)
 //			newPos = CStr(newPos1) & "|" & CStr(newPos2)
-		ElseIf newPos1 = -1 And newPos2 <> -1 Then
-			newPos = newPos2
-		ElseIf newPos2 = -1 And newPos1 <> -1 Then
-			newPos = newPos1
-		Else 
-			newPos = -1
-		End If
+//		ElseIf newPos1 = -1 And newPos2 <> -1 Then
+//			newPos = newPos2
+//		ElseIf newPos2 = -1 And newPos1 <> -1 Then
+//			newPos = newPos1
+//		Else 
+//			newPos = -1
+//		End If
 	End If
 	moveCardAfterIdentify = newPos
 End Function
