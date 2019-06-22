@@ -210,16 +210,19 @@ For i = 0 To 5
 						ElseIf Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 300 Then 
 							delayTime = 2200
 						Else 
-							delayTime = 500
+							delayTime = 1000
 						End If
 //						delayTime = 500
 						Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
 						Delay 200
 						compareCounter = compareCounter + 1
 						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
+						
 						cardInfoArr(i, 1) = cardInfoArr(j, 1)
 						cardInfoArr(i, 2) = cardInfoArr(j, 2)
-						
+						TracePrint "AFTER SWIPING..."
+						TracePrint "cardInfoArr():", cardInfoArr(i,0),",", cardInfoArr(i,1),",",cardInfoArr(i,2)
+												
 						'Waiting for new card appears
 						Delay 800
 						
@@ -365,16 +368,16 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	
 	If elementSuit = "S" Then 
 	 	TracePrint "Moving the S card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 5, 153, 800
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 5, 153, 1200
 	ElseIf elementSuit = "H" Then
 		TracePrint "Moving the H card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 105, 153, 800
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 105, 153, 1200
 	ElseIf elementSuit = "C" Then
 		TracePrint "Moving the C card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 198, 153, 800
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 198, 153, 1200
 	ElseIf elementSuit = "D" Then
 		TracePrint "Moving the D card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 291, 153, 800
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 291, 153, 1200
 	End If
 	
 	If foundationInfoArr(index, 0) = "0" Then 
