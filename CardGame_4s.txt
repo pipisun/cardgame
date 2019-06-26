@@ -199,7 +199,7 @@ For i = 0 To 5
 		TracePrint "number1:", number1
 		If number1 = 0 Then 
 			number1Arr = Split(cardInfoArr(i, 0), "|")
-			number1 = number1Arr(0)
+			number1 = CInt(number1Arr(0))
 		End If
 		
 		For j = i + 1 To 6
@@ -207,7 +207,7 @@ For i = 0 To 5
 			TracePrint "number2:", number2
 			If number2 = 0 Then 
 				number2Arr = Split(cardInfoArr(j, 0), "|")
-				number2 = number2Arr(0)		
+				number2 = CInt(number2Arr(0))		
 			End If
 			
 			If number1 <> number2 Then 
@@ -270,15 +270,15 @@ Function getDelayTime(distance)
 	
 	Dim delayTime
 	If distance > 500 Then 
-		delayTime = 4000							
+		delayTime = 4500							
 	ElseIf distance > 430 Then 
-		delayTime = 3500							
+		delayTime = 4000							
 	ElseIf distance > 400 Then 
 		delayTime = 3000					
 	ElseIf distance > 270 Then 
-		delayTime = 2200
+		delayTime = 2500
 	Else 
-		delayTime = 800
+		delayTime = 1200
 	End If
 	
 	getDelayTime = delayTime
