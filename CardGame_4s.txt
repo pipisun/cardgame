@@ -123,8 +123,10 @@ rightUpperCornerXForSuit = 93
 rightUpperCornerYForSuit = 332
 
 Dim offsetX1, offsetX2
+//Dim offsetY1 
 offsetX1 = 91
 offsetX2 = 95
+//offsetY1 = 10
 
 Dim cardPoint
 Dim cardSearchArea(7,4), suitSearchArea(7,4)
@@ -173,8 +175,10 @@ For i = 0 To 6
 	Next
 	leftUpperCornerX = leftUpperCornerX + offsetX1
 	rightUpperCornerX = rightUpperCornerX + offsetX2
+//	leftUpperCornerY = leftUpperCornerY + offsetY1
 	leftUpperCornerXForSuit = leftUpperCornerXForSuit + offsetX1
 	rightUpperCornerXForSuit = rightUpperCornerXForSuit + offsetX2
+//	leftUpperCornerYForSuit = leftUpperCornerYForSuit + offsetY1
 Next
 
 Call sortMaxToMin()
@@ -220,7 +224,13 @@ For i = 0 To 5
 					delayTime = getDelayTime(Abs(cardPosArr(j, 0) - cardPosArr(i, 0)))
 					
 //						delayTime = 500
-					Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+					If cardPosArr(j, 0) > 515 Then 
+						TracePrint "Moving last card to..."
+						Swipe cardPosArr(j, 0), cardPosArr(j, 1) + 70, cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+					Else 
+						Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime	
+					End If
+					
 					Delay 200
 					compareCounter = compareCounter + 1
 					cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
@@ -244,7 +254,8 @@ For i = 0 To 5
 
 					'Check if there is a match
 					While cardInfoArr(newPosition, 0) <> "0"
-						newPosition = moveCardAfterIdentify(oldPosition,"")
+						newPosition = moveCardAfterIdentify(oldPosition, "")
+						TracePrint "oldPosition:", oldPosition, ",newPosition:", newPosition
 						If newPosition <> oldPosition Then 
 							oldPosition = newPosition
 							Call identifyNewCard(newPosition)
