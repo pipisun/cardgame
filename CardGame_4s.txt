@@ -233,8 +233,13 @@ For i = 0 To 5
 					
 					Delay 200
 					compareCounter = compareCounter + 1
-					cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
 					
+					If InStr(1, cardInfoArr(i, 0), "|") > 0 Then 
+						cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
+					Else 
+						cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
+					End If
+										
 					cardInfoArr(i, 1) = cardInfoArr(j, 1)
 					cardInfoArr(i, 2) = cardInfoArr(j, 2)
 					TracePrint "AFTER SWIPING..."
