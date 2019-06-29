@@ -91,6 +91,9 @@ Dim cardInfoArr(7,3), cardPosArr(7,2)
 Dim allCardPicArr, suitPicArr
 Dim intX, intY
 
+Dim noSuitableCardMatch
+noSuitableCardMatch = False
+
 'Define variables for empty spots
 Dim emptySpotCount, emptySpotPos
 emptySpotCount = 0
@@ -261,8 +264,9 @@ For i = 0 To 5
 					While cardInfoArr(newPosition, 0) <> "0"
 						newPosition = moveCardAfterIdentify(oldPosition, "")
 						TracePrint "oldPosition:", oldPosition, ",newPosition:", newPosition
-						If newPosition <> oldPosition Then 
+						If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
 							oldPosition = newPosition
+							noSuitableCardMatch = True
 							Call identifyNewCard(newPosition)
 						Else 
 							Exit While
@@ -344,8 +348,9 @@ Sub moveCardToFoundation()
 						'Check if there is a match
 						While cardInfoArr(newPosition, 0) <> "0"
 							newPosition = moveCardAfterIdentify(oldPosition,"")
-							If newPosition <> oldPosition Then 
+							If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
 								oldPosition = newPosition
+								noSuitableCardMatch = True
 								Call identifyNewCard(newPosition)
 							Else 
 								Exit While
@@ -488,6 +493,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 		Swipe cardPosArr(searchPos, 0)+50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
 		suitRule = searchPos
+		noSuitableCardMatch = False
 	ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit Then
 		If pipePos = 0 Then 
 			cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
@@ -502,8 +508,10 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 		Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 		suitRule = pos
+		noSuitableCardMatch = False
 	Else 
 		suitRule = pos
+		noSuitableCardMatch = True
 	End If
 	moveCardRule = suitRule
 End Function
