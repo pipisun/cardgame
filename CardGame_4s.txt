@@ -289,22 +289,23 @@ Function getDelayTime(distance)
 	TracePrint "distance:", distance
 	
 	Dim delayTime
-	If distance >= 500 Then 
-		delayTime = 5500							
-	ElseIf distance >= 430 Then 
-		delayTime = 5000							
-	ElseIf distance >= 400 Then 
-		delayTime = 4800
-	ElseIf distance >= 360 Then
-		TracePrint "delaying..."
-		delayTime = 5500
-	ElseIf distance >= 270 Then 
-		delayTime = 2700
-	ElseIf distance >= 180 Then
-		delayTime = 1500
-	Else 
-		delayTime = 1200
-	End If
+	delayTime = 500
+//	If distance >= 500 Then 
+//		delayTime = 5500							
+//	ElseIf distance >= 430 Then 
+//		delayTime = 5000							
+//	ElseIf distance >= 400 Then 
+//		delayTime = 4800
+//	ElseIf distance >= 360 Then
+//		TracePrint "delaying..."
+//		delayTime = 5500
+//	ElseIf distance >= 270 Then 
+//		delayTime = 500
+//	ElseIf distance >= 180 Then
+//		delayTime = 1500
+//	Else 
+//		delayTime = 1200
+//	End If
 	
 	getDelayTime = delayTime
 End Function
