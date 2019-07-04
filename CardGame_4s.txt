@@ -229,7 +229,7 @@ For i = 0 To 5
 //						delayTime = 500
 					If cardPosArr(j, 0) > 515 Then 
 						TracePrint "Moving last card to..."
-						Swipe cardPosArr(j, 0), cardPosArr(j, 1) + 70, cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+						Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 70, cardPosArr(i, 0), cardPosArr(i, 1) + 70, delayTime
 					Else 
 						Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime	
 					End If
