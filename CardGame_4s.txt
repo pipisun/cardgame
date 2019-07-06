@@ -228,10 +228,18 @@ For i = 0 To 5
 					
 //					TracePrint "...:", cardPosArr(j,0), cardPosArr(i,0)
 //						delayTime = 500
-					If cardPosArr(j,0) < cardPosArr(i,0) Then
-						Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 75, cardPosArr(i, 0) + 50, cardPosArr(i, 1) + 75, delayTime
+					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
+						If cardPosArr(i, 0) > 500 Then 
+							Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 75, cardPosArr(i, 0) + 20, cardPosArr(i, 1) + 75, 800
+						Else
+							Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 75, cardPosArr(i, 0) + 50, cardPosArr(i, 1) + 75, delayTime
+						End If
 					Else 
-						Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 70, cardPosArr(i, 0) + 50, cardPosArr(i, 1) + 50, delayTime	
+					 	If cardPosArr(i, 0) < 50 Then 
+							Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 75, cardPosArr(i, 0) + 50, cardPosArr(i, 1) + 75, 800
+						Else
+							Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 70, cardPosArr(i, 0) + 50, cardPosArr(i, 1) + 50, delayTime
+						End If
 					End If
 					
 					Delay 200
@@ -430,9 +438,9 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	
 	Dim delayTime
 	If Abs(cardPosArr(pos, 0) - 5) > 400 Then 
-		delayTime = 3000
+		delayTime = 800
 	Else 
-		delayTime = 2000
+		delayTime = 500
 	End If
 	
 	If elementSuit = "S" Then 
