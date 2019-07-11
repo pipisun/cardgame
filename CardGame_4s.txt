@@ -105,6 +105,23 @@ For i = 0 To 3
 	foundationInfoArr(i, 0) = "0"
 	foundationInfoArr(i, 1) = "0"
 Next
+Dim foundationPosArr(4,2)
+foundationPosArr(0,0) = 5
+foundationPosArr(0,1) = 95
+foundationPosArr(1,0) = 99
+foundationPosArr(1,1) = 95
+foundationPosArr(2,0) = 198
+foundationPosArr(2,1) = 95
+foundationPosArr(3,0) = 291
+foundationPosArr(3, 1) = 95
+
+Dim pilePosArr(3,2)
+pilePosArr(0, 0) = 463
+pilePosArr(0, 1) = 100
+pilePosArr(1, 0) = 429
+pilePosArr(1, 1) = 100
+pilePosArr(2, 0) = 393
+pilePosArr(2, 1) = 100
 
 allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 "r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
@@ -293,6 +310,47 @@ Call moveCardToFoundation()
 
 Call moveKCard()
 
+Sub moveCardFromWastePile()
+	Dim element, elementSuit
+	Dim isMoved
+	isMoved = False
+	
+	For pos = 0 To 2
+		isMoved = checkFoundationAndMove(pos, element, elementSuit)
+		If isMoved = False Then 
+			Exit For
+		End If
+	Next
+End Sub
+
+Function checkFoundationAndMove(pos, element, elementSuit)
+	Dim index, isMoved
+	index = getSuitPosition(elementSuit)
+	isMoved = False
+	
+	If foundationInfoArr(index, 0) <> "0" Then 
+		Dim splitArr, lastElementCombination, lastElement, lastElementSuit
+		splitArr = Split(foundationInfoArr(index, 0), "|")
+		lastElementCombination = splitArr(Len(splitArr) - 1)
+		lastElement = Left(lastElementCombination, Len(lastElementCombination)-1)
+		lastElementSuit = Right(lastElementCombination, 1)
+		If CInt(lastElement) + 1 = CInt(element) Then 
+			Tap pilePosArr(pos, 0), pilePosArr(pos, 1)
+			foundationInfoArr(index,0) = foundationInfoArr(index,0) & "|" & element & elementSuit
+			isMoved = True
+		End If
+	Else 
+		If element = "1" Then 
+			Dim delayTime
+			delayTime = getDelayTime(Abs(pilePosArr(pos, 0) - foundationPosArr(index, 0)))
+			Swipe pilePosArr(pos, 0), pilePosArr(pos, 1), foundationPosArr(index, 0), foundationPosArr(index, 1), delayTime
+			foundationInfoArr(index, 0) = element & elementSuit
+			isMoved = True
+		End If
+	End If
+	checkFoundationAndMove = isMoved
+End Function
+
 Function getDelayTime(distance)
 	TracePrint "distance:", distance
 	
@@ -445,16 +503,16 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	
 	If elementSuit = "S" Then 
 	 	TracePrint "Moving the S card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 5, 95, delayTime
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(0,0), foundationPosArr(0,1), delayTime
 	ElseIf elementSuit = "H" Then
 		TracePrint "Moving the H card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 99, 95, delayTime
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(1,0), foundationPosArr(1,1), delayTime
 	ElseIf elementSuit = "C" Then
 		TracePrint "Moving the C card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 198, 95, delayTime
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(2,0), foundationPosArr(2,1), delayTime
 	ElseIf elementSuit = "D" Then
 		TracePrint "Moving the D card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, 291, 95, delayTime
+		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
 	End If
 	
 	If foundationInfoArr(index, 0) = "0" Then 
