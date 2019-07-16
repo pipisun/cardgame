@@ -238,6 +238,8 @@ For i = 0 To 5
 			number1SmallSuitColor = getSuitColor(Right(number1BottomElement,1))
 			TracePrint "new number1(suit) on top:", number1, number1SuitColor
 			TracePrint "new number1(suit) on bottom:", number1Small,number1SmallSuitColor
+		Else 
+			number1SuitColor = cardInfoArr(i,2)
 		End If
 		
 		For j = i + 1 To 6
@@ -253,6 +255,8 @@ For i = 0 To 5
 				number2SmallSuitColor = getSuitColor(Right(number2BottomElement,1))
 				TracePrint "new number2(suit) on top:", number2, number2SuitColor
 				TracePrint "new number2(suit) on bottom:", number2Small,number2SmallSuitColor
+			Else 
+				number2SuitColor = cardInfoArr(j, 2)
 			End If
 			
 			If number1 <> number2 Then 
@@ -740,7 +744,7 @@ Function moveCardAfterIdentify(pos, flag)
 //		TracePrint "Flag:Top - NewCardNumber:", intNewCardNumber, ",NewCardSuit:",strNewCardSuit
 	Else
 		intNewCardNumber = CInt(cardInfoArr(pos, 0))
-		strNewCardSuit = cardInfoArr(pos, 2)
+		strNewCardSuit = cardInfoArr(pos, 2)	
 		TracePrint "NewCardNumber:", intNewCardNumber, ",NewCardSuit:",strNewCardSuit
 	End If
 	If pos = 0 Or pos = 6 Then 
@@ -837,12 +841,18 @@ Sub identifyNewCard(j)
 				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.5, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: ", suitPicArr(s)
-					
 					'Save suit info
 					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
 					'Save suit color(Black/Red)
 					cardInfoArr(j, 2) = checkSuitBlackOrRed(suitPicArr(s))
 					TracePrint "Found suit color:", cardInfoArr(j,2)
+					
+					'Move it to foundation if the card is A
+					If cardInfoArr(j, 0) = "1" Then 
+						Call moveToSpecificFoundationAreaAndUpdate(j, getSuitPosition(cardInfoArr(j, 1)), cardInfoArr(j, 0), cardInfoArr(j, 1), 1, "")
+						Delay 200
+						Call identifyNewCard(j)
+					End If
 				End If
 			Next
 			noCard = False
