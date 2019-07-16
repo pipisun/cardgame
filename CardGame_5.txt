@@ -107,13 +107,13 @@ For i = 0 To 3
 Next
 Dim foundationPosArr(4,2)
 foundationPosArr(0,0) = 5
-foundationPosArr(0,1) = 95
-foundationPosArr(1,0) = 99
-foundationPosArr(1,1) = 95
-foundationPosArr(2,0) = 198
-foundationPosArr(2,1) = 95
-foundationPosArr(3,0) = 291
-foundationPosArr(3, 1) = 95
+foundationPosArr(0,1) = 158
+foundationPosArr(1,0) = 137
+foundationPosArr(1,1) = 158
+foundationPosArr(2,0) = 228
+foundationPosArr(2,1) = 158
+foundationPosArr(3,0) = 322
+foundationPosArr(3, 1) = 158
 
 Dim pilePosArr(3,2)
 pilePosArr(0, 0) = 463
@@ -131,22 +131,22 @@ suitPicArr = Array("spade.png", "heart.png", "club.png", "diamond.png")
 Dim leftUpperCornerX, leftUpperCornerY
 Dim rightUpperCornerX, rightUpperCornerY
 leftUpperCornerX = 2
-leftUpperCornerY = 215
+leftUpperCornerY = 250
 rightUpperCornerX = 45
-rightUpperCornerY = 332
+rightUpperCornerY = 310
 
 Dim leftUpperCornerXForSuit, leftUpperCornerYForSuit
 Dim rightUpperCornerXForSuit, rightUpperCornerYForSuit
 leftUpperCornerXForSuit = 45
-leftUpperCornerYForSuit = 215
+leftUpperCornerYForSuit = 250
 rightUpperCornerXForSuit = 93
-rightUpperCornerYForSuit = 332
+rightUpperCornerYForSuit = 310
 
 Dim offsetX1, offsetX2
-//Dim offsetY1 
-offsetX1 = 91
-offsetX2 = 95
-//offsetY1 = 10
+Dim offsetY1 
+offsetX1 = 90
+offsetX2 = 93
+offsetY1 = 10
 
 Dim cardPoint
 Dim cardSearchArea(7,4), suitSearchArea(7,4)
@@ -173,7 +173,7 @@ For i = 0 To 6
 			
 			For m = 0 To UBound(suitPicArr)
 				'Search suit
-				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.5, intX, intY
+				FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.4, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: ", suitPicArr(m)
 					'Save suit info
@@ -195,10 +195,12 @@ For i = 0 To 6
 	Next
 	leftUpperCornerX = leftUpperCornerX + offsetX1
 	rightUpperCornerX = rightUpperCornerX + offsetX2
-//	leftUpperCornerY = leftUpperCornerY + offsetY1
+	leftUpperCornerY = leftUpperCornerY + offsetY1
+	rightUpperCornerY = rightUpperCornerY + offsetY1
 	leftUpperCornerXForSuit = leftUpperCornerXForSuit + offsetX1
 	rightUpperCornerXForSuit = rightUpperCornerXForSuit + offsetX2
-//	leftUpperCornerYForSuit = leftUpperCornerYForSuit + offsetY1
+	leftUpperCornerYForSuit = leftUpperCornerYForSuit + offsetY1
+	rightUpperCornerYForSuit = rightUpperCornerYForSuit + offsetY1
 Next
 
 Call sortMaxToMin()
@@ -211,11 +213,16 @@ Next
 
 'Comparison
 Dim number1, number2
+Dim number1SuitColor, number2SuitColor
 Dim compareCounter
 Dim cardPileLastCardSuitColor
 compareCounter = 1
 Dim delayTime
 Dim number1Arr, number2Arr
+Dim number1TopElement, number2TopElement
+Dim number1BottomElement, number2BottomElement
+Dim number1Small, number2Small
+Dim number1SmallSuitColor, number2SmallSuitColor
 
 For i = 0 To 5
 //	If cardInfoArr(i,0) <> "?" Then
@@ -223,7 +230,16 @@ For i = 0 To 5
 		TracePrint "number1:", number1
 		If number1 = 0 Then 
 			number1Arr = Split(cardInfoArr(i, 0), "|")
-			number1 = CInt(number1Arr(0))
+			number1TopElement = number1Arr(0)
+			number1BottomElement = number1Arr(Len(number1Arr)-1)
+			number1 = CInt(Left(number1TopElement, Len(number1TopElement) - 1))
+			number1SuitColor = getSuitColor(Right(number1TopElement,1))
+			number1Small = CInt(Left(number1BottomElement, Len(number1BottomElement) - 1))
+			number1SmallSuitColor = getSuitColor(Right(number1BottomElement,1))
+			TracePrint "new number1(suit) on top:", number1, number1SuitColor
+			TracePrint "new number1(suit) on bottom:", number1Small,number1SmallSuitColor
+		Else 
+			number1SuitColor = cardInfoArr(i,2)
 		End If
 		
 		For j = i + 1 To 6
@@ -231,13 +247,27 @@ For i = 0 To 5
 			TracePrint "number2:", number2
 			If number2 = 0 Then 
 				number2Arr = Split(cardInfoArr(j, 0), "|")
-				number2 = CInt(number2Arr(0))		
+				number2TopElement = number2Arr(0)
+				number2BottomElement = number2Arr(Len(number2Arr)-1)
+				number2 = CInt(Left(number2TopElement, Len(number2TopElement) - 1))
+				number2SuitColor = getSuitColor(Right(number2TopElement,1))
+				number2Small = CInt(Left(number2BottomElement, Len(number2BottomElement) - 1))
+				number2SmallSuitColor = getSuitColor(Right(number2BottomElement,1))
+				TracePrint "new number2(suit) on top:", number2, number2SuitColor
+				TracePrint "new number2(suit) on bottom:", number2Small,number2SmallSuitColor
+			Else 
+				number2SuitColor = cardInfoArr(j, 2)
 			End If
 			
 			If number1 <> number2 Then 
 //			 	If j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 //				If cardInfoArr(j,0) <> "?" Then
-				If number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Then
+				If number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Or _
+					number1 + 1 = number2Small And number1SuitColor <> number2SmallSuitColor Or _
+					number1 - 1 = number2 And number1SuitColor <> number2SuitColor Or _
+					number2 + 1 = number1Small And number2SuitColor <> number1SmallSuitColor Or _
+					number2 -1 = number1 And number2SuitColor <> number1SuitColor Then
+
 					Delay 500
 					TracePrint "Abs(cardPosArr(j, 0) - cardPosArr(i, 0)):", Abs(cardPosArr(j, 0) - cardPosArr(i, 0))
 					
@@ -274,7 +304,7 @@ For i = 0 To 5
 					TracePrint "cardInfoArr():", cardInfoArr(i,0),",", cardInfoArr(i,1),",",cardInfoArr(i,2)
 					
 					'Waiting for new card appears
-					Delay 800
+					Delay 500
 					
 					'Identify the new card
 					Call identifyNewCard(j)
@@ -355,7 +385,14 @@ Function getDelayTime(distance)
 	TracePrint "distance:", distance
 	
 	Dim delayTime
-	delayTime = 500
+	If distance > 400 Then 
+		delayTime = 1000
+	ElseIf distance > 320 Then
+		delayTime = 800
+	Else 
+		delayTime = 500
+	End If
+
 //	If distance >= 500 Then 
 //		delayTime = 5500							
 //	ElseIf distance >= 430 Then 
@@ -389,15 +426,19 @@ Sub moveCardToFoundation()
 	Dim elementArr, isMoved, counter, newPosition
 	isMoved = False
 	
-	For m = 0 To 6
+	Delay 500
+	
+	For m = 6 To 0 Step -1
+		TracePrint "m=", m
 		TracePrint "cardInfoArr(m,0):", cardInfoArr(m,0)
 		elementArr = Split(cardInfoArr(m, 0), "|")
-		TracePrint "elementArr(0):", elementArr(0)
-		If elementArr <> Null Then
+//		TracePrint "elementArr(0):", elementArr(0)
+		If Len(elementArr) > 0 Then 
+			TracePrint "Start moving card to foundation..."
 			counter = 0
-			For n = UBOUND(elementArr) To 0
+			For n = UBOUND(elementArr) To 0 Step -1
 				If Len(elementArr) = 1 Then 
-					TracePrint "m=?", m, " elementArr(n)=?", elementArr(n), " cardInfo(m,1)=?", cardInfoArr(m,1) 
+//					TracePrint "m=?", m, " elementArr(n)=?", elementArr(n), " cardInfo(m,1)=?", cardInfoArr(m,1) 
 					isMoved = checkIfMoveCardToFoundation(m, elementArr(n), cardInfoArr(m, 1), 1)
 				Else 
 					Dim ele, eleSuit
@@ -407,8 +448,11 @@ Sub moveCardToFoundation()
 					counter = counter + 1
 				End If
 				
+				TracePrint "isMoved:", isMoved
+				
 				If isMoved = True Then 
 					If Len(elementArr) = 1 Or counter = Len(elementArr) Then 
+		 	
 						'Identify the new card
 						Call identifyNewCard(m)
 						
@@ -430,7 +474,8 @@ Sub moveCardToFoundation()
 						Wend
 					End If
 					isMoved = False
-					m = m - 1
+					TracePrint "After identifyNew, m=",m
+					'm = m - 1
 				End If
 			Next
 		End If
@@ -463,7 +508,7 @@ Function checkIfMoveCardToFoundation(pos, element, elementSuit, arrLength)
 	If foundationInfoArr(index, 0) = "0" Then
 		If Len(element) = 1 And element = "1" Or Len(element) = 2 And Left(element, 1) = "1" And _
 			Right(element,1) <> "0" And Right(element,1) <> "1" And Right(element,1) <> "2"  And Right(element,1) <> "3" Then
-			Call moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrLength)
+			Call moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrLength, "")
 			checkIfMoveCardToFoundation = True
 			Exit Function
 		End If
@@ -474,8 +519,8 @@ Function checkIfMoveCardToFoundation(pos, element, elementSuit, arrLength)
 		lastElement = eleArr(Len(eleArr)-1)
 		eleInFoundation = Left(lastElement, Len(lastElement) - 1)
 		eleSuitInFoundation = Right(lastElement, 1)
-		If eleInFoundation + 1 = element And eleSuitInFoundation = elementSuit Then 
-			Call moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrLength)
+		If CInt(eleInFoundation) + 1 = CInt(element) And eleSuitInFoundation = elementSuit Then 
+			Call moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrLength, "HasA")
 			checkIfMoveCardToFoundation = True
 			Exit Function
 		End If
@@ -483,7 +528,7 @@ Function checkIfMoveCardToFoundation(pos, element, elementSuit, arrLength)
 	checkIfMoveCardToFoundation = False
 End Function
 
-Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrLength)
+Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrLength, isAFlag)
 	TracePrint "pos,index,element,elementSuit,arrLength:",pos, " ", index, " ", element, " ", elementSuit, " ", arrLength
 	TracePrint "cardPosArr(pos,0),(pos,1):", cardPosArr(pos, 0), cardPosArr(pos, 1)
 	
@@ -501,22 +546,26 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 		delayTime = 500
 	End If
 	
-	If elementSuit = "S" Then 
-	 	TracePrint "Moving the S card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(0,0), foundationPosArr(0,1), delayTime
-	ElseIf elementSuit = "H" Then
-		TracePrint "Moving the H card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(1,0), foundationPosArr(1,1), delayTime
-	ElseIf elementSuit = "C" Then
-		TracePrint "Moving the C card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(2,0), foundationPosArr(2,1), delayTime
-	ElseIf elementSuit = "D" Then
-		TracePrint "Moving the D card..."
-		Swipe cardPosArr(pos, 0), cardPosArr(pos, 1) + 50 * offset, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
+	If isAFlag <> "" Then 
+		Tap cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 50 * offset + 5	
+	Else
+		If elementSuit = "S" Then 
+	 		TracePrint "Moving the S card..."
+			Swipe cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
+		ElseIf elementSuit = "H" Then
+			TracePrint "Moving the H card..."
+			Swipe cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1,0), foundationPosArr(1,1), delayTime
+		ElseIf elementSuit = "C" Then
+			TracePrint "Moving the C card..."
+			Swipe cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2,0), foundationPosArr(2,1), delayTime
+		ElseIf elementSuit = "D" Then
+			TracePrint "Moving the D card..."
+			Swipe cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
+		End If
 	End If
 	
 	If foundationInfoArr(index, 0) = "0" Then 
-		foundationInfoArr(index, 0) = foundationInfoArr(index, 0) & elementSuit
+		foundationInfoArr(index, 0) = element & elementSuit
 	Else 
 		foundationInfoArr(index, 0) = foundationInfoArr(index, 0) & "|" & element & elementSuit
 	End If
@@ -551,7 +600,14 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	TracePrint "newCardNumber+1", intNewCardNumber+1,":", intCardNumber
 	TracePrint "strNewCardSuit", strNewCardSuit
 	TracePrint "strTopCardSuit", strTopCardSuit
-	If intNewCardNumber - 1 = intTopCardNumber And strNewCardSuit <> strTopCardSuit Then 
+	
+	Dim containsNumber1, containsNumber2
+	containsNumber1 = InStr(1, cardInfoArr(pos, 0), CStr(intTopCardNumber))
+//	containsNumber2 = InStr(1, cardInfoArr(searchPos, 0), CStr(intCardNumber))
+	TracePrint "containsNumber1, containsNumber2:", containsNumber1, containsNumber2
+	
+	If intNewCardNumber - 1 = intTopCardNumber And strNewCardSuit <> strTopCardSuit And containsNumber1 = 0 Then 
+	
 		If pipePos = 0 Then 
 			cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
 		Else 
@@ -563,14 +619,31 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
 		
 		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
-		Swipe cardPosArr(searchPos, 0)+50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
+		If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
+			Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
+		ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
+			Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
+		Else 
+			Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
+		End If
+		
+		Call checkCardAfterMoveCardRule(searchPos, pos)
+		
 		suitRule = searchPos
 		noSuitableCardMatch = False
 	ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit Then
 		If pipePos = 0 Then 
-			cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+		 	If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
+				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+			Else 
+				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
+			End If
 		Else 
-			cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
+			If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
+				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+			Else 
+				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
+			End If
 		End If
 		cardInfoArr(searchPos, 1) = cardInfoArr(pos, 1)
 		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(searchPos,0)
@@ -579,6 +652,11 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		
 		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 		Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+		
+		Delay 300
+		
+		Call checkCardAfterMoveCardRule(searchPos, pos)
+		
 		suitRule = pos
 		noSuitableCardMatch = False
 	Else 
@@ -587,6 +665,69 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	End If
 	moveCardRule = suitRule
 End Function
+
+Sub checkCardAfterMoveCardRule(searchPos, position)
+	Dim flag
+	Dim delayTime
+	
+	flag = "-1"
+	While True
+		TracePrint "cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
+		If flag = "-1" Then
+			Call identifyNewCard(searchPos)
+		Else 
+			Call identifyNewCard(position)
+		End If
+		
+		Dim arrPosition, topElementOnPos
+		arrPosition = Split(cardInfoArr(position, 0), "|")
+		topElementOnPos = Left(arrPosition(0), Len(arrPosition(0))-1)
+		If CInt(topElementOnPos) > CInt(cardInfoArr(searchPos, 0)) Then 
+			flag = "-1"
+		Else 
+			flag = "+1"
+		End If
+		
+		If flag = "-1" Then 
+			'Compare last element with new card
+			Dim arrCard, lastElement, lastElementValue, lastElementSuitColor
+			arrCard = Split(cardInfoArr(position, 0), "|")
+			lastElement = arrCard(Len(arrCard) - 1)
+			lastElementValue = Left(lastElement, Len(lastElement)-1)
+			lastElementSuitColor = getSuitColor(Right(lastElement, 1))
+			
+			If CInt(lastElementValue) - 1 = CInt(cardInfoArr(searchPos, 0)) And lastElementSuitColor <> cardInfoArr(searchPos, 2) Then 
+				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
+				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
+				cardInfoArr(position,0) = cardInfoArr(position,0) & "|" & cardInfoArr(searchPos,0) & cardInfoArr(searchPos,1)
+			Else 
+				Exit While
+			End If
+		ElseIf flag = "+1" Then
+			'Compare top element with new card
+			Dim arrCard2, topElement, topElementValue, topElementSuitColor
+			arrCard2 = Split(cardInfoArr(position, 0), "|")
+			topElement = arrCard2(0)
+			topElementValue = Left(topElement, Len(topElement)-1)
+			topElementSuitColor = getSuitColor(Right(topElement, 1))
+			
+			If CInt(topElementValue) + 1 = CInt(cardInfoArr(searchPos, 0)) And topElementSuitColor <> cardInfoArr(searchPos, 2) Then 
+				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
+				Swipe cardPosArr(position, 0) + 50, cardPosArr(position, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
+				
+//				'Swap position and searchPos
+//				Dim tmp
+//				tmp = position
+//				position = searchPos
+//				searchPos = tmp
+			Else 
+				Exit While
+			End If
+		End If
+	Wend
+	
+End Sub
 
 Function moveCardAfterIdentify(pos, flag)
 	TracePrint "Position is:", pos
@@ -603,7 +744,7 @@ Function moveCardAfterIdentify(pos, flag)
 //		TracePrint "Flag:Top - NewCardNumber:", intNewCardNumber, ",NewCardSuit:",strNewCardSuit
 	Else
 		intNewCardNumber = CInt(cardInfoArr(pos, 0))
-		strNewCardSuit = cardInfoArr(pos, 2)
+		strNewCardSuit = cardInfoArr(pos, 2)	
 		TracePrint "NewCardNumber:", intNewCardNumber, ",NewCardSuit:",strNewCardSuit
 	End If
 	If pos = 0 Or pos = 6 Then 
@@ -638,10 +779,10 @@ Function moveCardAfterIdentify(pos, flag)
 		For k = pos + 1 To 6
 			newPos1 = moveCardRule(pos, k, intNewCardNumber, strNewCardSuit)
 			TracePrint "newPos1:", newPos1
-			While newPos1 <> pos
-				Call identifyNewCard(newPos1)
-				newPos1 = moveCardAfterIdentify(newPos1, "")
-			Wend
+//			While newPos1 <> pos
+//				Call identifyNewCard(newPos1)
+//				newPos1 = moveCardAfterIdentify(newPos1, "")
+//			Wend
 //			If newPos1 = pos Then 
 //				Exit For
 //			End If
@@ -682,6 +823,8 @@ Sub identifyNewCard(j)
 	
 	noCard = False
 	
+	Delay 500
+	
 	TracePrint "Finding card in (", cardSearchArea(j,0), cardSearchArea(j,1), cardSearchArea(j,2), cardSearchArea(j,3), ") area"
 	For m = 0 To UBound(allCardPicArr)
 		'Search again after the card is moved
@@ -698,18 +841,28 @@ Sub identifyNewCard(j)
 				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.5, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Found suit: ", suitPicArr(s)
-					
 					'Save suit info
 					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
 					'Save suit color(Black/Red)
 					cardInfoArr(j, 2) = checkSuitBlackOrRed(suitPicArr(s))
 					TracePrint "Found suit color:", cardInfoArr(j,2)
+					
+					'Move it to foundation if the card is A
+					If cardInfoArr(j, 0) = "1" Then 
+						Call moveToSpecificFoundationAreaAndUpdate(j, getSuitPosition(cardInfoArr(j, 1)), cardInfoArr(j, 0), cardInfoArr(j, 1), 1, "")
+						Delay 200
+						Call identifyNewCard(j)
+					End If
 				End If
 			Next
 			noCard = False
 			Exit For
 		Else 
-			noCard = True
+		 	FindPic cardSearchArea(j, 0), cardSearchArea(j, 1), cardSearchArea(j, 2), cardSearchArea(j, 3), "Attachment:" & "emptySlot.png", "000000", 0, 0.5, intX, intY
+		 	If intX > 0 And intY > 0 Then
+				noCard = True
+				Exit For
+			End If
 		End If 
 	Next
 	
