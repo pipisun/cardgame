@@ -569,6 +569,44 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	Else 
 		foundationInfoArr(index, 0) = foundationInfoArr(index, 0) & "|" & element & elementSuit
 	End If
+	
+	'Update cardInfoArr
+	Dim newStr
+	If InStr(1, cardInfoArr(pos, 0), "|") > 0 Then 
+	 	newStr = Right(cardInfoArr(pos,0), Instr(1, cardInfoArr(pos, 0), "|"))
+	 	TracePrint "newstr:", newStr
+		cardInfoArr(pos, 0) = newStr
+		cardInfoArr(pos, 1) = Right(newStr, 1)
+		cardInfoArr(pos, 2) = getSuitColor(Right(newStr, 1))
+	End If
+	
+	'Update search area range
+	updateSearchAreaRange(pos, 15, "up")
+	
+End Sub
+
+Sub updateSearchAreaRange(pos, offset, direction)
+	If direction = "up"
+		'Move search area up a bit
+		cardSearchArea(pos,0) = cardSearchArea(pos,0) - offset
+		cardSearchArea(pos,1) = cardSearchArea(pos,1) - offset
+		cardSearchArea(pos,2) = cardSearchArea(pos,2) - offset
+		cardSearchArea(pos,3) = cardSearchArea(pos,3) - offset
+		suitSearchArea(pos,0) = suitSearchArea(pos,0) - offset
+		suitSearchArea(pos,1) = suitSearchArea(pos,1) - offset
+		suitSearchArea(pos,2) = suitSearchArea(pos,2) - offset
+		suitSearchArea(pos, 3) = suitSearchArea(pos, 3) - offset
+	ElseIf direction = "down" Then
+		'Move search area up a bit
+		cardSearchArea(pos,0) = cardSearchArea(pos,0) + offset
+		cardSearchArea(pos,1) = cardSearchArea(pos,1) + offset
+		cardSearchArea(pos,2) = cardSearchArea(pos,2) + offset
+		cardSearchArea(pos,3) = cardSearchArea(pos,3) + offset
+		suitSearchArea(pos,0) = suitSearchArea(pos,0) + offset
+		suitSearchArea(pos,1) = suitSearchArea(pos,1) + offset
+		suitSearchArea(pos,2) = suitSearchArea(pos,2) + offset
+		suitSearchArea(pos, 3) = suitSearchArea(pos, 3) + offset	
+	End If
 End Sub
 
 Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
@@ -603,7 +641,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	
 	Dim containsNumber1, containsNumber2
 	containsNumber1 = InStr(1, cardInfoArr(pos, 0), CStr(intTopCardNumber))
-//	containsNumber2 = InStr(1, cardInfoArr(searchPos, 0), CStr(intCardNumber))
+	containsNumber2 = InStr(1, cardInfoArr(searchPos, 0), CStr(intCardNumber))
 	TracePrint "containsNumber1, containsNumber2:", containsNumber1, containsNumber2
 	
 	If intNewCardNumber - 1 = intTopCardNumber And strNewCardSuit <> strTopCardSuit And containsNumber1 = 0 Then 
@@ -631,7 +669,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		
 		suitRule = searchPos
 		noSuitableCardMatch = False
-	ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit Then
+	ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit And containsNumber2 = 0 Then
 		If pipePos = 0 Then 
 		 	If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
 				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
@@ -837,6 +875,7 @@ Sub identifyNewCard(j)
 			
 			cardInfoArr(j,0) = cardPoint
 			'Search suit
+			TracePrint "Finding suit in (", suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), ") area"
 			For s = 0 To UBound(suitPicArr)
 				FindPic suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.5, intX, intY
 				If intX > 0 And intY > 0 Then 
