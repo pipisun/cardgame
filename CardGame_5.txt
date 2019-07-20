@@ -94,6 +94,11 @@ Dim intX, intY
 Dim noSuitableCardMatch
 noSuitableCardMatch = False
 
+Dim isSearchPosCardChanged, isPosCardChanged
+isSearchPosCardChanged = False
+isPosCardChanged = False
+Dim intNewCardNumber, strNewCardSuit
+
 'Define variables for empty spots
 Dim emptySpotCount, emptySpotPos
 emptySpotCount = 0
@@ -300,7 +305,9 @@ For i = 0 To 5
 				End If
 				
 				'Update search area
-				Call updateSearchAreaRange(j, 15, "up")
+				If j <> 0 Then
+					Call updateSearchAreaRange(j, 15, "up")
+				End If
 				
 				Delay 200
 				compareCounter = compareCounter + 1
@@ -352,6 +359,14 @@ Next
 Call moveCardToFoundation()
 
 Call moveKCard()
+
+Call printOut()
+
+Sub printOut()
+	For i = 0 To 6
+		TracePrint "cardInfoArr", i, ":", cardInfoArr(i,0)
+	Next
+End Sub
 
 Sub moveCardFromWastePile()
 	Dim element, elementSuit
@@ -610,23 +625,15 @@ End Sub
 Sub updateSearchAreaRange(pos, offset, direction)
 	If direction = "up"
 		'Move search area up a bit
-		cardSearchArea(pos,0) = cardSearchArea(pos,0) - offset
 		cardSearchArea(pos,1) = cardSearchArea(pos,1) - offset
-		cardSearchArea(pos,2) = cardSearchArea(pos,2) - offset
 		cardSearchArea(pos,3) = cardSearchArea(pos,3) - offset
-		suitSearchArea(pos,0) = suitSearchArea(pos,0) - offset
 		suitSearchArea(pos,1) = suitSearchArea(pos,1) - offset
-		suitSearchArea(pos,2) = suitSearchArea(pos,2) - offset
 		suitSearchArea(pos, 3) = suitSearchArea(pos, 3) - offset
 	ElseIf direction = "down" Then
 		'Move search area up a bit
-		cardSearchArea(pos,0) = cardSearchArea(pos,0) + offset
 		cardSearchArea(pos,1) = cardSearchArea(pos,1) + offset
-		cardSearchArea(pos,2) = cardSearchArea(pos,2) + offset
 		cardSearchArea(pos,3) = cardSearchArea(pos,3) + offset
-		suitSearchArea(pos,0) = suitSearchArea(pos,0) + offset
 		suitSearchArea(pos,1) = suitSearchArea(pos,1) + offset
-		suitSearchArea(pos,2) = suitSearchArea(pos,2) + offset
 		suitSearchArea(pos, 3) = suitSearchArea(pos, 3) + offset	
 	End If
 End Sub
@@ -679,6 +686,8 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(pos,0)
 		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(pos,1)
 		TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
+		
+		Delay 100
 		
 		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 		If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
@@ -742,8 +751,16 @@ Sub checkCardAfterMoveCardRule(searchPos, position)
 		TracePrint "cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
 		If flag = "-1" Then
 			Call identifyNewCard(searchPos)
+			If cardInfoArr(searchPos, 0) <> "0" Then 
+			 	isSearchPosCardChanged = True
+				TracePrint "After that, cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
+			End If
 		Else 
 			Call identifyNewCard(position)
+			If cardInfoArr(position, 0) <> "0" Then 
+			 	isPosCardChanged = True
+				TracePrint "After that, cardInfoArr(position,0):", cardInfoArr(position,0)
+			End If
 		End If
 		
 		Dim arrPosition, topElementOnPos
@@ -767,6 +784,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position)
 				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
 				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
 				cardInfoArr(position, 0) = cardInfoArr(position, 0) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
+				isSearchPosCardChanged = False
 				'Update search area
 				Call updateSearchAreaRange(searchPos, 15, "up")
 			Else 
@@ -784,6 +802,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position)
 				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
 				Swipe cardPosArr(position, 0) + 50, cardPosArr(position, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
+				isPosCardChanged = False
 				'Update search area
 				Call updateSearchAreaRange(position, 15, "up")
 //				'Swap position and searchPos
@@ -803,8 +822,7 @@ Function moveCardAfterIdentify(pos, flag)
 	TracePrint "Position is:", pos
 	Dim newPos, newPos1, newPos2
 	Dim cardsStr, cardsTopStr, cardsTopSuitColor
-	Dim intNewCardNumber, strNewCardSuit
-	
+
 	If flag = "top" Then 
 //		cardsStr = Split(cardInfoArr(pos, 0), "|")
 //		cardsTopStr = Left(cardsStr(0), Len(cardsStr(0)) - 1)
@@ -849,6 +867,8 @@ Function moveCardAfterIdentify(pos, flag)
 		For k = pos + 1 To 6
 			newPos1 = moveCardRule(pos, k, intNewCardNumber, strNewCardSuit)
 			TracePrint "newPos1:", newPos1
+			
+			Call checkCardIfChanged(pos, k)
 //			While newPos1 <> pos
 //				Call identifyNewCard(newPos1)
 //				newPos1 = moveCardAfterIdentify(newPos1, "")
@@ -866,6 +886,8 @@ Function moveCardAfterIdentify(pos, flag)
 		
 		For j = pos - 1 To 0 Step -1
 			newPos2 = moveCardRule(pos, j, intNewCardNumber, strNewCardSuit)
+			
+			Call checkCardIfChanged(pos, j)
 //			If newPos2 <> pos Then 
 //				Exit For
 //			End If
@@ -885,6 +907,18 @@ Function moveCardAfterIdentify(pos, flag)
 	End If
 	moveCardAfterIdentify = newPos
 End Function
+
+Sub checkCardIfChanged(pos, searchPos)
+	If isSearchPosCardChanged = True Then 
+		intNewCardNumber = CInt(cardInfoArr(searchPos, 0))
+		strNewCardSuit = cardInfoArr(searchPos, 2)
+		isSearchPosCardChanged = False
+	ElseIf isPosCardChanged = True Then 
+		intNewCardNumber = CInt(cardInfoArr(pos, 0))
+		strNewCardSuit = cardInfoArr(pos, 2)
+		isPosCardChanged = False
+	End If	
+End Sub
 
 Sub identifyNewCard(j)
 	Dim intX, intY
