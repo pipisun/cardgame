@@ -356,6 +356,9 @@ For i = 0 To 5
 //	End If
 Next
 
+'Sort again
+Call sortMaxToMin()
+
 Call moveCardToFoundation()
 
 Call moveKCard()
@@ -608,9 +611,10 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	End If
 	
 	'Update cardInfoArr
-	Dim newStr
+	Dim newStr, oldStrArr
 	If InStr(1, cardInfoArr(pos, 0), "|") > 0 Then 
-	 	newStr = Right(cardInfoArr(pos,0), Instr(1, cardInfoArr(pos, 0), "|"))
+		oldStrArr = Split(cardInfoArr(pos,0), "|")
+	 	newStr = Left(cardInfoArr(pos,0), Len(cardInfoArr(pos,0)) - Len(oldStrArr(Len(oldStrArr)-1))-1)
 	 	TracePrint "newstr:", newStr
 		cardInfoArr(pos, 0) = newStr
 		cardInfoArr(pos, 1) = Right(newStr, 1)
@@ -701,7 +705,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		'Update search area
 		Call updateSearchAreaRange(searchPos, 15, "up")
 		
-		Call checkCardAfterMoveCardRule(searchPos, pos)
+		Call checkCardAfterMoveCardRule(searchPos, pos, "-1")
 		
 		suitRule = searchPos
 		noSuitableCardMatch = False
@@ -731,7 +735,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		Call updateSearchAreaRange(pos, 15, "up")
 		Delay 300
 		
-		Call checkCardAfterMoveCardRule(searchPos, pos)
+		Call checkCardAfterMoveCardRule(searchPos, pos, "+1")
 		
 		suitRule = pos
 		noSuitableCardMatch = False
@@ -742,13 +746,12 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	moveCardRule = suitRule
 End Function
 
-Sub checkCardAfterMoveCardRule(searchPos, position)
-	Dim flag
+Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 	Dim delayTime
 	
-	flag = "-1"
 	While True
 		TracePrint "cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
+		Delay 200
 		If flag = "-1" Then
 			Call identifyNewCard(searchPos)
 			If cardInfoArr(searchPos, 0) <> "0" Then 
@@ -963,8 +966,10 @@ Sub identifyNewCard(j)
 			noCard = False
 			Exit For
 		Else 
-		 	FindPic cardSearchArea(j, 0), cardSearchArea(j, 1), cardSearchArea(j, 2), cardSearchArea(j, 3), "Attachment:" & "emptySlot.png", "000000", 0, 0.5, intX, intY
-		 	If intX > 0 And intY > 0 Then
+			TracePrint "Trying to locate if there is no card"
+		 	FindPic cardSearchArea(j, 0), cardSearchArea(j, 1), cardSearchArea(j, 2), cardSearchArea(j, 3), "Attachment:" & "emptySlot.png", "000000", 0, 0.4, intX, intY
+		 	If intX > 0 And intY > 0 Then 
+		 		TracePrint "There is no card in the slot"
 				noCard = True
 				Exit For
 			End If
@@ -1053,11 +1058,23 @@ Sub sortMaxToMin()
 	Dim posx, posy
 	Dim temp, suitTemp, suitColorTemp
 	Dim tempCardPointSearchArea(4), tempCardSuitSearchArea(4)
+	Dim arrA, arrB
 	
 	For i = 0 To 5
 		For j = i + 1 To 6
-			a = CInt(cardInfoArr(i, 0))
-			b = CInt(cardInfoArr(j, 0))
+			arrA = Split(cardInfoArr(i,0), "|")
+			If Len(arrA) > 1 Then 
+				a = CInt(Left(arrA(0), Len(arrA(0)) - 1))
+			Else 
+				a = CInt(arrA(0))
+			End If
+			
+			arrB = Split(cardInfoArr(j,0), "|")
+			If Len(arrB) > 1 Then 
+				b = CInt(Left(arrB(0), Len(arrB(0)) - 1))
+			Else 
+				b = CInt(arrB(0))
+			End If
 			
 			'TracePrint "a:", a, ", b:", b
 			
