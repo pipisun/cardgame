@@ -600,7 +600,7 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 			Swipe cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2,0), foundationPosArr(2,1), delayTime
 		ElseIf elementSuit = "D" Then
 			TracePrint "Moving the D card..."
-			Swipe cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
+			Swipe cardPosArr(pos, 0) + 45, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
 		End If
 	End If
 	
@@ -966,13 +966,15 @@ Sub identifyNewCard(j)
 			noCard = False
 			Exit For
 		Else 
-			TracePrint "Trying to locate if there is no card"
-		 	FindPic cardSearchArea(j, 0), cardSearchArea(j, 1), cardSearchArea(j, 2), cardSearchArea(j, 3), "Attachment:" & "emptySlot.png", "000000", 0, 0.4, intX, intY
-		 	If intX > 0 And intY > 0 Then 
-		 		TracePrint "There is no card in the slot"
-				noCard = True
-				Exit For
-			End If
+//			TracePrint "Trying to locate if there is no card"
+//		 	FindPic cardSearchArea(j, 0), cardSearchArea(j, 1), cardSearchArea(j, 2), cardSearchArea(j, 3), "Attachment:" & "emptySlot.png", "000000", 0, 0.3, intX, intY
+//		 	Delay 200
+//		 	If intX > 0 And intY > 0 Then 
+//		 		TracePrint "There is no card in the slot"
+//				noCard = True
+//				Exit For
+//			End If
+			noCard = True
 		End If 
 	Next
 	
