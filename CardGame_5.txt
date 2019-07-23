@@ -306,7 +306,7 @@ For i = 0 To 5
 				
 				'Update search area
 				If j <> 0 Then
-					Call updateSearchAreaRange(j, 15, "up")
+					Call updateSearchAreaRange(j, 9, "up")
 				End If
 				
 				Delay 200
@@ -398,7 +398,7 @@ Function checkFoundationAndMove(pos, element, elementSuit)
 		If CInt(lastElement) + 1 = CInt(element) Then 
 			Tap pilePosArr(pos, 0), pilePosArr(pos, 1)
 			'Update search area
-			Call updateSearchAreaRange(pos, 15, "up")
+			Call updateSearchAreaRange(pos, 9, "up")
 		
 			foundationInfoArr(index,0) = foundationInfoArr(index,0) & "|" & element & elementSuit
 			isMoved = True
@@ -410,7 +410,7 @@ Function checkFoundationAndMove(pos, element, elementSuit)
 			Swipe pilePosArr(pos, 0), pilePosArr(pos, 1), foundationPosArr(index, 0), foundationPosArr(index, 1), delayTime
 			
 			'Update search area
-			Call updateSearchAreaRange(pos, 15, "up")
+			Call updateSearchAreaRange(pos, 9, "up")
 			
 			foundationInfoArr(index, 0) = element & elementSuit
 			isMoved = True
@@ -622,7 +622,7 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	End If
 	
 	'Update search area range
-	updateSearchAreaRange(pos, 15, "up")
+	updateSearchAreaRange(pos, 9, "up")
 	
 End Sub
 
@@ -691,7 +691,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(pos,1)
 		TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
 		
-		Delay 100
+		Delay 200
 		
 		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 		If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
@@ -703,7 +703,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		End If
 		
 		'Update search area
-		Call updateSearchAreaRange(searchPos, 15, "up")
+		Call updateSearchAreaRange(searchPos, 9, "up")
 		
 		Call checkCardAfterMoveCardRule(searchPos, pos, "-1")
 		
@@ -732,7 +732,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 		
 		'Update search area
-		Call updateSearchAreaRange(pos, 15, "up")
+		Call updateSearchAreaRange(pos, 9, "up")
 		Delay 300
 		
 		Call checkCardAfterMoveCardRule(searchPos, pos, "+1")
@@ -748,32 +748,45 @@ End Function
 
 Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 	Dim delayTime
+	Dim numberForSearchPos, numberForPos
+	Dim arrNumber
 	
 	While True
 		TracePrint "cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
 		Delay 200
-		If flag = "-1" Then
+		If flag = "-1" Then 
 			Call identifyNewCard(searchPos)
 			If cardInfoArr(searchPos, 0) <> "0" Then 
 			 	isSearchPosCardChanged = True
 				TracePrint "After that, cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
+//				numberForSearchPos = CInt(cardInfoArr(searchPos, 0))
+//				arrNumber = Split(cardInfoArr(position, 0), "|")
+//				numberForPos = CInt(Left(arrNumber(0), Len(arrNumber(0))-1))
 			End If
 		Else 
 			Call identifyNewCard(position)
 			If cardInfoArr(position, 0) <> "0" Then 
 			 	isPosCardChanged = True
 				TracePrint "After that, cardInfoArr(position,0):", cardInfoArr(position,0)
+//				numberForPos = CInt(cardInfoArr(position, 0))
+//				arrNumber = Split(cardInfoArr(searchPos, 0), "|")
+//				numberForSearchPos = CInt(Left(arrNumber(0), Len(arrNumber(0))-1))
 			End If
 		End If
 		
-		Dim arrPosition, topElementOnPos
-		arrPosition = Split(cardInfoArr(position, 0), "|")
-		topElementOnPos = Left(arrPosition(0), Len(arrPosition(0))-1)
-		If CInt(topElementOnPos) > CInt(cardInfoArr(searchPos, 0)) Then 
-			flag = "-1"
-		Else 
-			flag = "+1"
-		End If
+//		If numberForSearchPos > numberForPos Then 
+//			flag = "+1"
+//		Else 
+//			flag = "+1
+//		End If
+//		Dim arrPosition, topElementOnPos
+//		arrPosition = Split(cardInfoArr(position, 0), "|")
+//		topElementOnPos = Left(arrPosition(0), Len(arrPosition(0))-1)
+//		If CInt(topElementOnPos) > CInt(cardInfoArr(searchPos, 0)) Then 
+//			flag = "-1"
+//		Else 
+//			flag = "+1"
+//		End If
 		
 		If flag = "-1" Then 
 			'Compare last element with new card
@@ -789,14 +802,14 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				cardInfoArr(position, 0) = cardInfoArr(position, 0) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
 				isSearchPosCardChanged = False
 				'Update search area
-				Call updateSearchAreaRange(searchPos, 15, "up")
+				Call updateSearchAreaRange(searchPos, 9, "up")
 			Else 
 				Exit While
 			End If
 		ElseIf flag = "+1" Then
 			'Compare top element with new card
 			Dim arrCard2, topElement, topElementValue, topElementSuitColor
-			arrCard2 = Split(cardInfoArr(position, 0), "|")
+			arrCard2 = Split(cardInfoArr(searchPos, 0), "|")
 			topElement = arrCard2(0)
 			topElementValue = Left(topElement, Len(topElement)-1)
 			topElementSuitColor = getSuitColor(Right(topElement, 1))
@@ -807,7 +820,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
 				isPosCardChanged = False
 				'Update search area
-				Call updateSearchAreaRange(position, 15, "up")
+				Call updateSearchAreaRange(position, 9, "up")
 //				'Swap position and searchPos
 //				Dim tmp
 //				tmp = position
