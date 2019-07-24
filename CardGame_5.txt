@@ -513,7 +513,7 @@ Sub moveCardToFoundation()
 					End If
 					isMoved = False
 					TracePrint "After identifyNew, m=",m
-					'm = m - 1
+					m = m - 1
 				End If
 			Next
 		End If
@@ -795,6 +795,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			lastElement = arrCard(Len(arrCard) - 1)
 			lastElementValue = Left(lastElement, Len(lastElement)-1)
 			lastElementSuitColor = getSuitColor(Right(lastElement, 1))
+			TracePrint "arrCard,lastElement,lastElementValue,lastElementSuitColor",arrCard,lastElement,lastElementValue,lastElementSuitColor
 			
 			If CInt(lastElementValue) - 1 = CInt(cardInfoArr(searchPos, 0)) And lastElementSuitColor <> cardInfoArr(searchPos, 2) Then 
 				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
