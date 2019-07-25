@@ -99,6 +99,9 @@ isSearchPosCardChanged = False
 isPosCardChanged = False
 Dim intNewCardNumber, strNewCardSuit
 
+Dim isCardHasBeenIdentifed
+isCardHasBeenIdentifed = False
+
 'Define variables for empty spots
 Dim emptySpotCount, emptySpotPos
 emptySpotCount = 0
@@ -336,7 +339,7 @@ For i = 0 To 5
 				newPosition = j
 
 				'Check if there is a match
-				While cardInfoArr(newPosition, 0) <> "0"
+				While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
 					newPosition = moveCardAfterIdentify(oldPosition, "")
 					TracePrint "oldPosition:", oldPosition, ",newPosition:", newPosition
 					If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
@@ -500,7 +503,7 @@ Sub moveCardToFoundation()
 				 		newPosition = m
 				 		
 						'Check if there is a match
-						While cardInfoArr(newPosition, 0) <> "0"
+						While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
 							newPosition = moveCardAfterIdentify(oldPosition,"")
 							If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
 								oldPosition = newPosition
@@ -513,7 +516,7 @@ Sub moveCardToFoundation()
 					End If
 					isMoved = False
 					TracePrint "After identifyNew, m=",m
-					m = m - 1
+					m = m + 1
 				End If
 			Next
 		End If
@@ -956,6 +959,14 @@ Sub identifyNewCard(j)
 			cardPoint = Mid(allCardPicArr(m), 2, InStr(1, allCardPicArr(m), ".") - 2)
 			TracePrint "Found card: ", cardPoint
 			
+			If CInt(cardPoint) = intNewCardNumber Then 
+				isCardHasBeenIdentifed = True
+				intNewCardNumber = -1
+				Exit Sub
+			Else 
+				isCardHasBeenIdentifed = False
+			End If
+			
 			cardInfoArr(j,0) = cardPoint
 			'Search suit
 			TracePrint "Finding suit in (", suitSearchArea(j,0), suitSearchArea(j,1), suitSearchArea(j,2), suitSearchArea(j,3), ") area"
@@ -1020,7 +1031,7 @@ Sub moveKCard()
 			
 			newPosition = m
 			'Check if there is a match
-			While cardInfoArr(newPosition, 0) <> "0"
+			While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
 				newPosition = moveCardAfterIdentify(newPosition,"")
 				If newPosition <> -1 Then 
 					Call identifyNewCard(newPosition)
