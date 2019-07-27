@@ -271,14 +271,14 @@ For i = 0 To 5
 			number2SuitColor = cardInfoArr(j, 2)
 		End If
 		
-		If number1 <> number2 Then 
+		If number1 <> number2 And number1 > number2 Then 
 //			 	If j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 //				If cardInfoArr(j,0) <> "?" Then
 
 			'Check if there is duplicate card point
 			Dim duplicate
 			duplicate = InStr(1, cardInfoArr(i, 0), cardInfoArr(j, 0))
-			TracePrint "duplicate:", duplicate
+//			TracePrint "duplicate:", duplicate
 						
 			If duplicate = 0 And (number1 - compareCounter = number2 Or _
 				number1 + 1 = number2Small And number1SuitColor <> number2SmallSuitColor Or _
@@ -682,67 +682,76 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	TracePrint "cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
 	TracePrint "containsNumber1, containsNumber2:", containsNumber1, containsNumber2
 	
-	If intNewCardNumber - 1 = intTopCardNumber And strNewCardSuit <> strTopCardSuit And containsNumber1 = 0 Then 
-	
-		If pipePos = 0 Then 
-			cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
+	If cardInfoArr(pos,0) <> "0" And cardInfoArr(searchPos,0) <> "0" Then
+		If intNewCardNumber - 1 = intTopCardNumber And strNewCardSuit <> strTopCardSuit And containsNumber1 = 0 Then 
+		
+			If pipePos = 0 Then 
+				cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
+			Else 
+				cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0)
+			End If
+			cardInfoArr(pos, 1) = cardInfoArr(searchPos, 1)
+			TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(pos,0)
+			TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(pos,1)
+			TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
+			
+			Delay 200
+			
+			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
+			TracePrint cardPosArr(searchPos, 0), cardPosArr(searchPos, 0)
+			If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
+				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
+			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
+				Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
+			Else 
+				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
+			End If
+			
+			'Update search area
+			Call updateSearchAreaRange(searchPos, 9, "up")
+			
+			Call checkCardAfterMoveCardRule(searchPos, pos, "-1")
+			
+			suitRule = searchPos
+			noSuitableCardMatch = False
+		ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit And containsNumber2 = 0 Then
+			If pipePos = 0 Then 
+		 		If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
+					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+				Else 
+					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
+				End If
+			Else 
+				If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
+					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+				Else 
+					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
+				End If
+			End If
+			cardInfoArr(searchPos, 1) = cardInfoArr(pos, 1)
+			TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(searchPos,0)
+			TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(searchPos,1)
+			TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
+			
+			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
+			Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+			
+			'Update search area
+			Call updateSearchAreaRange(pos, 9, "up")
+			Delay 300
+			
+			Call checkCardAfterMoveCardRule(searchPos, pos, "+1")
+			
+			suitRule = pos
+			noSuitableCardMatch = False
 		Else 
-			cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0)
+			suitRule = pos
+			noSuitableCardMatch = True
 		End If
-		cardInfoArr(pos, 1) = cardInfoArr(searchPos, 1)
-		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(pos,0)
-		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(pos,1)
-		TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
-		
-		Delay 200
-		
-		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
-		If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
-			Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
-		ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
-			Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
-		Else 
-			Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
-		End If
-		
-		'Update search area
-		Call updateSearchAreaRange(searchPos, 9, "up")
-		
-		Call checkCardAfterMoveCardRule(searchPos, pos, "-1")
-		
+	ElseIf cardInfoArr(pos,0) = "0" Then
 		suitRule = searchPos
-		noSuitableCardMatch = False
-	ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit And containsNumber2 = 0 Then
-		If pipePos = 0 Then 
-		 	If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
-				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
-			Else 
-				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
-			End If
-		Else 
-			If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
-				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
-			Else 
-				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
-			End If
-		End If
-		cardInfoArr(searchPos, 1) = cardInfoArr(pos, 1)
-		TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(searchPos,0)
-		TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(searchPos,1)
-		TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
-		
-		delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
-		Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
-		
-		'Update search area
-		Call updateSearchAreaRange(pos, 9, "up")
-		Delay 300
-		
-		Call checkCardAfterMoveCardRule(searchPos, pos, "+1")
-		
-		suitRule = pos
-		noSuitableCardMatch = False
-	Else 
+		noSuitableCardMatch = True
+	ElseIf cardInfoArr(searchPos, 0) = "0" Then
 		suitRule = pos
 		noSuitableCardMatch = True
 	End If
@@ -798,7 +807,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			lastElement = arrCard(Len(arrCard) - 1)
 			lastElementValue = Left(lastElement, Len(lastElement)-1)
 			lastElementSuitColor = getSuitColor(Right(lastElement, 1))
-			TracePrint "arrCard,lastElement,lastElementValue,lastElementSuitColor",arrCard,lastElement,lastElementValue,lastElementSuitColor
+			TracePrint "cardInfoArr(position, 0),lastElement,lastElementValue,lastElementSuitColor",cardInfoArr(position, 0),lastElement,lastElementValue,lastElementSuitColor
 			
 			If CInt(lastElementValue) - 1 = CInt(cardInfoArr(searchPos, 0)) And lastElementSuitColor <> cardInfoArr(searchPos, 2) Then 
 				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
