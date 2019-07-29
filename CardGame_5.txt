@@ -283,7 +283,11 @@ Sub main()
 				number2SuitColor = cardInfoArr(j, 2)
 			End If
 			
-			If number2 <> 0 Then
+			If number2 <> 0 Then 
+				If number1 <> 0 Then 
+					number1 = number1Small
+				End If
+				
 				If number1 <> number2 And number1 > number2 Then 
 		//			 	If j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 		//				If cardInfoArr(j,0) <> "?" Then
@@ -859,6 +863,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			topElement = arrCard2(0)
 			topElementValue = Left(topElement, Len(topElement)-1)
 			topElementSuitColor = getSuitColor(Right(topElement, 1))
+			TracePrint "cardInfoArr(searchPos, 0),topElement,topElementValue,topElementSuitColor",cardInfoArr(searchPos, 0),topElement,topElementValue,topElementSuitColor
 			
 			If CInt(topElementValue) + 1 = CInt(cardInfoArr(searchPos, 0)) And topElementSuitColor <> cardInfoArr(searchPos, 2) Then 
 				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
