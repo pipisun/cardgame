@@ -233,8 +233,13 @@ Dim delayTime
 Dim number1Arr, number2Arr
 Dim number1TopElement, number2TopElement
 Dim number1BottomElement, number2BottomElement
+Dim number1Top, number2Top
 Dim number1Small, number2Small
+Dim number1TopSuitColor, number2TopSuitColor
 Dim number1SmallSuitColor, number2SmallSuitColor
+
+Dim tmpNumber1, tmpNumber1Color
+Dim tmpNumber2, tmpNumber2Color
 
 Sub main()
 	For i = 0 To 5
@@ -250,21 +255,21 @@ Sub main()
 				number1Arr = Split(cardInfoArr(i, 0), "|")
 				number1TopElement = number1Arr(0)
 				number1BottomElement = number1Arr(Len(number1Arr)-1)
-				number1 = CInt(Left(number1TopElement, Len(number1TopElement) - 1))
-				number1SuitColor = getSuitColor(Right(number1TopElement,1))
+				number1Top = CInt(Left(number1TopElement, Len(number1TopElement) - 1))
+				number1TopSuitColor = getSuitColor(Right(number1TopElement,1))
 				number1Small = CInt(Left(number1BottomElement, Len(number1BottomElement) - 1))
 				number1SmallSuitColor = getSuitColor(Right(number1BottomElement,1))
-				TracePrint "new number1(suit) on top:", number1, number1SuitColor
+				TracePrint "new number1(suit) on top:", number1Top, number1TopSuitColor
 				TracePrint "new number1(suit) on bottom:", number1Small,number1SmallSuitColor
-				cardInfoArr(i, 2) = number1SmallSuitColor
+//				cardInfoArr(i, 2) = number1SmallSuitColor
 			Else 
-				number1SuitColor = cardInfoArr(i,2)
+//				number1SuitColor = cardInfoArr(i,2)
 			End If
 			
 			'If number1 = 0 again, loop next
-			If number1 = 0 Then 
-				Exit For
-			End If
+//			If number1 = 0 Then 
+//				Exit For
+//			End If
 			
 			number2 = CInt(cardInfoArr(j, 0))
 			TracePrint "number2:", number2
@@ -272,23 +277,39 @@ Sub main()
 				number2Arr = Split(cardInfoArr(j, 0), "|")
 				number2TopElement = number2Arr(0)
 				number2BottomElement = number2Arr(Len(number2Arr)-1)
-				number2 = CInt(Left(number2TopElement, Len(number2TopElement) - 1))
-				number2SuitColor = getSuitColor(Right(number2TopElement,1))
+				number2Top = CInt(Left(number2TopElement, Len(number2TopElement) - 1))
+				number2TopSuitColor = getSuitColor(Right(number2TopElement,1))
 				number2Small = CInt(Left(number2BottomElement, Len(number2BottomElement) - 1))
 				number2SmallSuitColor = getSuitColor(Right(number2BottomElement,1))
-				TracePrint "new number2(suit) on top:", number2, number2SuitColor
+				TracePrint "new number2(suit) on top:", number2Top, number2TopSuitColor
 				TracePrint "new number2(suit) on bottom:", number2Small,number2SmallSuitColor
-				cardInfoArr(j, 2) = number2SuitColor
+//				cardInfoArr(j, 2) = number2TopSuitColor
 			Else 
-				number2SuitColor = cardInfoArr(j, 2)
+//				number2SuitColor = cardInfoArr(j, 2)
 			End If
 			
-			If number2 <> 0 Then 
-				If number1 <> 0 Then 
-					number1 = number1Small
-				End If
+			If number1 = 0 Then 
+				tmpNumber1 = number1Small
+				tmpNumber1Color = number1SmallSuitColor
+			Else 
+				tmpNumber1 = number1
+				tmpNumber1Color = cardInfoArr(i,2)
+			End If
+			If number2 = 0 Then 
+				tmpNumber2 = number2Top
+				tmpNumber2Color = number2TopSuitColor
+			Else 
+				tmpNumber2 = number2
+				tmpNumber2Color = cardInfoArr(j,2)
+			End If
+			
+//			If number2 <> 0 Then 
+//				If number1 <> 0 And number1Small <> Null Then 
+//					number1 = number1Small
+//					compareCounter = 1
+//				End If
 				
-				If number1 <> number2 And number1 > number2 Then 
+//				If number1 <> number2 And number1 > number2 Then 
 		//			 	If j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 		//				If cardInfoArr(j,0) <> "?" Then
 		
@@ -299,12 +320,13 @@ Sub main()
 					
 					TracePrint 	number1 - compareCounter, number2
 					TracePrint	number1SmallSuitColor, number1SuitColor,number2SmallSuitColor,number2SuitColor
-					If duplicate = 0 And (number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Or _
-						number1 + 1 = number2Small And number1SuitColor <> number2SmallSuitColor Or _
-						number1 - 1 = number2 And number1SuitColor <> number2SuitColor Or _
-						number2 + 1 = number1Small And number2SuitColor <> number1SmallSuitColor Or _
-						number2 -1 = number1 And number2SuitColor <> number1SuitColor) Then
-		
+//					If duplicate = 0 And (number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Or _
+//						number1 + 1 = number2Small And number1SuitColor <> number2SmallSuitColor Or _
+//						number1 - 1 = number2 And number1SuitColor <> number2SuitColor Or _
+//						number2 + 1 = number1Small And number2SuitColor <> number1SmallSuitColor Or _
+//						number2 -1 = number1 And number2SuitColor <> number1SuitColor) Then
+					If duplicate = 0 And tmpNumber1 - compareCounter = tmpNumber2 And tmpNumber1Color <> tmpNumber2Color Then 
+						
 						Delay 500
 						TracePrint "Abs(cardPosArr(j, 0) - cardPosArr(i, 0)):", Abs(cardPosArr(j, 0) - cardPosArr(i, 0))
 						
@@ -375,8 +397,8 @@ Sub main()
 					ElseIf j <> 6 And number2 <> CInt(cardInfoArr(j+1,0)) Then
 						Exit For
 					End If
-				End If
-			End If
+//				End If
+//			End If
 		Next
 		compareCounter = 1
 	//	End If
