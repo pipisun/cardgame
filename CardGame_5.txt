@@ -291,6 +291,7 @@ Sub main()
 			If number1 = 0 Then 
 				tmpNumber1 = number1Small
 				tmpNumber1Color = number1SmallSuitColor
+				compareCounter = 1
 			Else 
 				tmpNumber1 = number1
 				tmpNumber1Color = cardInfoArr(i,2)
@@ -319,7 +320,7 @@ Sub main()
 					TracePrint "duplicate:", duplicate
 					
 					TracePrint 	number1 - compareCounter, number2
-					TracePrint	number1SmallSuitColor, number1SuitColor,number2SmallSuitColor,number2SuitColor
+//					TracePrint	number1SmallSuitColor, number1SuitColor,number2SmallSuitColor,number2SuitColor
 //					If duplicate = 0 And (number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Or _
 //						number1 + 1 = number2Small And number1SuitColor <> number2SmallSuitColor Or _
 //						number1 - 1 = number2 And number1SuitColor <> number2SuitColor Or _
@@ -382,7 +383,7 @@ Sub main()
 						'Check if there is a match
 						While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
 							newPosition = moveCardAfterIdentify(oldPosition, "")
-							If newPosition = Null Then 
+							If newPosition = Null Or newPosition = 0 Then 
 								Exit While
 							End If
 							TracePrint "oldPosition:", oldPosition, ",newPosition:", newPosition
@@ -869,7 +870,8 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			TracePrint "cardInfoArr(position, 0),lastElement,lastElementValue,lastElementSuitColor",cardInfoArr(position, 0),lastElement,lastElementValue,lastElementSuitColor
 			
 			If CInt(lastElementValue) - 1 = CInt(cardInfoArr(searchPos, 0)) And lastElementSuitColor <> cardInfoArr(searchPos, 2) Then 
-				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
+				delayTime = getDelayTime(Abs(cardPosArr(position, 0) - cardPosArr(searchPos, 0)))
+				TracePrint "Swipe again"
 				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
 				cardInfoArr(position, 0) = cardInfoArr(position, 0) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
 				isSearchPosCardChanged = False
@@ -887,8 +889,9 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			topElementSuitColor = getSuitColor(Right(topElement, 1))
 			TracePrint "cardInfoArr(searchPos, 0),topElement,topElementValue,topElementSuitColor",cardInfoArr(searchPos, 0),topElement,topElementValue,topElementSuitColor
 			
-			If CInt(topElementValue) + 1 = CInt(cardInfoArr(searchPos, 0)) And topElementSuitColor <> cardInfoArr(searchPos, 2) Then 
-				delayTime = getDelayTime(Abs(cardPosArr(position,0)-cardPosArr(searchPos,0)))
+			If CInt(topElementValue) + 1 = CInt(cardInfoArr(position, 0)) And topElementSuitColor <> cardInfoArr(position, 2) Then 
+				delayTime = getDelayTime(Abs(cardPosArr(position, 0) - cardPosArr(searchPos, 0)))
+				TracePrint "Swipe again"
 				Swipe cardPosArr(position, 0) + 50, cardPosArr(position, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
 				isPosCardChanged = False
