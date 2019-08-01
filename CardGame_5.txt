@@ -412,6 +412,8 @@ Call main()
 'Sort again
 Call sortMaxToMin()
 
+Call printOut()
+
 Call moveCardToFoundation()
 
 Call moveKCard()
@@ -758,10 +760,12 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			Delay 200
 			
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
-			TracePrint cardPosArr(searchPos, 0), cardPosArr(searchPos, 0)
+			TracePrint cardPosArr(searchPos, 0), cardPosArr(pos, 0)
 			If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
+			 	TracePrint "Move left to right"
 				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
 			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
+				TracePrint "Move right to left"
 				Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
 			Else 
 				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
