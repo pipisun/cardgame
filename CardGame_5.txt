@@ -124,12 +124,40 @@ foundationPosArr(3,0) = 322
 foundationPosArr(3, 1) = 158
 
 Dim pilePosArr(3,2)
-pilePosArr(0, 0) = 463
-pilePosArr(0, 1) = 100
-pilePosArr(1, 0) = 429
-pilePosArr(1, 1) = 100
-pilePosArr(2, 0) = 393
-pilePosArr(2, 1) = 100
+pilePosArr(0, 0) = 497
+pilePosArr(0, 1) = 149
+pilePosArr(1, 0) = 454
+pilePosArr(1, 1) = 149
+pilePosArr(2, 0) = 411
+pilePosArr(2, 1) = 149
+Dim pileCardInfoArr(3,3)
+Dim pileSearchArea(3,4), pileSuitSearchArea(3,4)
+pileSearchArea(0,0) = 453
+pileSearchArea(0,1) = 100
+pileSearchArea(0,2) = 502
+pileSearchArea(0,3) = 148
+pileSuitSearchArea(0,0) = 502 
+pileSuitSearchArea(0,1) = 100
+pileSuitSearchArea(0,2) = 540
+pileSuitSearchArea(0,3) = 148
+
+//pileSearchArea(1,0) = 
+//pileSearchArea(1,1) = 
+//pileSearchArea(1,2) = 
+//pileSearchArea(1,3) = 
+//pileSuitSearchArea(1,0) =
+//pileSuitSearchArea(1,1) = 
+//pileSuitSearchArea(1,2) = 
+//pileSuitSearchArea(1,3) = 
+//
+//pileSearchArea(2,0) = 
+//pileSearchArea(2,1) = 
+//pileSearchArea(2,2) = 
+//pileSearchArea(2,3) = 
+//pileSuitSearchArea(2,0) =
+//pileSuitSearchArea(2,1) = 
+//pileSuitSearchArea(2,2) = 
+//pileSuitSearchArea(2,3) = 
 
 allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 "r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
@@ -436,16 +464,83 @@ Sub printOut()
 	Next
 End Sub
 
+Dim isFoundAnyCardMoved
+isFoundAnyCardMoved = False
 Sub moveCardFromWastePile()
 	Dim element, elementSuit
 	Dim isMoved
 	isMoved = False
 	
-	For pos = 0 To 2
-		isMoved = checkFoundationAndMove(pos, element, elementSuit)
-		If isMoved = False Then 
-			Exit For
+	Dim timer
+	Dim pos
+	pos = 0
+	timer = 28
+	
+	Dim isMovedForTableau
+	isMovedForTableau = False
+	
+	While timer > 0
+		Tap 588, 162
+		Delay 100
+		
+		'Check foundation area
+		For pos = 0 To 2
+			Call identifyPileCard(0)
+			element = pileCardInfoArr(0, 0)
+			elementSuit = pileCardInfoArr(0,1)
+			isMoved = checkFoundationAndMove(0, element, elementSuit)
+			If isMoved = False Then 
+				Exit For
+			End If
+		Next
+		
+		'Check tableau area
+		Call checkTableauAndMoveForPile(0)
+		
+		timer = timer - 1
+	Wend
+End Sub
+
+
+Sub addSuitToCard()
+	Dim lastDigitValue
+	For i = 0 To 6
+		lastDigitValue = Right(cardInfoArr(i, 0), 1)
+		If lastDigitValue <> "S" And lastDigitValue <> "H" And lastDigitValue <> "C" And lastDigitValue <> "D" Then
+			cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1)
+			TracePrint "cardInfoArr(i,0):", cardInfoArr(i,0)
 		End If
+	Next
+End Sub
+
+Sub checkTableauAndMoveForPile(index)
+	Dim lastDigitValue
+	For k = 0 To 2
+		Call identifyPileCard(index)
+		For i = 0 To 6
+			If cardInfoArr(i,0) <> "0" Then
+				'Get info for bottom card
+				Dim btmArr, btmElement, btmElementSuit 
+				btmArr = Split(cardInfoArr(i, 0), "|")
+				btmElement = btmArr(Len(btmArr) - 1)
+				lastDigitValue = Right(cardInfoArr(i,0),1)
+				btmElementSuit = getSuitColor(lastDigitValue)
+				
+				Dim delayTime
+				If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElement) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
+					delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
+					Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+					Delay 100
+					cardInfoArr(i, 0) = cardInfoArr(i, 0) & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1)
+					isFoundAnyCardMoved = True
+					Exit For
+				End If
+			Else 
+			 
+			End If
+		Next
+		'Identify next card in pile
+		Delay 100
 	Next
 End Sub
 
@@ -1017,6 +1112,58 @@ Sub checkCardIfChanged(pos, searchPos)
 		strNewCardSuit = cardInfoArr(pos, 2)
 		isPosCardChanged = False
 	End If	
+End Sub
+
+Sub identifyPileCard(index)
+	Dim intX, intY
+	Dim cardPoint
+	Dim noCard
+	
+	noCard = True
+	
+	TracePrint "Finding card in (", pileSearchArea(index,0), pileSearchArea(index,1), pileSearchArea(index,2), pileSearchArea(index,3), ") area"
+	For m = 0 To UBound(allCardPicArr)
+		'Search card
+		FindPic pileSearchArea(index,0), pileSearchArea(index,0), pileSearchArea(index,0), pileSearchArea(index,0), "Attachment:" & allCardPicArr(m), "000000", 0, 0.5, intX, intY
+//		TracePrint "allCardPicArr(m):", allCardPicArr(m)
+		If intX > 0 And intY > 0 Then
+			'Get card point
+			cardPoint = Mid(allCardPicArr(m), 2, InStr(1, allCardPicArr(m), ".") - 2)
+			TracePrint "Found card: ", cardPoint
+			
+		
+			pileCardInfoArr(index,0) = cardPoint
+			'Search suit
+			TracePrint "Finding suit in (", pileSuitSearchArea(index,0), pileSuitSearchArea(index,1), pileSuitSearchArea(index,2), pileSuitSearchArea(index,3), ") area"
+			For s = 0 To UBound(suitPicArr)
+				FindPic pileSuitSearchArea(index,0), pileSuitSearchArea(index,1), pileSuitSearchArea(index,2), pileSuitSearchArea(index,3), "Attachment:" & suitPicArr(s), "000000", 0, 0.4, intX, intY
+				If intX > 0 And intY > 0 Then 
+					TracePrint "Found suit: ", suitPicArr(s)
+					'Save suit info
+					pileCardInfoArr(index, 1) = convertSuitColorToSign(suitPicArr(s))
+					'Save suit color(Black/Red)
+					pileCardInfoArr(index, 2) = checkSuitBlackOrRed(suitPicArr(s))
+					TracePrint "Found suit color:", pileCardInfoArr(index,2)
+					
+					'Move it to foundation if the card is A
+					If pileCardInfoArr(index, 0) = "1" Then 
+						Call moveToSpecificFoundationAreaAndUpdate(index, getSuitPosition(pileCardInfoArr(index, 1)), pileCardInfoArr(index, 0), pileCardInfoArr(index, 1), 1, "")
+						Delay 200
+						Call identifyPileCard(index)
+					End If
+				End If
+			Next
+			noCard = False
+			Exit For
+		Else 
+		 	noCard = True
+		End If 
+	Next
+	
+	If noCard = True Then 
+		pileCardInfoArr(index, 0) = "0"	
+	End If
+	
 End Sub
 
 Sub identifyNewCard(j)
