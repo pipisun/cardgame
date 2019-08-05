@@ -366,15 +366,15 @@ Sub main()
 				
 						If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
 							If cardPosArr(i, 0) > 500 Then 
-								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0) + 20, cardPosArr(i, 1), 800
+								Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1), cardPosArr(i, 0) + 20, cardPosArr(i, 1), 800
 							Else
-								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0) + 50, cardPosArr(i, 1), delayTime
+								Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1), cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime
 							End If
 						Else 
 							If cardPosArr(i, 0) < 50 Then 
-								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0) + 50, cardPosArr(i, 1), 800
+								Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1), cardPosArr(i, 0) + 20, cardPosArr(i, 1), 800
 							Else
-								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0) + 50, cardPosArr(i, 1), delayTime
+								Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1), cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime
 							End If
 						End If
 						
@@ -484,9 +484,18 @@ Sub moveCardFromWastePile()
 	Dim isMovedForTableau
 	isMovedForTableau = False
 	
+	Dim intX, intY, cycletimes
+	cycletimes = 0
 	While timer > 0
 		Tap 588, 162
 		Delay 100
+		
+		'If one loop ends
+		FindPic 550, 110, 634, 224, "Attachment:" & "endoneloop.png", "000000", 0, 0.5, intX, intY
+		If cycletimes < 4 And intX > 0 And intY > 0 Then 
+			Tap 591, 163
+			cycletimes = cycletimes + 1
+		End If
 		
 		'Check foundation area
 		For pos = 0 To 2
