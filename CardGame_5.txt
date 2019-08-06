@@ -471,11 +471,10 @@ End Sub
 
 Dim isFoundAnyCardMoved
 isFoundAnyCardMoved = False
+Dim isMoved
+isMoved = False
 Sub moveCardFromWastePile()
 	Dim element, elementSuit
-	Dim isMoved
-	isMoved = False
-	
 	Dim timer
 	Dim pos
 	pos = 0
@@ -501,7 +500,9 @@ Sub moveCardFromWastePile()
 		For pos = 0 To 2
 			Call identifyPileCard(0)
 			element = pileCardInfoArr(0, 0)
-			elementSuit = pileCardInfoArr(0,1)
+			elementSuit = pileCardInfoArr(0, 1)
+			TracePrint "element,elementSuit:", element, elementSuit
+			
 			isMoved = checkFoundationAndMove(0, element, elementSuit)
 			If isMoved = False Then 
 				Exit For
@@ -528,9 +529,13 @@ Sub addSuitToCard()
 End Sub
 
 Sub checkTableauAndMoveForPile(index)
+	TracePrint "Check tableau for pile"
 	Dim lastDigitValue
 	For k = 0 To 2
-		Call identifyPileCard(index)
+		If isMoved = True Then
+			Call identifyPileCard(index)
+		End If
+		
 		For i = 0 To 6
 			If cardInfoArr(i,0) <> "0" Then
 				'Get info for bottom card
@@ -539,6 +544,7 @@ Sub checkTableauAndMoveForPile(index)
 				btmElement = btmArr(Len(btmArr) - 1)
 				lastDigitValue = Right(cardInfoArr(i,0),1)
 				btmElementSuit = getSuitColor(lastDigitValue)
+				TracePrint "btmArr,btmElement,lastDigitValue,btmElementSuit",btmArr,btmElement,lastDigitValue,btmElementSuit
 				
 				Dim delayTime
 				If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElement) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
@@ -589,6 +595,8 @@ Function checkFoundationAndMove(pos, element, elementSuit)
 			
 			foundationInfoArr(index, 0) = element & elementSuit
 			isMoved = True
+			
+			Delay 200
 		End If
 	End If
 	checkFoundationAndMove = isMoved
@@ -952,6 +960,8 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 	Dim numberForSearchPos, numberForPos
 	Dim arrNumber
 	
+	Dim tmp
+	
 	While True
 		TracePrint "cardInfoArr(searchPos,0):", cardInfoArr(searchPos,0)
 		Delay 200
@@ -1007,6 +1017,9 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				'Update search area
 				Call updateSearchAreaRange(searchPos, 9, "up")
 			Else 
+				tmp = searchPos
+				searchPos = position
+				position = tmp
 				Exit While
 			End If
 		ElseIf flag = "+1" Then
@@ -1021,7 +1034,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			If CInt(topElementValue) + 1 = CInt(cardInfoArr(position, 0)) And topElementSuitColor <> cardInfoArr(position, 2) Then 
 				delayTime = getDelayTime(Abs(cardPosArr(position, 0) - cardPosArr(searchPos, 0)))
 				TracePrint "Swipe again"
-				Swipe cardPosArr(position, 0) + 50, cardPosArr(position, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+				Swipe cardPosArr(search, 0) + 20, cardPosArr(search, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
 				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
 				isPosCardChanged = False
 				'Update search area
@@ -1151,6 +1164,8 @@ Sub identifyPileCard(index)
 	
 	noCard = True
 	
+	Delay 200
+	
 	TracePrint "Finding card in (", pileSearchArea(index,0), pileSearchArea(index,1), pileSearchArea(index,2), pileSearchArea(index,3), ") pile area"
 	For m = 0 To UBound(allCardPicArr)
 		'Search card
@@ -1162,7 +1177,9 @@ Sub identifyPileCard(index)
 			TracePrint "Found card: ", cardPoint
 			
 		
-			pileCardInfoArr(index,0) = cardPoint
+			pileCardInfoArr(index, 0) = cardPoint
+			TracePrint "index,pileCardInfoArr", index, pileCardInfoArr(index,0)
+			
 			'Search suit
 			TracePrint "Finding suit in (", pileSuitSearchArea(index,0), pileSuitSearchArea(index,1), pileSuitSearchArea(index,2), pileSuitSearchArea(index,3), ") pile area"
 			For s = 0 To UBound(suitPicArr)
@@ -1177,17 +1194,18 @@ Sub identifyPileCard(index)
 					
 					'Move it to foundation if the card is A
 					If pileCardInfoArr(index, 0) = "1" Then 
+						TracePrint "=1"
 						Call moveToSpecificFoundationAreaAndUpdate(index, getSuitPosition(pileCardInfoArr(index, 1)), pileCardInfoArr(index, 0), pileCardInfoArr(index, 1), 1, "PILE")
 						Delay 200
 						Call identifyPileCard(index)
 					End If
 					noCard = False
-					Exit For
+					Exit Sub
 				End If
 			Next
-			If noCard = False Then 
-				Exit For
-			End If
+//			If noCard = False Then 
+//				Exit For
+//			End If
 		Else 
 		 	noCard = True
 		End If 
