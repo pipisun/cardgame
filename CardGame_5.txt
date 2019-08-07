@@ -141,23 +141,23 @@ pileSuitSearchArea(0,1) = 100
 pileSuitSearchArea(0,2) = 540
 pileSuitSearchArea(0,3) = 148
 
-//pileSearchArea(1,0) = 
-//pileSearchArea(1,1) = 
-//pileSearchArea(1,2) = 
-//pileSearchArea(1,3) = 
-//pileSuitSearchArea(1,0) =
-//pileSuitSearchArea(1,1) = 
-//pileSuitSearchArea(1,2) = 
-//pileSuitSearchArea(1,3) = 
-//
-//pileSearchArea(2,0) = 
-//pileSearchArea(2,1) = 
-//pileSearchArea(2,2) = 
-//pileSearchArea(2,3) = 
-//pileSuitSearchArea(2,0) =
-//pileSuitSearchArea(2,1) = 
-//pileSuitSearchArea(2,2) = 
-//pileSuitSearchArea(2,3) = 
+pileSearchArea(1,0) = 414
+pileSearchArea(1,1) = 100
+pileSearchArea(1,2) = 458
+pileSearchArea(1,3) = 148
+pileSuitSearchArea(1,0) = 471
+pileSuitSearchArea(1,1) = 100
+pileSuitSearchArea(1,2) = 503
+pileSuitSearchArea(1,3) = 148
+
+pileSearchArea(2,0) = 376
+pileSearchArea(2,1) = 100
+pileSearchArea(2,2) = 415
+pileSearchArea(2,3) = 148
+pileSuitSearchArea(2,0) = 414
+pileSuitSearchArea(2,1) = 100
+pileSuitSearchArea(2,2) = 459
+pileSuitSearchArea(2,3) = 148
 
 allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 "r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
@@ -473,6 +473,8 @@ Dim isFoundAnyCardMoved
 isFoundAnyCardMoved = False
 Dim isMoved
 isMoved = False
+Dim isFirstCardGroupCounter
+isFirstCardGroupCounter = 1
 Sub moveCardFromWastePile()
 	Dim element, elementSuit
 	Dim timer
@@ -494,16 +496,23 @@ Sub moveCardFromWastePile()
 		If cycletimes < 4 And intX > 0 And intY > 0 Then 
 			Tap 591, 163
 			cycletimes = cycletimes + 1
+			isFirstCardGroupCounter = 1
 		End If
 		
 		'Check foundation area
+		Dim index 
+		index = 0
 		For pos = 0 To 2
-			Call identifyPileCard(0)
-			element = pileCardInfoArr(0, 0)
-			elementSuit = pileCardInfoArr(0, 1)
+			If isFirstCardGroupCounter = 1 Then 
+				index = pos
+			End If
+			
+			Call identifyPileCard(index)
+			element = pileCardInfoArr(index, 0)
+			elementSuit = pileCardInfoArr(index, 1)
 			TracePrint "element,elementSuit:", element, elementSuit
 			
-			isMoved = checkFoundationAndMove(0, element, elementSuit)
+			isMoved = checkFoundationAndMove(index, element, elementSuit)
 			If isMoved = False Then 
 				Exit For
 			End If
@@ -513,6 +522,10 @@ Sub moveCardFromWastePile()
 		Call checkTableauAndMoveForPile(0)
 		
 		timer = timer - 1
+		
+		If isFirstCardGroupCounter = 1 Then 
+			isFirstCardGroupCounter = 0
+		End If
 	Wend
 End Sub
 
@@ -539,15 +552,16 @@ Sub checkTableauAndMoveForPile(index)
 		For i = 0 To 6
 			If cardInfoArr(i,0) <> "0" Then
 				'Get info for bottom card
-				Dim btmArr, btmElement, btmElementSuit 
+				Dim btmArr, btmElement, btmElementSuit, btmElementNumber
 				btmArr = Split(cardInfoArr(i, 0), "|")
 				btmElement = btmArr(Len(btmArr) - 1)
+				btmElementNumber = Left(btmElement, Len(btmElement)-1)
 				lastDigitValue = Right(cardInfoArr(i,0),1)
 				btmElementSuit = getSuitColor(lastDigitValue)
-				TracePrint "btmArr,btmElement,lastDigitValue,btmElementSuit",btmArr,btmElement,lastDigitValue,btmElementSuit
+				TracePrint "btmArr,btmElementNumber,lastDigitValue,btmElementSuit",btmArr,btmElementNumber,lastDigitValue,btmElementSuit
 				
 				Dim delayTime
-				If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElement) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
+				If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElementNumber) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
 					delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
 					Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
 					Delay 100
@@ -931,7 +945,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
 			
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
-			Swipe cardPosArr(pos, 0)+50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+			Swipe cardPosArr(pos, 0)+20, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 			
 			'Update search area
 			Call updateSearchAreaRange(pos, 9, "up")
@@ -1034,7 +1048,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			If CInt(topElementValue) + 1 = CInt(cardInfoArr(position, 0)) And topElementSuitColor <> cardInfoArr(position, 2) Then 
 				delayTime = getDelayTime(Abs(cardPosArr(position, 0) - cardPosArr(searchPos, 0)))
 				TracePrint "Swipe again"
-				Swipe cardPosArr(search, 0) + 20, cardPosArr(search, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
 				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
 				isPosCardChanged = False
 				'Update search area
