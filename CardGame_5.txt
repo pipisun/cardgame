@@ -480,20 +480,20 @@ Sub moveCardFromWastePile()
 	Dim timer
 	Dim pos
 	pos = 0
-	timer = 28
+//	timer = 28
 	
 	Dim isMovedForTableau
 	isMovedForTableau = False
 	
 	Dim intX, intY, cycletimes
 	cycletimes = 0
-	While timer > 0
+	While cycletimes < 4
 		Tap 588, 162
 		Delay 100
 		
 		'If one loop ends
 		FindPic 550, 110, 634, 224, "Attachment:" & "endoneloop.png", "000000", 0, 0.5, intX, intY
-		If cycletimes < 4 And intX > 0 And intY > 0 Then 
+		If intX > 0 And intY > 0 Then 
 			Tap 591, 163
 			cycletimes = cycletimes + 1
 			isFirstCardGroupCounter = 1
@@ -519,9 +519,32 @@ Sub moveCardFromWastePile()
 		Next
 		
 		'Check tableau area
-		Call checkTableauAndMoveForPile(0)
+		Dim indexForTableau
+		indexForTableau = 0
+		For t = 0 To 2
+			If isFirstCardGroupCounter = 1 Then 
+				If isMoved = True Then 
+					If t = 0 Then 
+						indexForTableau = t + 1
+						t = t+1
+					End If
+				Else 
+					indexForTableau = 0
+				End If
+			Else 
+				indexForTableau = 0
+			End If
+			
+			Delay 200
+			Call identifyPileCard(indexForTableau)
+			
+			Call checkTableauAndMoveForPile(indexForTableau)
+			Delay 200
+		Next
 		
-		timer = timer - 1
+		Call main()
+		
+//		timer = timer - 1
 		
 		If isFirstCardGroupCounter = 1 Then 
 			isFirstCardGroupCounter = 0
@@ -544,10 +567,10 @@ End Sub
 Sub checkTableauAndMoveForPile(index)
 	TracePrint "Check tableau for pile"
 	Dim lastDigitValue
-	For k = 0 To 2
-		If isMoved = True Then
-			Call identifyPileCard(index)
-		End If
+//	For k = 0 To 2
+//		If isMoved = True Then
+//			Call identifyPileCard(index)
+//		End If
 		
 		For i = 0 To 6
 			If cardInfoArr(i,0) <> "0" Then
@@ -565,7 +588,7 @@ Sub checkTableauAndMoveForPile(index)
 					delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
 					Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
 					Delay 100
-					cardInfoArr(i, 0) = cardInfoArr(i, 0) & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1)
+					cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1)
 					isFoundAnyCardMoved = True
 					Exit For
 				End If
@@ -575,7 +598,7 @@ Sub checkTableauAndMoveForPile(index)
 		Next
 		'Identify next card in pile
 		Delay 100
-	Next
+//	Next
 End Sub
 
 Function checkFoundationAndMove(pos, element, elementSuit)
