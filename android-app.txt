@@ -170,7 +170,6 @@ For i = 0 To 6
 			cardSearchArea(i, 3) = rightUpperCornerY
 			
 			TracePrint "Finding suit in (", leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, ") area"
-			Delay 200
 			
 			For m = 0 To UBound(suitPicArr)
 				'Search suit
@@ -196,10 +195,12 @@ For i = 0 To 6
 	Next
 	leftUpperCornerX = leftUpperCornerX + offsetX1
 	rightUpperCornerX = rightUpperCornerX + offsetX2
+	leftUpperCornerY = leftUpperCornerY + offsetY1
 	rightUpperCornerY = rightUpperCornerY + offsetY1
 	leftUpperCornerXForSuit = leftUpperCornerXForSuit + offsetX1
 	rightUpperCornerXForSuit = rightUpperCornerXForSuit + offsetX2
-    rightUpperCornerYForSuit = rightUpperCornerYForSuit + offsetY1
+	leftUpperCornerYForSuit = leftUpperCornerYForSuit + offsetY1
+	rightUpperCornerYForSuit = rightUpperCornerYForSuit + offsetY1
 Next
 
 Call sortMaxToMin()
@@ -303,7 +304,7 @@ For i = 0 To 5
 					TracePrint "cardInfoArr():", cardInfoArr(i,0),",", cardInfoArr(i,1),",",cardInfoArr(i,2)
 					
 					'Waiting for new card appears
-					Delay 800
+					Delay 500
 					
 					'Identify the new card
 					Call identifyNewCard(j)
