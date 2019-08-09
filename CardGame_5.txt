@@ -249,7 +249,10 @@ For i = 0 To 6
 	TracePrint "Card position(x,y):", cardPosArr(i,0), ",", cardPosArr(i,1)
 	TracePrint "Card suit type:", cardInfoArr(i,1)
 	TracePrint "Card suit color:", cardInfoArr(i,2)
+	Call moveAFirst(i)
 Next
+
+Call sortMaxToMin()
 
 'Comparison
 Dim number1, number2
@@ -268,6 +271,16 @@ Dim number1SmallSuitColor, number2SmallSuitColor
 
 Dim tmpNumber1, tmpNumber1Color
 Dim tmpNumber2, tmpNumber2Color
+
+'Move A first
+Sub moveAFirst(index)
+	'Move it to foundation if the card is A
+	If cardInfoArr(index, 0) = "1" Then 
+		Call moveToSpecificFoundationAreaAndUpdate(index, getSuitPosition(cardInfoArr(index, 1)), cardInfoArr(index, 0), cardInfoArr(index, 1), 1, "")
+		Delay 200
+		Call identifyNewCard(index)
+	End If	
+End Sub
 
 Sub main()
 	For i = 0 To 5
