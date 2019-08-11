@@ -164,6 +164,12 @@ pileSuitSearchArea(2,1) = 100
 pileSuitSearchArea(2,2) = 459
 pileSuitSearchArea(2,3) = 148
 
+Dim isFoundAnyCardMovedInACycle, isMoved, isFirstGroupInACycle, isFoundInTableau
+isFoundAnyCardMovedInACycle = False
+isMoved = False
+isFirstGroupInACycle = True
+isFoundInTableau = False
+
 allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 "r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
 
@@ -516,50 +522,19 @@ Sub printOut()
 	Next
 End Sub
 
-Dim isFoundAnyCardMovedInACycle, isMoved, isFirstGroupInACycle 
-isFoundAnyCardMovedInACycle = False
-isMoved = False
-isFirstGroupInACycle = True
+
 Sub moveCardFromWastePile()
 	Dim element, elementSuit
 	Dim timer
 	Dim pos
 	pos = 0
 //	timer = 28
-	
-	Dim isMovedForTableau
-	isMovedForTableau = False
-	
 	Dim intX, intY, cycletimes, timesinacycle
 	cycletimes = 0
 	timesinacycle = 8
-	While cycletimes < timesinacycle
+	Do
 		Tap 588, 162
 		Delay 100
-		
-		cycletimes = cycletimes + 1
-		'If one loop ends
-		FindPic 550, 110, 634, 224, "Attachment:" & "endoneloop.png", "000000", 0, 0.5, intX, intY
-		If intX > 0 And intY > 0 Then 
-			timesinacycle = cycletimes
-			cycletimes = 0
-			If isFoundAnyCardMovedInACycle = False Then 
-				Exit While
-			End If
-			Tap 591, 163
-			isFirstGroupInACycle = True
-		Else 
-			FindPic 550, 110, 634, 224, "Attachment:" & "20points.png", "000000", 0, 0.5, intX, intY
-			timesinacycle = cycletimes
-			cycletimes = 0
-			If intX > 0 And intY > 0 Then 
-				If isFoundAnyCardMovedInACycle = False Then 
-					Exit While
-				End If	
-				Tap 591, 163
-				isFirstGroupInACycle = True
-			End If
-		End If
 		
 		'Check foundation area
 		For pos = 0 To 2
@@ -567,6 +542,8 @@ Sub moveCardFromWastePile()
 			element = pileCardInfoArr(pos, 0)
 			elementSuit = pileCardInfoArr(pos, 1)
 			TracePrint "element,elementSuit:", element, elementSuit
+			TracePrint "isFirstGroupInACycle:", isFirstGroupInACycle
+			TracePrint "pos", pos
 			
 			isMoved = checkFoundationAndMove(pos, element, elementSuit)
 			If isMoved = False Then 
@@ -575,7 +552,7 @@ Sub moveCardFromWastePile()
 			 	End If
 				Exit For
 			ElseIf isFirstGroupInACycle = False Then
-				pos = pos - 1
+				pos = -1
 			End If
 			isFoundAnyCardMovedInACycle = True
 			Delay 100
@@ -583,15 +560,19 @@ Sub moveCardFromWastePile()
 		
 		Delay 200
 		
+		TracePrint "isMoved in pile:", isMoved
+		TracePrint "pos", pos
+		isFoundInTableau = False
 		'Check tableau area
 		For t = 0 To 2
-			
-			If isFirstGroupInACycle = False Then 
-				If pileCardInfoArr(0,0) = "0" Then
+			If isFoundInTableau = True Then 
+				isFoundAnyCardMovedInACycle = True
+				If isFirstGroupInACycle = False Then 
 					Call identifyPileCard(0)
+				Else 
+					Call identifyPileCard(t)
 				End If
-			ElseIf pileCardInfoArr(t,0) = "0" Then 
-				Call identifyPileCard(t)
+				isFoundInTableau = False
 			End If
 			
 			If isFirstGroupInACycle = False Then
@@ -600,6 +581,9 @@ Sub moveCardFromWastePile()
 				Call checkTableauAndMoveForPile(t)
 			End If
 			
+			If isFoundInTableau = False Then 
+				Exit For
+			End If
 			Delay 200
 		Next
 		
@@ -610,14 +594,43 @@ Sub moveCardFromWastePile()
 		End If
 //		cycletimes = cycletimes - 1
 		
-		If cycletimes = 1 Then 
-			isFirstGroupInACycle = False
-		End If
+//		If cycletimes = 1 Then 
+//			isFirstGroupInACycle = False
+//		End If
+		TracePrint "isFoundAnyCardMovedInACycle", isFoundAnyCardMovedInACycle
 		
+		'If one loop ends
+		FindPic 550, 110, 634, 224, "Attachment:" & "endoneloop.png", "000000", 0, 0.5, intX, intY
+		If intX > 0 And intY > 0 Then 
+			timesinacycle = cycletimes
+			cycletimes = 0
+			If isFoundAnyCardMovedInACycle = False Then 
+				Exit Do
+			End If
+			Tap 591, 163
+			isFirstGroupInACycle = True
+			isFoundAnyCardMovedInACycle = False
+		Else 
+			FindPic 550, 110, 634, 224, "Attachment:" & "20points.png", "000000", 0, 0.5, intX, intY
+			timesinacycle = cycletimes
+			cycletimes = 0
+			If intX > 0 And intY > 0 Then 
+				If isFoundAnyCardMovedInACycle = False Then 
+					Exit Do
+				End If	
+				Tap 591, 163
+				isFirstGroupInACycle = True
+				isFoundAnyCardMovedInACycle = False
+			Else 
+				isFirstGroupInACycle = False
+			End If
+		End If
 //		If cycletimes = 0 Then 
 //			cycletimes = 8
 //		End If
-	Wend
+		cycletimes = cycletimes + 1
+		
+	Loop While True
 End Sub
 
 Dim isExecutedAddSuitToCard 
@@ -658,9 +671,10 @@ Sub checkTableauAndMoveForPile(index)
 				If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElementNumber) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
 					delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
 					Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
-					Delay 100
+					Delay 300
 					cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1)
 					isFoundAnyCardMovedInACycle = True
+					isFoundInTableau = True
 					Exit For
 				End If
 			Else 
@@ -1004,12 +1018,12 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			TracePrint cardPosArr(searchPos, 0), cardPosArr(pos, 0)
 			If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
 			 	TracePrint "Move left to right"
-				Swipe cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
 			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
 				TracePrint "Move right to left"
-				Swipe cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
 			Else 
-				Swipe cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
 			End If
 			
 			'Update search area
@@ -1119,7 +1133,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			If CInt(lastElementValue) - 1 = CInt(cardInfoArr(searchPos, 0)) And lastElementSuitColor <> cardInfoArr(searchPos, 2) Then 
 				delayTime = getDelayTime(Abs(cardPosArr(position, 0) - cardPosArr(searchPos, 0)))
 				TracePrint "Swipe again"
-				Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
 				cardInfoArr(position, 0) = cardInfoArr(position, 0) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
 				isSearchPosCardChanged = False
 				'Update search area
@@ -1277,7 +1291,7 @@ Sub identifyPileCard(index)
 	TracePrint "Finding card in (", pileSearchArea(index,0), pileSearchArea(index,1), pileSearchArea(index,2), pileSearchArea(index,3), ") pile area"
 	For m = 0 To UBound(allCardPicArr)
 		'Search card
-		FindPic pileSearchArea(index,0), pileSearchArea(index,1), pileSearchArea(index,2), pileSearchArea(index,3), "Attachment:" & allCardPicArr(m), "000000", 0, 0.5, intX, intY
+		FindPic pileSearchArea(index,0), pileSearchArea(index,1), pileSearchArea(index,2), pileSearchArea(index,3), "Attachment:" & allCardPicArr(m), "000000", 0, 0.4, intX, intY
 //		TracePrint "allCardPicArr(m):", allCardPicArr(m)
 		If intX > 0 And intY > 0 Then
 			'Get card point
@@ -1288,7 +1302,7 @@ Sub identifyPileCard(index)
 			pileCardInfoArr(index, 0) = cardPoint
 			TracePrint "index,pileCardInfoArr", index, pileCardInfoArr(index,0)
 			
-			Delay 100
+			Delay 300
 			
 			'Search suit
 			TracePrint "Finding suit in (", pileSuitSearchArea(index,0), pileSuitSearchArea(index,1), pileSuitSearchArea(index,2), pileSuitSearchArea(index,3), ") pile area"
@@ -1310,6 +1324,7 @@ Sub identifyPileCard(index)
 						Call identifyPileCard(index)
 					End If
 					noCard = False
+					Delay 100
 					Exit Sub
 				End If
 			Next
