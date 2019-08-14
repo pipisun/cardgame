@@ -312,6 +312,9 @@ Sub main()
 					number1 = CInt(cardInfoArr(i, 0))
 				End If
 				
+				Dim ifPipeChar
+				ifPipeChar = InStr(1, number1, "|")
+				
 				TracePrint "cint(number1£©:", number1
 				If number1 = 0 Then 
 					number1Arr = Split(cardInfoArr(i, 0), "|")
@@ -330,7 +333,12 @@ Sub main()
 					End If
 	//				cardInfoArr(i, 2) = number1SmallSuitColor
 				Else 
-	//				number1SuitColor = cardInfoArr(i,2)
+					If ifPipeChar > 0 Then 
+						number1Arr = Split(number1, "|")
+						number1BottomElement = number1Arr(Len(number1Arr) - 1)
+						number1Small = CInt(Left(number1BottomElement, Len(number1BottomElement) - 1))
+						number1SmallSuitColor = getSuitColor(Right(number1BottomElement, 1))
+					End If
 				End If
 				
 				'If number1 = 0 again, loop next
@@ -360,13 +368,13 @@ Sub main()
 	//				number2SuitColor = cardInfoArr(j, 2)
 				End If
 				
-				If number1 = 0 Then 
+				If number1 = 0 Or ifPipeChar > 0 Then 
 					tmpNumber1 = number1Small
 					tmpNumber1Color = number1SmallSuitColor
 					compareCounter = 1
 				Else 
 					tmpNumber1 = number1
-					tmpNumber1Color = cardInfoArr(i,2)
+					tmpNumber1Color = cardInfoArr(i, 2)
 				End If
 				If number2 = 0 Then 
 					tmpNumber2 = number2Top
@@ -391,7 +399,7 @@ Sub main()
 						duplicate = InStr(1, cardInfoArr(i, 0), cardInfoArr(j, 0))
 						TracePrint "duplicate:", duplicate
 						
-						TracePrint 	number1 - compareCounter, number2
+//						TracePrint 	number1 - compareCounter, number2
 	//					TracePrint	number1SmallSuitColor, number1SuitColor,number2SmallSuitColor,number2SuitColor
 	//					If duplicate = 0 And (number1 - compareCounter = number2 And cardInfoArr(i,2) <> cardInfoArr(j,2) Or _
 	//						number1 + 1 = number2Small And number1SuitColor <> number2SmallSuitColor Or _
@@ -424,7 +432,7 @@ Sub main()
 							
 							'Update search area
 							If j <> 0 Then
-								Call updateSearchAreaRange(j, 50, "up")
+								Call updateSearchAreaRange(j, 15, "up")
 							End If
 							
 							Delay 200
@@ -447,7 +455,7 @@ Sub main()
 //										cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
 //									End If
 								Else 
-									If InStr(1, cardPosArr(j, 0), "|") > 0 Then 
+									If InStr(1, cardInfoArr(j, 0), "|") > 0 Then 
 										cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0)
 									Else
 										cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
@@ -459,6 +467,7 @@ Sub main()
 							cardInfoArr(i, 2) = cardInfoArr(j, 2)
 							TracePrint "AFTER SWIPING..."
 							TracePrint "cardInfoArr():", cardInfoArr(i,0),",", cardInfoArr(i,1),",",cardInfoArr(i,2)
+							number1 = cardInfoArr(i, 0)
 							
 							'Waiting for new card appears
 							Delay 500
@@ -968,7 +977,7 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 		End If
 		
 		'Update search area range
-		updateSearchAreaRange(pos, 50, "up")
+		updateSearchAreaRange(pos, 15, "up")
 	End If
 End Sub
 
@@ -1058,7 +1067,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			End If
 			
 			'Update search area
-			Call updateSearchAreaRange(searchPos, 50, "up")
+			Call updateSearchAreaRange(searchPos, 15, "up")
 			
 			Call checkCardAfterMoveCardRule(searchPos, pos, "-1")
 			
@@ -1087,7 +1096,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			Swipe cardPosArr(pos, 0)+20, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 			
 			'Update search area
-			Call updateSearchAreaRange(pos, 50, "up")
+			Call updateSearchAreaRange(pos, 15, "up")
 			Delay 300
 			
 			Call checkCardAfterMoveCardRule(searchPos, pos, "+1")
@@ -1168,7 +1177,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				cardInfoArr(position, 0) = cardInfoArr(position, 0) & "|" & cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1)
 				isSearchPosCardChanged = False
 				'Update search area
-				Call updateSearchAreaRange(searchPos, 50, "up")
+				Call updateSearchAreaRange(searchPos, 15, "up")
 			Else 
 				tmp = searchPos
 				searchPos = position
@@ -1191,7 +1200,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
 				isPosCardChanged = False
 				'Update search area
-				Call updateSearchAreaRange(position, 50, "up")
+				Call updateSearchAreaRange(position, 15, "up")
 //				'Swap position and searchPos
 //				Dim tmp
 //				tmp = position
@@ -1352,6 +1361,7 @@ Sub identifyPileCard(index)
 						TracePrint "=1"
 						Call moveToSpecificFoundationAreaAndUpdate(index, getSuitPosition(pileCardInfoArr(index, 1)), pileCardInfoArr(index, 0), pileCardInfoArr(index, 1), 1, "PILE")
 						Delay 200
+						isFoundAnyCardMovedInACycle = True
 						Call identifyPileCard(index)
 					End If
 					noCard = False
