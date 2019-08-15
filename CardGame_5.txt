@@ -517,7 +517,7 @@ Call printOut()
 
 Call moveCardToFoundation()
 
-Call moveKCard()
+Call moveKCard("", "")
 
 Call printOut()
 
@@ -589,7 +589,7 @@ Sub moveCardFromWastePile()
 		TracePrint "pos", pos
 		isFoundInTableau = False
 		'Check tableau area
-		For t = 0 To 2
+		For t = tmpIndex To 2
 			If isFoundInTableau = True Then 
 				isFoundAnyCardMovedInACycle = True
 				If isFirstGroupInACycle = False Then 
@@ -602,7 +602,7 @@ Sub moveCardFromWastePile()
 			
 			If isFirstGroupInACycle = False Then
 				Call checkTableauAndMoveForPile(0)
-			Else 
+			Else
 				Call checkTableauAndMoveForPile(t)
 			End If
 			
@@ -612,7 +612,10 @@ Sub moveCardFromWastePile()
 			Delay 200
 		Next
 		
-		If isFoundAnyCardMovedInACycle = True Then
+		If isFoundAnyCardMovedInACycle = True Then 
+			
+			Call sortMaxToMin()
+			
 			Call main()
 		
 			Call moveCardToFoundation()
@@ -713,7 +716,10 @@ Sub checkTableauAndMoveForPile(index)
 					Exit For
 				End If
 			Else 
-			 
+				If moveKCard(i, index) = True Then 
+					Delay 300
+					Exit For
+				End If
 			End If
 		Next
 		'Identify next card in pile
@@ -977,7 +983,9 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 		End If
 		
 		'Update search area range
-		updateSearchAreaRange(pos, 15, "up")
+		Call updateSearchAreaRange(pos, 15, "up")
+		
+		
 	End If
 End Sub
 
@@ -1464,55 +1472,105 @@ Sub identifyNewCard(j)
 	End If
 End Sub
 
-Sub moveKCard()
+Function moveKCard(emptyIndex, pileIndex)
 	Dim emptySpotPosArr, newPosition, isHavingPipe, element, elementArr
-	For m = 0 To 6
-		isHavingPipe = InStr(1, cardInfoArr(m, 0), "|")
-		If isHavingPipe > 0 Then 
-			elementArr = Split(cardInfoArr(m, 0), "|")
-			element = Left(elementArr(0), Len(elementArr(0))-1)
-		ElseIf isExecutedAddSuitToCard = True Then
-			element = Left(cardInfoArr(m, 0), Len(cardInfoArr(m, 0)) - 1)
-		Else 
-			element = cardInfoArr(m,0)
-		End If
-		
-		emptySpotPosArr = Split(emptySpotPos, "|")
-		If element = "13" And emptySpotCount >= 2 Then 
+	
+	emptySpotPosArr = Split(emptySpotPos, "|")
+	If pileIndex <> "" Then 
+		If pileCardInfoArr(pileIndex, 0) = "13" Then 
+			If emptySpotCount >= 2 Then
+				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 2), cardPosArr(emptyIndex, 1), 500
+				cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
+				cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
+				cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
+				emptySpotCount = emptySpotCount - 1
+				isFoundInTableau = True
+				isFoundAnyCardMovedInACycle = True
+				moveKCard = True
+				Exit Function
+			ElseIf emptySpotCount = 1 Then
+				For m = 0 To 6
+					Dim arrElement,topElementValue, topElementSuit
+					arrElement = Split(cardInfoArr(m, 0), "|")
+					If Len(arrElement) = 1 Then 
+						If isExecutedAddSuitToCard = False Then 
+							topElementValue = arrElement(0)
+							topElementSuit = cardInfoArr(m, 1)
+						Else 
+							topElementValue = Left(arrElement(0), Len(arrElement(0)) - 1)
+							topElementSuit = Right(arrElement(0),1)
+						End If
+					Else 
+						topElementValue = Left(arrElement(0), Len(arrElement(0)) - 1)
+						topElementSuit = Right(arrElement(0),1)
+					End If
+					
+					If CInt(pileCardInfoArr(pileIndex, 0)) - 1 = CInt(topElementValue) And pileCardInfoArr(pileIndex, 1) <> topElementSuit Then 
+						Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 2), cardPosArr(emptyIndex, 1), 500
+						cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
+						cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
+						cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
+						isFoundInTableau = True
+						isFoundAnyCardMovedInACycle = True
+						emptySpotCount = emptySpotCount - 1
+						moveKCard = True
+						Exit Function
+					End If
+				Next
+			End If	
+		End If	
+	Else
+		For m = 0 To 6
+			isHavingPipe = InStr(1, cardInfoArr(m, 0), "|")
 			If isHavingPipe > 0 Then 
-				Swipe cardPosArr(m, 0), cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
+				elementArr = Split(cardInfoArr(m, 0), "|")
+				element = Left(elementArr(0), Len(elementArr(0))-1)
+			ElseIf isExecutedAddSuitToCard = True Then
+				element = Left(cardInfoArr(m, 0), Len(cardInfoArr(m, 0)) - 1)
 			Else 
-				Tap cardPosArr(m, 0), cardPosArr(m, 1)
+				element = cardInfoArr(m,0)
 			End If
 			
-			Delay 100
-			emptySpotCount = emptySpotCount - 1
-			If Len(emptySpotPosArr) <> 1 Then
-				emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0)))
-			End If
-			TracePrint "emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
-			'Check if there is any card needed to identify
-			Call identifyNewCard(m)
-			
-			Dim oldPosition
-						
-			oldPosition = m
-			newPosition = m
-			
-			'Check if there is a match
-			While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
-				newPosition = moveCardAfterIdentify(oldPosition,"")
-				If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
-					oldPosition = newPosition
-					noSuitableCardMatch = True
-					Call identifyNewCard(newPosition)
-				Else 
-					Exit While
+			If element = "13" And emptySpotCount >= 2 Then 
+//				If isHavingPipe > 0 Then 
+					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
+//				Else 
+//					Tap cardPosArr(m, 0), cardPosArr(m, 1)
+//				End If
+				cardInfoArr(CInt(emptySpotPosArr(0)), 0) = cardInfoArr(m, 0)
+				cardInfoArr(CInt(emptySpotPosArr(0)), 1) = cardInfoArr(m, 1)
+				cardInfoArr(CInt(emptySpotPosArr(0)), 2) = cardInfoArr(m, 2)
+				
+				Delay 100
+				emptySpotCount = emptySpotCount - 1
+				If Len(emptySpotPosArr) <> 1 Then
+					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0) - 1))
 				End If
-			Wend
-		End If
-	Next	
-End Sub
+				TracePrint "emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
+				'Check if there is any card needed to identify
+				Call identifyNewCard(m)
+				
+				Dim oldPosition
+							
+				oldPosition = m
+				newPosition = m
+				
+				'Check if there is a match
+				While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
+					newPosition = moveCardAfterIdentify(oldPosition,"")
+					If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
+						oldPosition = newPosition
+						noSuitableCardMatch = True
+						Call identifyNewCard(newPosition)
+					Else 
+						Exit While
+					End If
+				Wend
+			End If
+		Next
+	End If
+	moveKCard = False
+End Function
 
 Function getSuitColor(strSuit)
 	Dim strSuitSign
