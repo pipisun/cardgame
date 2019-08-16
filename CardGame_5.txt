@@ -415,18 +415,19 @@ Sub main()
 							
 							TracePrint "...:", cardPosArr(j,0), cardPosArr(j,1), cardPosArr(i,0), cardPosArr(i,1)
 			//						delayTime = 500
-					
+							Delay 50
+							
 							If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
 								If cardPosArr(i, 0) > 363 Then 
-									Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
+									Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
 								Else
-									Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
+									Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 								End If
 							Else 
 								If cardPosArr(i, 0) < 50 Then 
-									Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
+									Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
 								Else
-									Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
+									Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 								End If
 							End If
 							
@@ -823,7 +824,11 @@ Sub moveCardToFoundation()
 			For n = UBOUND(elementArr) To 0 Step -1
 				If Len(elementArr) = 1 Then 
 //					TracePrint "m=?", m, " elementArr(n)=?", elementArr(n), " cardInfo(m,1)=?", cardInfoArr(m,1) 
-					isMoved = checkIfMoveCardToFoundation(m, elementArr(n), cardInfoArr(m, 1), 1)
+					If isExecutedAddSuitToCard = True Then 
+						isMoved = checkIfMoveCardToFoundation(m, Left(elementArr(n),Len(elementArr(n))-1), cardInfoArr(m, 1), 1)
+					Else
+						isMoved = checkIfMoveCardToFoundation(m, elementArr(n), cardInfoArr(m, 1), 1)
+					End If
 				Else 
 					Dim ele, eleSuit
 					ele = Left(elementArr(n), Len(elementArr(n)) - 1)
