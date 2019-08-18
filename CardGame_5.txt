@@ -173,6 +173,9 @@ isFoundInTableau = False
 Dim isExecutedAddSuitToCard 
 isExecutedAddSuitToCard = False
 
+Dim isCardMovedInTableauOrFoundation
+isCardMovedInTableauOrFoundation = False
+
 allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 "r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
 
@@ -427,10 +430,14 @@ Sub main()
 							Else 
 								If cardPosArr(i, 0) < 50 Then 
 									Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
+								ElseIf cardPosArr(j,0) > 550 Then
+									Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 								Else
 									Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 								End If
 							End If
+							
+							isCardMovedInTableauOrFoundation = True
 							
 							'Update search area
 							If j <> 0 Then
@@ -699,6 +706,7 @@ Sub checkTableauAndMoveForPile(index)
 //		If isMoved = True Then
 //			Call identifyPileCard(index)
 //		End If
+		isCardMovedInTableauOrFoundation = False
 		
 		For i = 0 To 6
 			If cardInfoArr(i,0) <> "0" Then
@@ -845,6 +853,8 @@ Sub moveCardToFoundation()
 				TracePrint "isMoved:", isMoved
 				
 				If isMoved = True Then 
+					isCardMovedInTableauOrFoundation = True
+					
 					If Len(elementArr) = 1 Or counter = Len(elementArr) Then 
 		 	
 						'Identify the new card
@@ -1197,6 +1207,8 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				'Update search area
 				Call updateSearchAreaRange(searchPos, 15, "up")
 			Else 
+				TracePrint "Swap searchpos and position"
+				TracePrint "searchpos:", searchPos, ",position:", position
 				tmp = searchPos
 				searchPos = position
 				position = tmp
@@ -1246,7 +1258,8 @@ Function moveCardAfterIdentify(pos, flag)
 //		TracePrint "Flag:Top - NewCardNumber:", intNewCardNumber, ",NewCardSuit:",strNewCardSuit
 	Else
 		intNewCardNumber = CInt(cardInfoArr(pos, 0))
-		strNewCardSuit = cardInfoArr(pos, 2)	
+		strNewCardSuit = cardInfoArr(pos, 2)
+		TracePrint "strNewCardNumber", cardInfoArr(pos, 0)
 		TracePrint "NewCardNumber:", intNewCardNumber, ",NewCardSuit:",strNewCardSuit
 	End If
 	
@@ -1360,7 +1373,7 @@ Sub identifyPileCard(index)
 			pileCardInfoArr(index, 0) = cardPoint
 			TracePrint "index,pileCardInfoArr", index, pileCardInfoArr(index,0)
 			
-			Delay 300
+			Delay 500
 			
 			'Search suit
 			TracePrint "Finding suit in (", pileSuitSearchArea(index,0), pileSuitSearchArea(index,1), pileSuitSearchArea(index,2), pileSuitSearchArea(index,3), ") pile area"
@@ -1497,7 +1510,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 	emptySpotPosArr = Split(emptySpotPos, "|")
 	If pileIndex <> "" Then 
 		If pileCardInfoArr(pileIndex, 0) = "13" Then 
-			If flag = "FINAL" Then 
+			If flag = "FINAL" And emptySpotCount >=1 Then 
 				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 2), cardPosArr(emptyIndex, 1), 500
 				cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
@@ -1560,7 +1573,8 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				element = cardInfoArr(m,0)
 			End If
 			
-			If element = "13" Then 
+			TracePrint "top element:", element
+			If element = "13" And emptySpotCount >=1 Then 
 				If flag = "FINAL" Then 
 					Swipe cardPosArr(m, 0) + 10, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
 				
@@ -1730,16 +1744,20 @@ Sub finalCheck()
 	
 //	Call addSuitToCard()
 	
-	Call moveCardFromWastePile()
-	For i = 0 To 6
-		If cardInfoArr(i,0) = 0 Then
-			Call moveKCard(i, globalPileIndex, "FINAL")
-			Exit For
-		End If
-	Next
+	If isCardMovedInTableauOrFoundation = True Then
+		Call moveCardFromWastePile()
 	
-	Call sortMaxToMin()
-	Call moveKCard("", "", "FINAL")
-	Call main()
-	Call moveCardToFoundation()
+		For i = 0 To 6
+			If cardInfoArr(i,0) = 0 Then
+				Call moveKCard(i, globalPileIndex, "FINAL")
+				Exit For
+			End If
+		Next
+		
+		Call sortMaxToMin()
+		Call moveKCard("", "", "FINAL")
+		Call main()
+		Call moveCardToFoundation()
+	End If
+
 End Sub
