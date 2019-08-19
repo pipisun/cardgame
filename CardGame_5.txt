@@ -1,95 +1,11 @@
-//Dim screenX, screenY
-//Dim intX, intY
-//
-//Dim count, isFound 
-//
-//screenX = GetScreenX()
-//screenY = GetScreenY()
-//TracePrint "Screen size:", screenX, screenY
-//
-//'Run app
-//RunApp "com.tether.solitaire.klondike"
-//
-//count = 30
-//While count > 0 
-//	FindPic 0, 0, 0, 0, "Attachment:playnow.png", "000000", 0, 0.7, intX, intY
-//	If intX > 0 And intY > 0 Then 
-//		TracePrint "Found Playnow button"
-//	
-//		Tap intX, intY
-//		Exit While
-//	Else 
-//		TracePrint "Continue searching playnow..."	
-//	End If
-//	count = count - 1
-//	Delay 1000
-//Wend
-//
-//'Tap Play Now
-//'Tap screenX / 2, screenY - 60
-//
-//'Choose game
-//count = 30
-//isFound = False
-//
-//TracePrint "Searching entry z1"
-//While count > 0 
-//	FindPic 0, 0, 0, 0, "Attachment:entryz1.png", "000000", 0, 0.7, intX, intY
-//	If intX > 0 And intY > 0 Then 
-//		TracePrint "Found entry z1"
-//
-//		isFound = True
-//		Exit While
-//	Else 
-//		TracePrint "Continue searching z1..."	
-//	End If
-//	count = count - 1
-//	Delay 1000
-//Wend
-//
-//If Not isFound Then 
-//	TracePrint "Not found entryz1"
-//Else 
-//	Delay 2000
-//	Tap intX, intY	
-//End If
-//
-//'Tap Start Game
-//count = 30
-//While count > 0 
-//	FindPic 0, 0, 0, 0, "Attachment:startgame.png", "000000", 0, 0.7, intX, intY
-//	If intX > 0 And intY > 0 Then 
-//		TracePrint "Found Startgame button"
-//
-//		Tap intX, intY
-//		Exit While
-//	Else 
-//		TracePrint "Continue searching startgame..."	
-//	End If
-//	count = count - 1
-//	Delay 1000
-//Wend
-//
-//'Waiting game to start
-//count = 30
-//While count > 0 
-//	FindPic 0, 800, 320, 960, "Attachment:endbutton.png", "000000", 0, 0.7, intX, intY
-//	If intX > 0 And intY > 0 Then 
-//		TracePrint "Found Endbutton button"
-//
-//		Delay 1000
-//		Exit While
-//	Else 
-//		TracePrint "Continue searching Endbutton..."	
-//	End If
-//	count = count - 1
-//	Delay 1000
-//Wend
+Dim screenX, screenY
+Dim intX, intY
+
+Dim count, isFound 
 
 'Save card info(point, suit,suitColor) and card position
 Dim cardInfoArr(7,3), cardPosArr(7,2)
 Dim allCardPicArr, suitPicArr
-Dim intX, intY
 
 Dim noSuitableCardMatch
 noSuitableCardMatch = False
@@ -206,73 +122,6 @@ Dim cardPoint
 Dim cardSearchArea(7,4), suitSearchArea(7,4)
 Dim globalPileIndex
 
-Sub init()
-	For i = 0 To 6
-		TracePrint "Finding card in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
-		For j = 0 To UBound(allCardPicArr)
-			FindPic leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, "Attachment:" & allCardPicArr(j), "000000", 0, 0.5, intX, intY
-	//		TracePrint "Finding ", allCardPicArr(j), " in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
-			If intX > 0 And intY > 0 Then 
-				'Get card point
-				cardPoint = Mid(allCardPicArr(j), 2, InStr(1, allCardPicArr(j), ".") - 2) 
-				TracePrint "Found card: ", cardPoint
-				'Save card info
-				cardInfoArr(i, 0) = cardPoint
-				cardPosArr(i, 0) = intX + 20
-				cardPosArr(i, 1) = intY + 20
-				cardSearchArea(i,0) = leftUpperCornerX
-				cardSearchArea(i,1) = leftUpperCornerY
-				cardSearchArea(i,2) = rightUpperCornerX
-				cardSearchArea(i, 3) = rightUpperCornerY
-				
-				TracePrint "Finding suit in (", leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, ") area"
-				
-				For m = 0 To UBound(suitPicArr)
-					'Search suit
-					FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.4, intX, intY
-					If intX > 0 And intY > 0 Then 
-						TracePrint "Found suit: ", suitPicArr(m)
-						'Save suit info
-						cardInfoArr(i, 1) = convertSuitColorToSign(suitPicArr(m))
-						'Save suit color(Black/Red)
-						cardInfoArr(i, 2) = checkSuitBlackOrRed(suitPicArr(m))
-						TracePrint "Found suit color: ", cardInfoArr(i, 2)
-						
-						suitSearchArea(i,0) = leftUpperCornerXForSuit
-						suitSearchArea(i,1) = leftUpperCornerYForSuit
-						suitSearchArea(i,2) = rightUpperCornerXForSuit
-						suitSearchArea(i,3) = rightUpperCornerYForSuit
-						
-						Exit For
-					End If
-				Next
-				Exit For
-			End If
-		Next
-		leftUpperCornerX = leftUpperCornerX + offsetX1
-		rightUpperCornerX = rightUpperCornerX + offsetX2
-		leftUpperCornerY = leftUpperCornerY + offsetY1
-		rightUpperCornerY = rightUpperCornerY + offsetY2
-		leftUpperCornerXForSuit = leftUpperCornerXForSuit + offsetX1
-		rightUpperCornerXForSuit = rightUpperCornerXForSuit + offsetX2
-		leftUpperCornerYForSuit = leftUpperCornerYForSuit + offsetY1
-		rightUpperCornerYForSuit = rightUpperCornerYForSuit + offsetY2
-	Next
-End Sub
-
-Call init()
-
-Call sortMaxToMin()
-For i = 0 To 6
-	TracePrint "Card point:", cardInfoArr(i,0)
-	TracePrint "Card position(x,y):", cardPosArr(i,0), ",", cardPosArr(i,1)
-	TracePrint "Card suit type:", cardInfoArr(i,1)
-	TracePrint "Card suit color:", cardInfoArr(i,2)
-	Call moveAFirst(i)
-Next
-
-Call sortMaxToMin()
-
 'Comparison
 Dim number1, number2
 Dim number1SuitColor, number2SuitColor
@@ -290,6 +139,84 @@ Dim number1SmallSuitColor, number2SmallSuitColor
 
 Dim tmpNumber1, tmpNumber1Color
 Dim tmpNumber2, tmpNumber2Color
+
+Dim timesOfExecution
+
+'Start the game
+screenX = GetScreenX()
+screenY = GetScreenY()
+TracePrint "Screen size:", screenX, screenY
+
+'Run app
+RunApp "com.tether.solitaire.klondike"
+
+Call playNow()
+
+Call runTestScenarioForZ1(10)
+
+Sub runTestScenarioForZ1(timesOfExecution)
+	
+	For i = 1 To timesOfExecution
+		Call selectGame("entryz1.png")
+		Call startGame()
+		Call waitGameToStart()
+		
+		Call init()
+		Call sortMaxToMin()
+		Call printOutCardInfoAndMoveAFirst()
+		Call sortMaxToMin()
+		'Main
+		Call main()
+		
+		'Sort again
+		Call sortMaxToMin()
+		
+		Call printOut()
+		
+		Call moveCardToFoundation()
+		
+		Call moveKCard("", "", "")
+		
+		Call printOut()
+		
+		'Call main again
+		Call sortMaxToMin()
+		
+		Call main()
+		
+		'Sort again
+		Call sortMaxToMin()
+		
+		Call moveCardToFoundation()
+		
+		Call addSuitToCard()
+		
+		Call moveCardFromWastePile()
+		
+		Call finalCheck()
+		
+		'End game
+		Call endGame()
+	Next
+End Sub	
+
+//Call init()
+//
+//Call sortMaxToMin()
+
+Sub printOutCardInfoAndMoveAFirst()
+	For i = 0 To 6
+		TracePrint "Card point:", cardInfoArr(i,0)
+		TracePrint "Card position(x,y):", cardPosArr(i,0), ",", cardPosArr(i,1)
+		TracePrint "Card suit type:", cardInfoArr(i,1)
+		TracePrint "Card suit color:", cardInfoArr(i,2)
+		Call moveAFirst(i)
+	Next
+End Sub
+
+//Call sortMaxToMin()
+
+
 
 'Move A first
 Sub moveAFirst(index)
@@ -516,35 +443,35 @@ Sub main()
 	Next
 End Sub
 
-'Main
-Call main()
-
-'Sort again
-Call sortMaxToMin()
-
-Call printOut()
-
-Call moveCardToFoundation()
-
-Call moveKCard("", "", "")
-
-Call printOut()
-
-'Call main again
-Call sortMaxToMin()
-
-Call main()
-
-'Sort again
-Call sortMaxToMin()
-
-Call moveCardToFoundation()
-
-Call addSuitToCard()
-
-Call moveCardFromWastePile()
-
-Call finalCheck()
+//'Main
+//Call main()
+//
+//'Sort again
+//Call sortMaxToMin()
+//
+//Call printOut()
+//
+//Call moveCardToFoundation()
+//
+//Call moveKCard("", "", "")
+//
+//Call printOut()
+//
+//'Call main again
+//Call sortMaxToMin()
+//
+//Call main()
+//
+//'Sort again
+//Call sortMaxToMin()
+//
+//Call moveCardToFoundation()
+//
+//Call addSuitToCard()
+//
+//Call moveCardFromWastePile()
+//
+//Call finalCheck()
 
 Sub printOut()
 	For i = 0 To 6
@@ -1086,12 +1013,12 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			TracePrint cardPosArr(searchPos, 0), cardPosArr(pos, 0)
 			If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
 			 	TracePrint "Move left to right"
-				Swipe cardPosArr(searchPos, 0) + 5, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 15, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
 			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
 				TracePrint "Move right to left"
-				Swipe cardPosArr(searchPos, 0) + 5, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 15, cardPosArr(searchPos, 1), cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), delayTime
 			Else 
-				Swipe cardPosArr(searchPos, 0) + 5, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
+				Swipe cardPosArr(searchPos, 0) + 15, cardPosArr(searchPos, 1), cardPosArr(pos, 0), cardPosArr(pos, 1), delayTime
 			End If
 			
 			'Update search area
@@ -1121,7 +1048,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
 			
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
-			Swipe cardPosArr(pos, 0)+5, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+			Swipe cardPosArr(pos, 0)+10, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 			
 			'Update search area
 			Call updateSearchAreaRange(pos, 15, "up")
@@ -1760,4 +1687,197 @@ Sub finalCheck()
 		Call moveCardToFoundation()
 	End If
 
+End Sub
+
+Sub init()
+	For i = 0 To 6
+		TracePrint "Finding card in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
+		For j = 0 To UBound(allCardPicArr)
+			FindPic leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, "Attachment:" & allCardPicArr(j), "000000", 0, 0.5, intX, intY
+	//		TracePrint "Finding ", allCardPicArr(j), " in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
+			If intX > 0 And intY > 0 Then 
+				'Get card point
+				cardPoint = Mid(allCardPicArr(j), 2, InStr(1, allCardPicArr(j), ".") - 2) 
+				TracePrint "Found card: ", cardPoint
+				'Save card info
+				cardInfoArr(i, 0) = cardPoint
+				cardPosArr(i, 0) = intX + 20
+				cardPosArr(i, 1) = intY + 20
+				cardSearchArea(i,0) = leftUpperCornerX
+				cardSearchArea(i,1) = leftUpperCornerY
+				cardSearchArea(i,2) = rightUpperCornerX
+				cardSearchArea(i, 3) = rightUpperCornerY
+				
+				TracePrint "Finding suit in (", leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, ") area"
+				
+				For m = 0 To UBound(suitPicArr)
+					'Search suit
+					FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.4, intX, intY
+					If intX > 0 And intY > 0 Then 
+						TracePrint "Found suit: ", suitPicArr(m)
+						'Save suit info
+						cardInfoArr(i, 1) = convertSuitColorToSign(suitPicArr(m))
+						'Save suit color(Black/Red)
+						cardInfoArr(i, 2) = checkSuitBlackOrRed(suitPicArr(m))
+						TracePrint "Found suit color: ", cardInfoArr(i, 2)
+						
+						suitSearchArea(i,0) = leftUpperCornerXForSuit
+						suitSearchArea(i,1) = leftUpperCornerYForSuit
+						suitSearchArea(i,2) = rightUpperCornerXForSuit
+						suitSearchArea(i,3) = rightUpperCornerYForSuit
+						
+						Exit For
+					End If
+				Next
+				Exit For
+			End If
+		Next
+		leftUpperCornerX = leftUpperCornerX + offsetX1
+		rightUpperCornerX = rightUpperCornerX + offsetX2
+		leftUpperCornerY = leftUpperCornerY + offsetY1
+		rightUpperCornerY = rightUpperCornerY + offsetY2
+		leftUpperCornerXForSuit = leftUpperCornerXForSuit + offsetX1
+		rightUpperCornerXForSuit = rightUpperCornerXForSuit + offsetX2
+		leftUpperCornerYForSuit = leftUpperCornerYForSuit + offsetY1
+		rightUpperCornerYForSuit = rightUpperCornerYForSuit + offsetY2
+	Next
+End Sub
+
+Sub playNow()
+	Dim count, intX, intY
+	count = 5
+	While count > 0 
+		FindPic 0, 0, 0, 0, "Attachment:playnow.png", "000000", 0, 0.7, intX, intY
+		If intX > 0 And intY > 0 Then 
+			TracePrint "Found Playnow button"
+		
+			Tap intX, intY
+			Exit While
+		Else 
+			'TracePrint "Continue searching playnow..."	
+		End If
+		count = count - 1
+		Delay 1000
+	Wend
+End Sub
+'Tap Play Now
+'Tap screenX / 2, screenY - 60
+
+Sub selectGame(gameOption)
+	Dim count, isFound, intX, intY
+	'Choose game
+	count = 10
+	isFound = False
+	
+	TracePrint "Searching entry " & gameOption
+	While count > 0 
+		FindPic 0, 0, 0, 0, "Attachment:" & gameOption, "000000", 0, 0.7, intX, intY
+		If intX > 0 And intY > 0 Then 
+			TracePrint "Found entry " & gameOption
+	
+			isFound = True
+			Exit While
+		Else 
+			TracePrint "Continue searching z1..."	
+		End If
+		count = count - 1
+		Delay 1000
+	Wend
+	
+	If Not isFound Then 
+		TracePrint "Not found entryz1"
+	Else 
+		Delay 2000
+		Tap intX, intY	
+	End If
+End Sub
+
+Sub startGame()
+	Dim count, intX, intY
+	'Tap Start Game
+	count = 10
+	While count > 0 
+		FindPic 0, 0, 0, 0, "Attachment:startgame.png", "000000", 0, 0.7, intX, intY
+		If intX > 0 And intY > 0 Then 
+			TracePrint "Found Startgame button"
+	
+			Tap intX, intY
+			Exit While
+		Else 
+			'TracePrint "Continue searching startgame..."	
+		End If
+		count = count - 1
+		Delay 1000
+	Wend
+End Sub
+
+'Waiting game to start
+Sub waitGameToStart()
+	Dim count, intX, intY
+	count = 15
+	While count > 0 
+		FindPic 0, 967, 105, 1132, "Attachment:endbutton.png", "000000", 0, 0.7, intX, intY
+		If intX > 0 And intY > 0 Then 
+			TracePrint "Found Endbutton button"
+	
+			Delay 1000
+			Exit While
+		Else 
+			'TracePrint "Continue searching Endbutton..."	
+		End If
+		count = count - 1
+		Delay 1000
+	Wend
+End Sub
+
+Sub endGame()
+	Dim count, intX, intY
+	count = 15
+	While count > 0 
+		FindPic 0, 967, 105, 1132, "Attachment:endbutton.png", "000000", 0, 0.7, intX, intY
+		If intX > 0 And intY > 0 Then 
+			TracePrint "Hit Endbutton button"
+			Tap intX + 5, intY + 5
+			
+			Delay 200
+			'Find End Now button
+			FindPic 335, 625, 575, 718, "Attachment:endnowbutton.png", "000000", 0, 0.5, intX, intY
+			If intX > 0 And intY > 0 Then 
+				TracePrint "Hit End Now button"
+				Tap intX + 20, intY + 10
+				
+				Delay 5000
+				
+				FindPic 65, 732, 485, 826, "Attachment:submitbutton.png", "000000", 0, 0.4, intX, intY
+				If intX > 0 And intY > 0 Then 
+					TracePrint "Hit Submit button"
+					Tap intX + 20, intY + 10
+				End If
+					
+				Delay 5000
+				
+				'Hit Next
+				FindPic 90, 996, 547, 1038, "Attachment:nextbutton.png", "000000", 0, 0.6, intX, intY
+				If intX > 0 And intY > 0 Then 
+					TracePrint "Hit Next button"
+					Tap intX + 50, intY + 50
+					
+					Delay 2000
+					
+					FindPic 529, 0, 629, 100, "Attachment:xbutton.png", "000000", 0, 0.6, intX, intY
+					If intX > 0 And intY > 0 Then 
+					 	TracePrint "Hit X button"
+						Tap intX + 5, intY + 5
+					End If
+				End If
+			End If
+			
+			Delay 1000
+			Exit While
+		Else 
+			'TracePrint "Continue searching Endbutton..."	
+		End If
+		count = count - 1
+		Delay 1000
+	Wend
 End Sub
