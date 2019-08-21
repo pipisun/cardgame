@@ -283,8 +283,8 @@ Sub main()
 							Else 
 								If cardPosArr(i, 0) < 50 Then 
 									Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
-								ElseIf cardPosArr(j,0) > 550 Then
-									Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
+								ElseIf cardPosArr(j,0) > 530 Then
+									Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1), cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime
 								Else
 									Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 								End If
@@ -1440,13 +1440,13 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 0) = cardInfoArr(m, 0)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 1) = cardInfoArr(m, 1)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 2) = cardInfoArr(m, 2)
-				
+				TracePrint "1emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
 				Delay 100
 				emptySpotCount = emptySpotCount - 1
 				If Len(emptySpotPosArr) <> 1 Then
 					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0) - 1))
 				End If
-				TracePrint "emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
+				TracePrint "2emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
 				'Check if there is any card needed to identify
 				Call identifyNewCard(m)
 				
@@ -1754,10 +1754,11 @@ End Sub
 
 Sub playNow()
 	Dim count, intX, intY
-	count = 5
+	count = 15
 	While count > 0 
-		FindPic 0, 0, 0, 0, "Attachment:playnow.png", "000000", 0, 0.7, intX, intY
+		FindPic 163, 1020, 472, 1110, "Attachment:playnow.png", "000000", 0, 0.7, intX, intY
 		If intX > 0 And intY > 0 Then 
+		 	Delay 2000
 			TracePrint "Found Playnow button"
 		
 			Tap intX, intY
@@ -1811,6 +1812,8 @@ Sub startGame()
 			TracePrint "Found Startgame button"
 	
 			Tap intX, intY
+			Delay 6000
+			
 			Exit While
 		Else 
 			'TracePrint "Continue searching startgame..."	
@@ -1825,11 +1828,11 @@ Sub waitGameToStart()
 	Dim count, intX, intY
 	count = 15
 	While count > 0 
-		FindPic 0, 0, 0, 0, "Attachment:endbutton.png", "000000", 0, 0.4, intX, intY
+		FindPic 0, 0, 0, 0, "Attachment:endbutton.png", "000000", 0, 0.7, intX, intY
 		If intX > 0 And intY > 0 Then 
 			TracePrint "Found Endbutton button"
 	
-			Delay 1000
+			Delay 5000
 			Exit While
 		Else 
 			'TracePrint "Continue searching Endbutton..."	
@@ -1863,10 +1866,15 @@ Sub endGame()
 					Tap intX + 20, intY + 10
 				End If
 					
-				Delay 5000
+				Delay 7000
+				
+				'Swipe the page
+				Swipe 22,1049, 22, 619, 500
+				
+				Delay 500
 				
 				'Hit Next
-				FindPic 90, 966, 442, 1030, "Attachment:nextbutton.png", "000000", 0, 0.6, intX, intY
+				FindPic 12, 500, 580, 1058, "Attachment:nextbutton.png", "000000", 0, 0.6, intX, intY
 				If intX > 0 And intY > 0 Then 
 					TracePrint "Hit Next button"
 					Tap intX + 20, intY + 20
