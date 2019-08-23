@@ -822,16 +822,16 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	ElseIf isAFlag = "" Then  
 		If elementSuit = "S" Then 
 	 		TracePrint "Moving the S card..."
-			Swipe cardPosArr(pos, 0) + 5, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
+			Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
 		ElseIf elementSuit = "H" Then
 			TracePrint "Moving the H card..."
-			Swipe cardPosArr(pos, 0) + 5, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1,0), foundationPosArr(1,1), delayTime
+			Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1,0), foundationPosArr(1,1), delayTime
 		ElseIf elementSuit = "C" Then
 			TracePrint "Moving the C card..."
-			Swipe cardPosArr(pos, 0) + 5, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2,0), foundationPosArr(2,1), delayTime
+			Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2,0), foundationPosArr(2,1), delayTime
 		ElseIf elementSuit = "D" Then
 			TracePrint "Moving the D card..."
-			Swipe cardPosArr(pos, 0) + 5, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
+			Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
 		End If
 	Else
 		Tap cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 50 * offset + 5
@@ -1444,7 +1444,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				Delay 100
 				emptySpotCount = emptySpotCount - 1
 				If Len(emptySpotPosArr) <> 1 Then
-					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0) - 1))
+					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0)) - 1)
 				End If
 				TracePrint "2emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
 				'Check if there is any card needed to identify
@@ -1672,7 +1672,7 @@ Sub init()
 	pileSearchArea(2,3) = 148
 	pileSuitSearchArea(2,0) = 414
 	pileSuitSearchArea(2,1) = 100
-	pileSuitSearchArea(2,2) = 459
+	pileSuitSearchArea(2,2) = 465
 	pileSuitSearchArea(2, 3) = 148
 	allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 	"r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
@@ -1774,10 +1774,19 @@ End Sub
 'Tap screenX / 2, screenY - 60
 
 Sub selectGame(gameOption)
-	Dim count, isFound, intX, intY
+	Dim count, isFound, intX, intY, offsetY1, offsetY2
 	'Choose game
 	count = 10
 	isFound = False
+	offsetY1 = 200
+	offsetY2 = 100
+	
+	'Check if there is SEE ALL RESULTS
+	FindPic 175, 971, 322, 1039, "Attachment:seeallresults.png", "000000", 0, 0.7, intX, intY
+	If intX > 0 And intY > 0 Then 
+		Tap intX + 5, intY + 5
+		Tap intX + 5, intY + 5
+	End If
 	
 	TracePrint "Searching entry " & gameOption
 	While count > 0 
@@ -1788,7 +1797,12 @@ Sub selectGame(gameOption)
 			isFound = True
 			Exit While
 		Else 
-			TracePrint "Continue searching z1..."	
+			TracePrint "Continue searching z1..."
+			If gameOption = "entryz1.png" Then 
+				Swipe 358, 200 + offsetY1, 358, 100 + offsetY2, 800
+			End If
+			offsetY1 = offsetY1 + 200
+			offsetY2 = offsetY2 + 100
 		End If
 		count = count - 1
 		Delay 1000
