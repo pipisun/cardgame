@@ -66,6 +66,8 @@ Dim number1SmallSuitColor, number2SmallSuitColor
 Dim tmpNumber1, tmpNumber1Color
 Dim tmpNumber2, tmpNumber2Color
 
+Dim tmpIndex
+
 Dim timesOfExecution
 
 'Start the game
@@ -124,7 +126,7 @@ Sub runTestScenarioForZ1(timesOfExecution)
 		'End game
 		Call endGame()
 		
-		Delay 2000
+		Delay 8000
 	Next
 End Sub	
 
@@ -419,63 +421,20 @@ Sub moveCardFromWastePile()
 		Delay 100
 		
 		'Check foundation area
-		Dim tmpIndex
-		tmpIndex = 0
-		For pos = 0 To 2
-			TracePrint "tmpIndex", tmpIndex
-			Call identifyPileCard(tmpIndex)
-			element = pileCardInfoArr(tmpIndex, 0)
-			elementSuit = pileCardInfoArr(tmpIndex, 1)
-			TracePrint "element,elementSuit:", element, elementSuit
-			TracePrint "isFirstGroupInACycle:", isFirstGroupInACycle
-			
-			isMoved = checkFoundationAndMove(tmpIndex, element, elementSuit)
-			If isMoved = False Then 
-//			 	If pos = 0 Then 
-//			 		isFoundAnyCardMovedInACycle = False	
-//			 	End If
-				Exit For
-			ElseIf isFirstGroupInACycle = False Then
-				TracePrint "pos-1:", tmpIndex
-				tmpIndex = 0
-			Else 
-				tmpIndex = tmpIndex + 1
-			End If
-			isFoundAnyCardMovedInACycle = True
-			Delay 200
-		Next
+		Call checkFoundationForPile(0, "")
 		
 		Delay 200
 		
 		TracePrint "isMoved in pile:", isMoved
 		TracePrint "isFoundAnyCardMovedInACycle", isFoundAnyCardMovedInACycle
 		TracePrint "pos", pos
-		isFoundInTableau = False
-		'Check tableau area
-		For t = tmpIndex To 2
-			If isFoundInTableau = True Then 
-				isFoundAnyCardMovedInACycle = True
-				If isFirstGroupInACycle = False Then 
-					Call identifyPileCard(0)
-				Else 
-					Call identifyPileCard(t)
-				End If
-				isFoundInTableau = False
-			End If
-			
-			If isFirstGroupInACycle = False Then
-				Call checkTableauAndMoveForPile(0)
-				globalPileIndex = 0
-			Else
-				Call checkTableauAndMoveForPile(t)
-				globalPileIndex = t
-			End If
-			
-			If isFoundInTableau = False Then 
-				Exit For
-			End If
-			Delay 200
-		Next
+
+		If tmpIndex = Null Then 
+			tmpIndex = 0
+		End If
+		TracePrint "tmpIndex", tmpIndex
+				
+		Call checkTableauForPile(tmpIndex, "")
 		
 		If isFoundAnyCardMovedInACycle = True Then 
 			
@@ -526,6 +485,81 @@ Sub moveCardFromWastePile()
 	Loop While True
 End Sub
 
+Sub checkTableauForPile(tmpIndex, flag)
+	Dim counter
+	
+	counter = 0
+	isFoundInTableau = False
+	'Check tableau area
+	For t = tmpIndex To 2
+		counter = counter + 1
+		If isFoundInTableau = True Then 
+			isFoundAnyCardMovedInACycle = True
+			If isFirstGroupInACycle = False Then 
+				Call identifyPileCard(0)
+			Else 
+				Call identifyPileCard(t)
+			End If
+			isFoundInTableau = False
+		End If
+		
+		If isFirstGroupInACycle = False Then
+			Call checkTableauAndMoveForPile(0)
+			globalPileIndex = 0
+		Else
+			Call checkTableauAndMoveForPile(t)
+			globalPileIndex = t
+		End If
+		
+		If isFoundInTableau = False Then 
+			If globalPileIndex <> 0 And counter > 1 Then 
+				Call checkFoundationForPile(globalPileIndex, "AGAIN")
+				counter = counter - 1
+			ElseIf globalPileIndex = 0 And counter > 1 Then
+				Call checkFoundationForPile(0, "AGAIN")
+				counter = counter - 1
+			End If
+			
+			Exit For
+		End If
+		Delay 200
+	Next
+End Sub
+
+Sub checkFoundationForPile(tmpIndex, flag)
+	Dim element, elementSuit
+	For pos = 0 To 2
+		TracePrint "tmpIndex", tmpIndex
+		If flag <> "AGAIN" Then 
+			Call identifyPileCard(tmpIndex)
+		End If
+		
+		element = pileCardInfoArr(tmpIndex, 0)
+		elementSuit = pileCardInfoArr(tmpIndex, 1)
+		TracePrint "element,elementSuit:", element, elementSuit
+		TracePrint "isFirstGroupInACycle:", isFirstGroupInACycle
+		
+		isMoved = checkFoundationAndMove(tmpIndex, element, elementSuit)
+		If isMoved = False Then 
+//			 	If pos = 0 Then 
+//			 		isFoundAnyCardMovedInACycle = False	
+//			 	End If
+			Exit For
+		ElseIf isFirstGroupInACycle = False Then
+			TracePrint "pos-1:", tmpIndex
+			tmpIndex = 0
+		Else 
+			tmpIndex = tmpIndex + 1
+		End If
+		isFoundAnyCardMovedInACycle = True
+		
+		If flag = "AGAIN" Then 
+			Call checkTableauForPile(tmpIndex, "")
+		End If
+		
+		Delay 200
+	Next
+End Sub
 
 Sub addSuitToCard()
 	Dim lastDigitValue
@@ -1388,12 +1422,13 @@ End Sub
 
 Function moveKCard(emptyIndex, pileIndex, flag)
 	Dim emptySpotPosArr, newPosition, isHavingPipe, element, elementArr
+	Dim topElementForPile, topElementSuitForPile
 	
 	emptySpotPosArr = Split(emptySpotPos, "|")
 	If pileIndex <> "" Then 
 		If pileCardInfoArr(pileIndex, 0) = "13" Then 
 			If flag = "FINAL" And emptySpotCount >=1 Then 
-				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 2), cardPosArr(emptyIndex, 1), 500
+				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
 				cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)	
@@ -1402,8 +1437,32 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				isFoundAnyCardMovedInACycle = True
 				moveKCard = True
 				Exit Function
+			ElseIf emptySpotCount = 1 Then
+				For t = 0 To 6
+                    If t <> emptyIndex Then
+						topElementForPile = Left(cardInfoArr(t, 0), 2)
+						If Instr(1, cardInfoArr(t,0), "|") > 0 Or isExecutedAddSuitToCard = True Then
+							topElementSuitForPile = Mid(cardInfoArr(t, 0), 3, 1)
+						Else
+							topElementSuitForPile = cardInfoArr(t, 1)
+						End If
+							
+						TracePrint "moveKcard:topelement,topElementSuit:", topElementForPile, topElementSuitForPile
+						If topElementForPile = "12" And topElementSuitForPile <> pileCardInfoArr(pileIndex, 1) Then 
+							Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
+							cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
+							cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
+							cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
+							emptySpotCount = emptySpotCount - 1
+							isFoundInTableau = True
+							isFoundAnyCardMovedInACycle = True
+							moveKCard = True
+							Exit Function
+						End If
+					End If
+				Next
 			ElseIf emptySpotCount >= 2 Then
-				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 2), cardPosArr(emptyIndex, 1), 500
+				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
 				cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
@@ -1430,7 +1489,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 					End If
 					
 					If CInt(pileCardInfoArr(pileIndex, 0)) - 1 = CInt(topElementValue) And pileCardInfoArr(pileIndex, 1) <> topElementSuit Then 
-						Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 2), cardPosArr(emptyIndex, 1), 500
+						Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
 						cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
 						cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
 						cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
@@ -1456,16 +1515,15 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 			End If
 			
 			TracePrint "top element:", element
-			If element = "13" And emptySpotCount >=1 Then 
-				If flag = "FINAL" Then 
-					Swipe cardPosArr(m, 0) + 10, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
+			If element = "13" And flag = "FINAL" And emptySpotCount >= 1 Then 
+				Swipe cardPosArr(m, 0) + 10, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
 				
-				ElseIf emptySpotCount >= 2 Then 	
+//				ElseIf emptySpotCount >= 2 Then 	
 //				If isHavingPipe > 0 Then 
-					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
+//					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
 //				Else 
 //					Tap cardPosArr(m, 0), cardPosArr(m, 1)
-				End If
+//				End If
 				cardInfoArr(CInt(emptySpotPosArr(0)), 0) = cardInfoArr(m, 0) & cardInfoArr(m, 1)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 1) = cardInfoArr(m, 1)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 2) = cardInfoArr(m, 2)
@@ -1476,6 +1534,11 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0)) - 1)
 				End If
 				TracePrint "2emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
+								
+				If emptySpotCount = 0 Then 
+					emptySpotPos = ""
+				End If
+				
 				'Check if there is any card needed to identify
 				Call identifyNewCard(m)
 				
@@ -1632,6 +1695,8 @@ Sub finalCheck()
 		For i = 0 To 6
 			If cardInfoArr(i,0) = 0 Then
 				Call moveKCard(i, globalPileIndex, "FINAL")
+				Call sortMaxToMin()
+				Call main()
 				Exit For
 			End If
 		Next
@@ -1690,7 +1755,7 @@ Sub init()
 	pileSearchArea(1,1) = 100
 	pileSearchArea(1,2) = 458
 	pileSearchArea(1,3) = 148
-	pileSuitSearchArea(1,0) = 471
+	pileSuitSearchArea(1,0) = 464
 	pileSuitSearchArea(1,1) = 100
 	pileSuitSearchArea(1,2) = 503
 	pileSuitSearchArea(1,3) = 148
