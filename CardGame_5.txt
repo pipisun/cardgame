@@ -303,7 +303,7 @@ Sub main()
 					
 					If InStr(1, cardInfoArr(i, 0), "|") > 0 Then 
 						TracePrint "i>0, InStr(1, cardInfoArr(j, 0), |):", InStr(1, cardInfoArr(j, 0), "|")
-						If InStr(1, cardPosArr(j, 0), "|") > 0 Or isExecutedAddSuitToCard = True Then 
+						If InStr(1, cardInfoArr(j, 0), "|") > 0 Or isExecutedAddSuitToCard = True Then 
 							cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & cardInfoArr(j, 0)
 						Else
 							cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
@@ -1025,10 +1025,12 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			suitRule = pos
 			noSuitableCardMatch = True
 		End If
-	ElseIf cardInfoArr(pos,0) = "0" Then
+	ElseIf cardInfoArr(pos, 0) = "0" Then
+		TracePrint "cardInfoArr(pos, 0) = 0"
 		suitRule = searchPos
 		noSuitableCardMatch = True
 	ElseIf cardInfoArr(searchPos, 0) = "0" Then
+		TracePrint "cardInfoArr(searchPos, 0) = 0"
 		suitRule = pos
 		noSuitableCardMatch = True
 	End If
@@ -1176,6 +1178,9 @@ Function moveCardAfterIdentify(pos, flag)
 		intNewCardNumber = CInt(cardInfoArr(pos, 0))
 		strNewCardSuit = cardInfoArr(pos, 2)
 		TracePrint "strNewCardNumber", cardInfoArr(pos, 0)
+		If isExecutedAddSuitToCard = True Then 
+			intNewCardNumber = Left(cardInfoArr(pos, 0), Len(cardInfoArr(pos, 0))-1)
+		End If
 		TracePrint "NewCardNumber:", intNewCardNumber, ",NewCardSuit:",strNewCardSuit
 	End If
 	
