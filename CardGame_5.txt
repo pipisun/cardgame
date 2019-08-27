@@ -68,6 +68,8 @@ Dim tmpNumber2, tmpNumber2Color
 
 Dim tmpIndex
 
+Dim cycletimes
+
 Dim timesOfExecution
 
 'Start the game
@@ -345,6 +347,9 @@ Sub main()
 					newPosition = j
 			
 					'Check if there is a match
+					TracePrint "cardInfoArr(newPosition, 0):",  cardInfoArr(newPosition, 0)
+					TracePrint "isCardHasBeenIdentifed:", isCardHasBeenIdentifed
+					
 					While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
 						newPosition = moveCardAfterIdentify(oldPosition, "")
 						If newPosition = Null Or newPosition = 0 Then 
@@ -413,7 +418,7 @@ Sub moveCardFromWastePile()
 	Dim pos
 	pos = 0
 //	timer = 28
-	Dim intX, intY, cycletimes, timesinacycle
+	Dim intX, intY, timesinacycle
 	cycletimes = 0
 	timesinacycle = 8
 	Do
@@ -921,14 +926,22 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		
 	suitRule = -1
 	'If there is | in the string
-	Dim pipePos 
+	Dim pipePos, lastChar
+	
 	pipePos = InStr(1, cardInfoArr(searchPos, 0), "|")
 	TracePrint "Pipe pos:", pipePos
 	If pipePos = 0 Then
 		intCardNumber = CInt(cardInfoArr(searchPos, 0))
+		
+		lastChar = Right(cardInfoArr(searchPos, 0), 1)
+		If lastChar = "S" Or lastChar = "H" Or lastChar = "C" Or lastChar = "D" Then 
+			intCardNumber = Left(cardInfoArr(searchPos, 0), Len(cardInfoArr(searchPos, 0))-1)
+		End If
+		
 		intTopCardNumber = intCardNumber
 		strCardSuit = cardInfoArr(searchPos, 2)
 		strTopCardSuit = strCardSuit
+		
 		TracePrint "Searching card:", intCardNumber
 	Else 
 		Dim newArr
@@ -1413,7 +1426,8 @@ Sub identifyNewCard(j)
 	Next
 	
 	If noCard = True Then 
-		cardInfoArr(j,0) = "0"
+		cardInfoArr(j, 0) = "0"
+		isCardHasBeenIdentifed = True
 		emptySpotCount = emptySpotCount + 1
 		If emptySpotPos = "" Then 
 			emptySpotPos = j
@@ -1476,7 +1490,8 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				isFoundAnyCardMovedInACycle = True
 				moveKCard = True
 				Exit Function
-			ElseIf emptySpotCount = 1 Then
+			ElseIf emptySpotCount = 1 And cycletimes >= 4 Then
+				TracePrint "cycletimes:", cycletimes
 				For m = 0 To 6
 					Dim arrElement,topElementValue, topElementSuit
 					arrElement = Split(cardInfoArr(m, 0), "|")
