@@ -72,6 +72,8 @@ Dim cycletimes
 
 Dim timesOfExecution
 
+Dim isSwapChecked
+
 'Start the game
 screenX = GetScreenX()
 screenY = GetScreenY()
@@ -535,7 +537,7 @@ Sub checkFoundationForPile(tmpIndex, flag)
 	Dim element, elementSuit
 	For pos = 0 To 2
 		TracePrint "tmpIndex", tmpIndex
-		If flag <> "AGAIN" Then 
+		If flag <> "AGAIN" Or tmpIndex = 2 Then 
 			Call identifyPileCard(tmpIndex)
 		End If
 		
@@ -928,6 +930,10 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	'If there is | in the string
 	Dim pipePos, lastChar
 	
+	If isSwapChecked = True Then 
+		intNewCardNumber = CInt(cardInfoArr(pos, 0))
+	End If
+	
 	pipePos = InStr(1, cardInfoArr(searchPos, 0), "|")
 	TracePrint "Pipe pos:", pipePos
 	If pipePos = 0 Then
@@ -1083,6 +1089,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 			lastElementValue = Left(lastElement, Len(lastElement)-1)
 			lastElementSuitColor = getSuitColor(Right(lastElement, 1))
 			TracePrint "cardInfoArr(position, 0),lastElement,lastElementValue,lastElementSuitColor",cardInfoArr(position, 0),lastElement,lastElementValue,lastElementSuitColor
+			isSwapChecked = False
 			
 			If CInt(lastElementValue) - 1 = CInt(cardInfoArr(searchPos, 0)) And lastElementSuitColor <> cardInfoArr(searchPos, 2) Then 
 				delayTime = getDelayTime(Abs(cardPosArr(position, 0) - cardPosArr(searchPos, 0)))
@@ -1093,6 +1100,8 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				'Update search area
 				Call updateSearchAreaRange(searchPos, 15, "up")
 			Else 
+				isSwapChecked = True
+				
 				TracePrint "Swap searchpos and position"
 				TracePrint "searchpos:", searchPos, ",position:", position
 				tmp(0, 0) = cardInfoArr(searchPos, 0)
@@ -1389,6 +1398,7 @@ Sub identifyNewCard(j)
 					cardInfoArr(j, 1) = convertSuitColorToSign(suitPicArr(s))
 					'Save suit color(Black/Red)
 					cardInfoArr(j, 2) = checkSuitBlackOrRed(suitPicArr(s))
+					TracePrint "Found suit:", cardInfoArr(j,1)
 					TracePrint "Found suit color:", cardInfoArr(j,2)
 					
 					'Move it to foundation if the card is A
@@ -1398,6 +1408,7 @@ Sub identifyNewCard(j)
 						Call identifyNewCard(j)
 					End If
 					
+					TracePrint "cardInfoArr(j,0), cardInfoArr(j,1)", cardInfoArr(j,0), cardInfoArr(j,1)
 					'Add suit
 					If isExecutedAddSuitToCard = True Then 
 						cardInfoArr(j,0) = cardInfoArr(j,0) & cardInfoArr(j,1)	
