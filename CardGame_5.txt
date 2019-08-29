@@ -300,6 +300,7 @@ Sub main()
 					'Update search area
 					If cardPosArr(j, 0) > 91 Then
 						Call updateSearchAreaRange(j, 15, "up")
+						Call updateCardPosition(j, -15)
 					End If
 					
 					Delay 200
@@ -375,6 +376,11 @@ Sub main()
 		compareCounter = 1
 	//	End If
 	Next
+End Sub
+
+Sub updateCardPosition(index, offset)
+	cardPosArr(index,0) = cardPosArr(index,0) + offset
+	cardPosArr(index,1) = cardPosArr(index,1) + offset
 End Sub
 
 //'Main
