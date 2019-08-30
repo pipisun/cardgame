@@ -881,7 +881,11 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 			Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2,0), foundationPosArr(2,1), delayTime
 		ElseIf elementSuit = "D" Then
 			TracePrint "Moving the D card..."
-			Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
+			If cardPosArr(pos, 0) > 440 Then 
+				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
+			Else
+				Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3, 0), foundationPosArr(3, 1), delayTime
+			End If
 		End If
 	Else
 		Tap cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 50 * offset + 5
@@ -988,7 +992,11 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 				End If
 	
 			Else 
-				cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0)
+			 	If isExecutedAddSuitToCard = True Then 
+			 		cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & "|" & cardInfoArr(searchPos, 0)
+			 	Else
+					cardInfoArr(pos, 0) = cardInfoArr(pos, 0) & cardInfoArr(pos, 1) & "|" & cardInfoArr(searchPos, 0)
+				End If
 			End If
 			cardInfoArr(pos, 1) = cardInfoArr(searchPos, 1)
 			TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(pos,0)
@@ -1018,14 +1026,22 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			noSuitableCardMatch = False
 		ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit And containsNumber2 = 0 Then
 			If pipePos = 0 Then 
-		 		If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
-					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+		 		If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then 
+		 			If isExecutedAddSuitToCard = True Then 
+		 			 	cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
+		 			Else
+						cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+					End If
 				Else 
 					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
 				End If
 			Else 
-				If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then
-					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+				If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then 
+					If isExecutedAddSuitToCard = True Then 
+						cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
+					Else
+						cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
+					End If
 				Else 
 					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
 				End If
@@ -1799,11 +1815,11 @@ Sub init()
 	
 	pileSearchArea(2,0) = 376
 	pileSearchArea(2,1) = 100
-	pileSearchArea(2,2) = 415
+	pileSearchArea(2,2) = 430
 	pileSearchArea(2,3) = 148
 	pileSuitSearchArea(2,0) = 414
 	pileSuitSearchArea(2,1) = 100
-	pileSuitSearchArea(2,2) = 465
+	pileSuitSearchArea(2,2) = 468
 	pileSuitSearchArea(2, 3) = 148
 	allCardPicArr = Array("b1.png", "r1.png", "b2.png", "r2.png", "b3.png", "r3.png", "b4.png", "r4.png", "b5.png", "r5.png", "b6.png", "r6.png", "b7.png", _
 	"r7.png", "b8.png", "r8.png", "b9.png", "r9.png", "b10.png", "r10.png", "b11.png", "r11.png", "b12.png", "r12.png", "b13.png", "r13.png")
