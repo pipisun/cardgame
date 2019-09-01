@@ -291,8 +291,9 @@ Sub main()
 						ElseIf cardPosArr(j, 0) > 530 Then
 							Delay 100
 							Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1), cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime
-						Else
-							Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
+						Else 
+							Delay 100
+							Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 						End If
 					End If
 							
@@ -878,7 +879,8 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	 		If cardPosArr(pos, 0) > 500 Then
 				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
 			Else 
-				Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
+				Delay 100
+				Swipe cardPosArr(pos, 0) + 15, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
 			End If
 		ElseIf elementSuit = "H" Then
 			TracePrint "Moving the H card..."
@@ -1864,7 +1866,7 @@ Sub init()
 	rightUpperCornerXForSuit = 93
 	rightUpperCornerYForSuit = 310
 	
-	offsetX1 = 90
+	offsetX1 = 92
 	offsetX2 = 95
 	offsetY1 = 10
 	offsetY2 = 30
