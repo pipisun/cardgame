@@ -121,7 +121,7 @@ Sub runTestScenarioForZ1(timesOfExecution)
 		
 		Call moveCardToFoundation()
 		
-		Call addSuitToCard()
+		'Call addSuitToCard()
 		
 		Call moveCardFromWastePile()
 		
@@ -280,24 +280,26 @@ Sub main()
 					Delay 50
 							
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
+						Delay 100
 						If cardPosArr(i, 0) > 363 Then 
-							Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
+							Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
 						Else
-							Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
+							Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 						End If
 					Else 
 						If cardPosArr(i, 0) < 50 Then 
+						 	Delay 100
 							If cardPosArr(j, 0) > 550 Then 
 								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
 							Else
-								Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
+								Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), 800
 							End If
 						ElseIf cardPosArr(j, 0) > 530 Then
 							Delay 100
 							Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1), cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime
 						Else 
 							Delay 100
-							Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
+							Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1), cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 						End If
 					End If
 							
@@ -625,12 +627,16 @@ Sub checkTableauAndMoveForPile(index)
 				btmElement = btmArr(Len(btmArr) - 1)
 				If Right(btmElement, 1) <> "S" And Right(btmElement, 1) <> "H" And Right(btmElement, 1) <> "C" And Right(btmElement, 1) <> "D" Then 
 					btmElementNumber = btmElement
+					lastDigitValue = cardInfoArr(i, 1)
+					btmElementSuit = getSuitColor(lastDigitValue)
 				Else	
-					btmElementNumber = Left(btmElement, Len(btmElement)-1)
+					btmElementNumber = Left(btmElement, Len(btmElement) - 1)
+					lastDigitValue = Right(cardInfoArr(i, 0), 1)
+					btmElementSuit = getSuitColor(lastDigitValue)
 				End If
-				btmElementNumber = Left(btmElement, Len(btmElement)-1)
-				lastDigitValue = Right(cardInfoArr(i,0),1)
-				btmElementSuit = getSuitColor(lastDigitValue)
+				'btmElementNumber = Left(btmElement, Len(btmElement)-1)
+				'lastDigitValue = Right(cardInfoArr(i,0),1)
+				'btmElementSuit = getSuitColor(lastDigitValue)
 				TracePrint "btmArr,btmElementNumber,lastDigitValue,btmElementSuit",btmArr,btmElementNumber,lastDigitValue,btmElementSuit
 				
 				Dim delayTime
@@ -1068,21 +1074,21 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 		ElseIf intNewCardNumber + 1 = intCardNumber And strNewCardSuit <> strCardSuit And containsNumber2 = 0 Then
 			If pipePos = 0 Then 
 		 		If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then 
-		 			If isExecutedAddSuitToCard = True Then 
-		 			 	cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
-		 			Else
+//		 			If isExecutedAddSuitToCard = True Then 
+//		 			 	cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
+//		 			Else
 						cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
-					End If
+//					End If
 				Else 
 					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(pos, 0)
 				End If
 			Else 
 				If InStr(1, cardInfoArr(pos, 0), "|") = 0 Then 
-					If isExecutedAddSuitToCard = True Then 
-						cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
-					Else
+//					If isExecutedAddSuitToCard = True Then 
+//						cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
+//					Else
 						cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0) & cardInfoArr(pos, 1)
-					End If
+//					End If
 				Else 
 					cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & "|" & cardInfoArr(pos, 0)
 				End If
