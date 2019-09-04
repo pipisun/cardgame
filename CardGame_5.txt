@@ -989,6 +989,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	
 	pipePos = InStr(1, cardInfoArr(searchPos, 0), "|")
 	TracePrint "Pipe pos:", pipePos
+	TracePrint "cardInfoArr(searchPos, 0):", cardInfoArr(searchPos, 0)
 	If pipePos = 0 Then
 		intCardNumber = CInt(cardInfoArr(searchPos, 0))
 		
@@ -1067,6 +1068,9 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			'Update search area
 			Call updateSearchAreaRange(searchPos, 15, "up")
 			
+			'Update card position
+			Call updateCardPosition(searchPos, -10)
+			
 			Call checkCardAfterMoveCardRule(searchPos, pos, "-1")
 			
 			suitRule = searchPos
@@ -1109,6 +1113,8 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			'Update search area
 			Call updateSearchAreaRange(pos, 15, "up")
 			Delay 300
+			'Update card position
+			Call updateCardPosition(pos, -10)
 			
 			Call checkCardAfterMoveCardRule(searchPos, pos, "+1")
 			
@@ -1619,10 +1625,12 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				element = cardInfoArr(m,0)
 			End If
 			
+			Dim emptySPA
 			TracePrint "top element:", element
+			'TracePrint "emptySpotPosArr(0):", emptySpotPosArr(0)
 			If element = "13" And flag = "FINAL" And emptySpotCount >= 1 Then 
-				Swipe cardPosArr(m, 0) + 10, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
-				
+				emptySPA = CInt(emptySpotPosArr(0))
+				Swipe cardPosArr(m, 0) + 10, cardPosArr(m, 1), cardPosArr(emptySPA, 0), cardPosArr(emptySPA, 1), 500
 //				ElseIf emptySpotCount >= 2 Then 	
 //				If isHavingPipe > 0 Then 
 //					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
@@ -1805,8 +1813,9 @@ Sub sortMaxToMin()
 End Sub
 
 Sub finalCheck()
+	TracePrint "Starting final check..."
 	Call sortMaxToMin()
-	Call moveKCard("", "", "")
+	Call moveKCard("", "", "FINAL")
 	Call main()
 	Call moveCardToFoundation()
 	
@@ -1816,7 +1825,7 @@ Sub finalCheck()
 		Call moveCardFromWastePile()
 	
 		For i = 0 To 6
-			If cardInfoArr(i,0) = 0 Then
+			If cardInfoArr(i,0) = "0" Then
 				Call moveKCard(i, globalPileIndex, "FINAL")
 				Call sortMaxToMin()
 				Call main()
