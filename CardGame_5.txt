@@ -308,7 +308,7 @@ Sub main()
 					'Update search area
 					If cardPosArr(j, 0) > 91 Then
 						Call updateSearchAreaRange(j, 15, "up")
-						Call updateCardPosition(j, -15)
+						Call updateCardPosition(j, -10)
 					End If
 					
 					Delay 200
@@ -984,7 +984,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	If isSwapChecked = True Then 
 		intNewCardNumber = CInt(cardInfoArr(pos, 0))
 		TracePrint "isSwapChecked, intNewCardNumber", intNewCardNumber
-		isSwapChecked = False
+		'isSwapChecked = False
 	End If
 	
 	pipePos = InStr(1, cardInfoArr(searchPos, 0), "|")
@@ -1069,7 +1069,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			Call updateSearchAreaRange(searchPos, 15, "up")
 			
 			'Update card position
-			Call updateCardPosition(searchPos, -10)
+			'Call updateCardPosition(searchPos, -10)
 			
 			Call checkCardAfterMoveCardRule(searchPos, pos, "-1")
 			
@@ -1114,7 +1114,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			Call updateSearchAreaRange(pos, 15, "up")
 			Delay 300
 			'Update card position
-			Call updateCardPosition(pos, -10)
+			'Call updateCardPosition(pos, -10)
 			
 			Call checkCardAfterMoveCardRule(searchPos, pos, "+1")
 			
@@ -1358,6 +1358,7 @@ Function moveCardAfterIdentify(pos, flag)
 	//		End If
 		End If
 	End If
+	isSwapChecked = False
 	moveCardAfterIdentify = newPos
 End Function
 
@@ -1455,6 +1456,8 @@ Sub identifyNewCard(j)
 			'Get card point
 			cardPoint = Mid(allCardPicArr(m), 2, InStr(1, allCardPicArr(m), ".") - 2)
 			TracePrint "Found card: ", cardPoint
+			cardPosArr(j, 0) = intX + 20
+			cardPosArr(j, 1) = intY + 20
 			
 			If CInt(cardPoint) = intNewCardNumber Then 
 				isCardHasBeenIdentifed = True
@@ -1557,13 +1560,24 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 							topElementSuitForPile = cardInfoArr(t, 1)
 						End If
 							
-						TracePrint "moveKcard:topelement,topElementSuit:", topElementForPile, topElementSuitForPile
-						If topElementForPile = "12" And topElementSuitForPile <> pileCardInfoArr(pileIndex, 1) Then 
+						TracePrint "moveKcard:topelement,topElementSuit, pileCardInfoArr(pileIndex, 1):", topElementForPile, topElementSuitForPile, pileCardInfoArr(pileIndex, 1)
+						If topElementForPile = "12" And getSuitColor(topElementSuitForPile) <> pileCardInfoArr(pileIndex, 2) Then 
 							Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
-							cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
+							Delay 100
+							Swipe cardPosArr(t, 0) + 15, cardPosArr(t, 1) + 10, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
+							Delay 100
+							
+							If Instr(1, cardInfoArr(t,0), "|") > 0 Then
+								cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1) & "|" & cardInfoArr(t, 0)
+							Else 
+								cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1) & "|" & cardInfoArr(t, 0) & cardInfoArr(t, 1)
+							End If
 							cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
 							cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
 							emptySpotCount = emptySpotCount - 1
+							
+							Call identifyNewCard(t)
+							
 							isFoundInTableau = True
 							isFoundAnyCardMovedInACycle = True
 							moveKCard = True
@@ -2016,6 +2030,9 @@ Sub selectGame(gameOption)
 	End If
 	
 	Delay 2000
+	'Make sure the screen is on Select Game tab
+	Tap 236, 1078
+	Delay 500
 	
 	TracePrint "Searching entry " & gameOption
 	While count > 0 
