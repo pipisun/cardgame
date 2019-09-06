@@ -1633,18 +1633,28 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 			If isHavingPipe > 0 Then 
 				elementArr = Split(cardInfoArr(m, 0), "|")
 				element = Left(elementArr(0), Len(elementArr(0))-1)
-			ElseIf isExecutedAddSuitToCard = True Then
-				element = Left(cardInfoArr(m, 0), Len(cardInfoArr(m, 0)) - 1)
+//			ElseIf isExecutedAddSuitToCard = True Then
+//				element = Left(cardInfoArr(m, 0), Len(cardInfoArr(m, 0)) - 1)
 			Else 
-				element = cardInfoArr(m,0)
+				If Right(cardInfoArr(m, 0), 1) = "S" Or Right(cardInfoArr(m, 0), 1) = "H" Or Right(cardInfoArr(m, 0), 1) = "C" Or Right(cardInfoArr(m, 0), 1) = "D" Then 
+					element = Left(cardInfoArr(m, 0), Len(cardInfoArr(m,0)) - 1)
+				Else
+					element = cardInfoArr(m, 0)
+				End If
 			End If
 			
 			Dim emptySPA
 			TracePrint "top element:", element
 			'TracePrint "emptySpotPosArr(0):", emptySpotPosArr(0)
 			If element = "13" And flag = "FINAL" And emptySpotCount >= 1 Then 
-				emptySPA = CInt(emptySpotPosArr(0))
-				Swipe cardPosArr(m, 0) + 10, cardPosArr(m, 1), cardPosArr(emptySPA, 0), cardPosArr(emptySPA, 1), 500
+				For t = 0 To 6
+					If cardInfoArr(t, 0) = "0" Then 
+						emptySPA = t
+						Exit For
+					End If
+				Next
+				
+				Swipe cardPosArr(m, 0) + 10, cardPosArr(m, 1), cardPosArr(emptySPA, 0), cardPosArr(emptySPA, 1), 800
 //				ElseIf emptySpotCount >= 2 Then 	
 //				If isHavingPipe > 0 Then 
 //					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
@@ -1654,17 +1664,18 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 0) = cardInfoArr(m, 0) & cardInfoArr(m, 1)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 1) = cardInfoArr(m, 1)
 				cardInfoArr(CInt(emptySpotPosArr(0)), 2) = cardInfoArr(m, 2)
-				TracePrint "1emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
+//				TracePrint "1emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
 				Delay 100
 				emptySpotCount = emptySpotCount - 1
-				If Len(emptySpotPosArr) <> 1 Then
-					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0)) - 1)
-				End If
-				TracePrint "2emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
+				TracePrint "after moving, emptySpotCount:", emptySpotCount
+//				If Len(emptySpotPosArr) <> 1 Then
+//					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0)) - 1)
+//				End If
+//				TracePrint "2emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
 								
-				If emptySpotCount = 0 Then 
-					emptySpotPos = ""
-				End If
+//				If emptySpotCount = 0 Then 
+//					emptySpotPos = ""
+//				End If
 				
 				'Check if there is any card needed to identify
 				Call identifyNewCard(m)
