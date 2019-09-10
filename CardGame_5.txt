@@ -312,7 +312,7 @@ Sub main()
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
 						Delay 100
 						If cardPosArr(i, 0) > 363 Then 
-							Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
+							Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 						Else
 							Swipe cardPosArr(j, 0) + 15, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 						End If
@@ -712,12 +712,16 @@ Function getDelayTime(distance)
 	TracePrint "distance:", distance
 	
 	Dim delayTime
-	If distance > 400 Then 
+	If distance > 500 Then 
 		delayTime = 800
-	ElseIf distance > 320 Then
-		delayTime = 500
+	ElseIf distance > 400 Then
+		delayTime = 700
+	ElseIf distance > 300 Then
+		delayTime = 600
+	ElseIf distance > 200 Then
+		delayTime = 400
 	Else 
-		delayTime = 200
+		delayTime = 300
 	End If
 
 //	If distance >= 500 Then 
@@ -1459,8 +1463,8 @@ Sub identifyNewCard(j)
 			'Get card point
 			cardPoint = Mid(allCardPicArr(m), 2, InStr(1, allCardPicArr(m), ".") - 2)
 			TracePrint "Found card: ", cardPoint
-			cardPosArr(j, 0) = intX + 20
-			cardPosArr(j, 1) = intY + 20
+			cardPosArr(j, 0) = intX + 15
+			cardPosArr(j, 1) = intY + 15
 			
 			If CInt(cardPoint) = intNewCardNumber Then 
 				isCardHasBeenIdentifed = True
@@ -1567,7 +1571,11 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 						If topElementForPile = "12" And getSuitColor(topElementSuitForPile) <> pileCardInfoArr(pileIndex, 2) Then 
 							Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
 							Delay 100
-							Swipe cardPosArr(t, 0) + 25, cardPosArr(t, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
+							If cardPosArr(t, 0) > 530 Then
+								Swipe cardPosArr(t, 0) + 30, cardPosArr(t, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 800
+							Else 
+							 	Swipe cardPosArr(t, 0) + 25, cardPosArr(t, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 600
+							End If
 							Delay 100
 							
 							If Instr(1, cardInfoArr(t,0), "|") > 0 Then
@@ -1626,7 +1634,12 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 					If CInt(pileCardInfoArr(pileIndex, 0)) - 1 = CInt(topElementValue) And pileCardInfoArr(pileIndex, 2) <> getSuitColor(topElementSuit) Then 
 						Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
 						Delay 100
-						Swipe cardPosArr(m, 0) + 25, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
+						If cardPosArr(m, 0) > 530 Then
+							Swipe cardPosArr(m, 0) + 30, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 800
+						Else 
+							Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 600
+						End If
+							
 						Delay 100
 						
 						If Instr(1, cardInfoArr(m,0), "|") > 0 Then
@@ -1997,8 +2010,8 @@ Sub init()
 				TracePrint "Found card: ", cardPoint
 				'Save card info
 				cardInfoArr(i, 0) = cardPoint
-				cardPosArr(i, 0) = intX + 20
-				cardPosArr(i, 1) = intY + 20
+				cardPosArr(i, 0) = intX + 15
+				cardPosArr(i, 1) = intY + 15
 				cardSearchArea(i,0) = leftUpperCornerX
 				cardSearchArea(i,1) = leftUpperCornerY
 				cardSearchArea(i,2) = rightUpperCornerX
