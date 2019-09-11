@@ -74,6 +74,8 @@ Dim timesOfExecution
 
 Dim isSwapChecked
 
+Dim isEverEmptyPos(7)
+
 'Start the game
 screenX = GetScreenX()
 screenY = GetScreenY()
@@ -82,13 +84,14 @@ TracePrint "Screen size:", screenX, screenY
 'Run app
 RunApp "com.tether.solitaire.klondike"
 
-Call playNow()
+Call playNow() 
 
 Call runTestScenarioForZ1(10)
 
 Sub runTestScenarioForZ1(timesOfExecution)
 	
 	For i = 1 To timesOfExecution
+		TracePrint "STARTING EXECUTION(TIMES):", i
 		Call selectGame("entryz1.png")
 		Call startGame()
 		Call waitGameToStart()
@@ -131,6 +134,8 @@ Sub runTestScenarioForZ1(timesOfExecution)
 		Call endGame()
 		
 		Delay 8000
+		
+		TracePrint "END EXECUTION(TIMES):", i
 	Next
 End Sub	
 
@@ -1529,6 +1534,9 @@ Sub identifyNewCard(j)
 	If noCard = True Then 
 		cardInfoArr(j, 0) = "0"
 		isCardHasBeenIdentifed = True
+		
+		isEverEmptyPos(j) = True
+		
 		emptySpotCount = emptySpotCount + 1
 		If emptySpotPos = "" Then 
 			emptySpotPos = j
@@ -1696,7 +1704,11 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 					End If
 				Next
 				
-				Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1) + 20, cardPosArr(emptySPA, 0), cardPosArr(emptySPA, 1), 800
+				If isEverEmptyPos(m) <> True Then
+					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1) + 20, cardPosArr(emptySPA, 0), cardPosArr(emptySPA, 1), 800
+				Else 
+					Exit For
+				End If
 //				ElseIf emptySpotCount >= 2 Then 	
 //				If isHavingPipe > 0 Then 
 //					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
@@ -1998,6 +2010,10 @@ Sub init()
 	offsetX2 = 95
 	offsetY1 = 10
 	offsetY2 = 30
+	
+	For e = 0 To 6
+		isEverEmptyPos(e) = False
+	Next
 	
 	For i = 0 To 6
 		TracePrint "Finding card in (", leftUpperCornerX, leftUpperCornerY, rightUpperCornerX, rightUpperCornerY, ") area"
