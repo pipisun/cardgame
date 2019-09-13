@@ -660,6 +660,9 @@ Sub checkTableauAndMoveForPile(index)
 					isFoundAnyCardMovedInACycle = True
 					isFoundInTableau = True
 					Exit For
+				Else 
+					isFoundAnyCardMovedInACycle = False
+					isFoundInTableau = False
 				End If
 			Else 
 				If moveKCard(i, index, "") = True Then 
