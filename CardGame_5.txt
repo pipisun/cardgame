@@ -462,8 +462,10 @@ Sub moveCardFromWastePile()
 			tmpIndex = 0
 		End If
 		TracePrint "tmpIndex", tmpIndex
-				
-		Call checkTableauForPile(tmpIndex, "")
+		
+		If tmpIndex <> 3 Then		
+			Call checkTableauForPile(tmpIndex, "")
+		End If
 		
 		If isFoundAnyCardMovedInACycle = True Then 
 			
@@ -563,9 +565,15 @@ Sub checkFoundationForPile(tmpIndex, flag)
 	Dim element, elementSuit
 	For pos = 0 To 2
 		TracePrint "tmpIndex", tmpIndex
+		
+		If tmpIndex = 3 Then 
+			Exit Sub
+		End If
+		
 		If flag <> "AGAIN" Or tmpIndex = 2 Then 
 			Call identifyPileCard(tmpIndex)
 		End If
+		
 		
 		element = pileCardInfoArr(tmpIndex, 0)
 		elementSuit = pileCardInfoArr(tmpIndex, 1)
@@ -661,7 +669,7 @@ Sub checkTableauAndMoveForPile(index)
 					isFoundInTableau = True
 					Exit For
 				Else 
-					isFoundAnyCardMovedInACycle = False
+					'isFoundAnyCardMovedInACycle = False
 					isFoundInTableau = False
 				End If
 			Else 
@@ -1122,7 +1130,11 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			If cardPosArr(pos, 0) > 530 Then
 				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 			Else 
-				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+				If cardPosArr(searchPos, 0) > 530 Then 
+					Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), delayTime
+				Else
+					Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+				End If
 			End If
 			
 			'Update search area
@@ -2106,6 +2118,8 @@ Sub selectGame(gameOption)
 		Tap intX + 5, intY + 5
 		Delay 200
 		Tap intX + 5, intY + 5
+		Delay 200
+		Tap intX + 5, intY + 5
 	End If
 	
 	Delay 2000
@@ -2170,7 +2184,12 @@ Sub waitGameToStart()
 		FindPic 0, 0, 0, 0, "Attachment:endbutton.png", "000000", 0, 0.7, intX, intY
 		If intX > 0 And intY > 0 Then 
 			TracePrint "Found Endbutton button"
-	
+			
+			FindPic 0, 0, 0, 0, "Attachment:alertontopbanner.png", "000000", 0, 0.7, intX, intY
+			If intX > 0 And intY > 0 Then 
+			 	Swipe intX + 26, intY + 50, intX + 26, intY, 200
+			End If
+			
 			Delay 5000
 			Exit While
 		Else 
