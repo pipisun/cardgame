@@ -286,7 +286,7 @@ Sub main()
 							
 					If InStr(1, cardInfoArr(i, 0), "|") > 0 Then 
 						TracePrint "i>0, InStr(1, cardInfoArr(j, 0), |):", InStr(1, cardInfoArr(j, 0), "|")
-						If InStr(1, cardInfoArr(j, 0), "|") > 0 Or isExecutedAddSuitToCard = True Then 
+						If InStr(1, cardInfoArr(j, 0), "|") > 0 Or Right(cardInfoArr(j,0),1) = "S" Or Right(cardInfoArr(j,0),1) = "H" Or Right(cardInfoArr(j,0),1) = "C" Or Right(cardInfoArr(j,0),1) = "D" Then 
 							cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & cardInfoArr(j, 0)
 						Else
 							cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
@@ -301,7 +301,7 @@ Sub main()
 //										cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
 //									End If
 						Else 
-							If InStr(1, cardInfoArr(j, 0), "|") > 0 Then 
+							If InStr(1, cardInfoArr(j, 0), "|") > 0 Or Right(cardInfoArr(j,0),1) = "S" Or Right(cardInfoArr(j,0),1) = "H" Or Right(cardInfoArr(j,0),1) = "C" Or Right(cardInfoArr(j,0),1) = "D" Then 
 								cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0)
 							Else
 								cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & cardInfoArr(j, 0) & cardInfoArr(j, 1)
