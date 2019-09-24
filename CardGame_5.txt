@@ -83,6 +83,7 @@ TracePrint "Screen size:", screenX, screenY
 
 'Run app
 RunApp "com.tether.solitaire.klondike"
+//SetAppSpeed "com.tether.solitaire.klondike", 5
 
 Call playNow() 
 
@@ -757,7 +758,7 @@ Function getDelayTime(distance)
 //		delayTime = 1200
 //	End If
 	
-	getDelayTime = delayTime
+	getDelayTime = delayTime - 50
 End Function
 Sub moveCardAgain()
 	Dim cardStrArr
@@ -924,6 +925,8 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 	 		TracePrint "Moving the S card..."
 	 		If cardPosArr(pos, 0) > 500 Then
 				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
+			ElseIf cardPosArr(pos, 0) > 360 Then
+				Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
 			Else 
 				Delay 100
 				Swipe cardPosArr(pos, 0) + 15, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
@@ -932,6 +935,8 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 			TracePrint "Moving the H card..."
 			If cardPosArr(pos, 0) > 500 Then 
 			 	Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1, 0), foundationPosArr(1, 1), delayTime
+			ElseIf cardPosArr(pos, 0) > 360 Then
+				Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1, 0), foundationPosArr(1, 1), delayTime
 			Else
 				Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1, 0), foundationPosArr(1, 1), delayTime
 			End If
@@ -939,13 +944,17 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 			TracePrint "Moving the C card..."
 			If cardPosArr(pos, 0) > 500 Then 
 				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2, 0), foundationPosArr(2, 1), delayTime
+			ElseIf cardPosArr(pos, 0) > 360 Then
+				Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2, 0), foundationPosArr(2, 1), delayTime
 			Else 
 				Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(2, 0), foundationPosArr(2, 1), delayTime
 			End If
 		ElseIf elementSuit = "D" Then
 			TracePrint "Moving the D card..."
 			If cardPosArr(pos, 0) > 440 Then 
-				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3,0), foundationPosArr(3,1), delayTime
+				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3, 0), foundationPosArr(3, 1), delayTime
+			ElseIf cardPosArr(pos, 0) > 360 Then
+				Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(3, 0), foundationPosArr(3, 1), delayTime
 			Else
 				Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3, 0), foundationPosArr(3, 1), delayTime
 			End If
