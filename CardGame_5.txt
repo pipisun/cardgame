@@ -313,10 +313,10 @@ Sub main()
 					cardInfoArr(i, 1) = cardInfoArr(j, 1)
 					cardInfoArr(i, 2) = cardInfoArr(j, 2)
 					
-					Delay 50
+					Delay 200
 					
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
-						Delay 100
+						'Delay 200
 						If cardPosArr(i, 0) > 363 Then 
 							Swipe cardPosArr(j, 0) + 5, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 15, cardPosArr(i, 1), delayTime
 						Else
@@ -639,8 +639,9 @@ Sub checkTableauAndMoveForPile(index)
 		For i = 0 To 6
 			If cardInfoArr(i,0) <> "0" Then
 				'Get info for bottom card
-				Delay 200
+				Delay 500
 				
+				TracePrint "cardInfoArr(i, 0):", cardInfoArr(i, 0)
 				Dim btmArr, btmElement, btmElementSuit, btmElementNumber
 				btmArr = Split(cardInfoArr(i, 0), "|")
 				btmElement = btmArr(Len(btmArr) - 1)
@@ -701,11 +702,13 @@ Function checkFoundationAndMove(pos, element, elementSuit)
 		TracePrint "checkFoundationAndMove:lastElement,element",lastElement, element
 		
 		If CInt(lastElement) + 1 = CInt(element) Then 
+			Delay 100
 			Tap pilePosArr(pos, 0), pilePosArr(pos, 1)
 			'Update search area
 			'Call updateSearchAreaRange(pos, 9, "up")
 		
-			foundationInfoArr(index,0) = foundationInfoArr(index,0) & "|" & element & elementSuit
+			foundationInfoArr(index, 0) = foundationInfoArr(index, 0) & "|" & element & elementSuit
+			
 			isMoved = True
 		End If
 	Else 
@@ -783,7 +786,7 @@ Sub moveCardToFoundation()
 		TracePrint "cardInfoArr(m,0):", cardInfoArr(m,0)
 		elementArr = Split(cardInfoArr(m, 0), "|")
 //		TracePrint "elementArr(0):", elementArr(0)
-		If Len(elementArr) > 0 Then 
+		If Len(elementArr) > 0 And cardInfoArr(m,0) <> "0" Then 
 			TracePrint "Start moving card to foundation..."
 			counter = 0
 			For n = UBOUND(elementArr) To 0 Step -1
@@ -962,8 +965,9 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 			End If
 		End If
 	Else 
-		Delay 100
-		Tap cardPosArr(pos, 0) + 25, cardPosArr(pos, 1) + 50 * offset + 5
+		Delay 200
+		TracePrint "Tap card to foundation:", cardInfoArr(pos,0), cardInfoArr(pos,1)
+		Tap cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 50 * offset + 5
 	End If
 	
 	If foundationInfoArr(index, 0) = "0" Then 
@@ -2135,11 +2139,9 @@ Sub selectGame(gameOption)
 	'Check if there is SEE ALL RESULTS
 	FindPic 175, 971, 322, 1039, "Attachment:seeallresults.png", "000000", 0, 0.7, intX, intY
 	If intX > 0 And intY > 0 Then 
-		Tap intX + 5, intY + 5
-		Delay 200
-		Tap intX + 5, intY + 5
-		Delay 200
-		Tap intX + 5, intY + 5
+		Touch intX + 5, intY + 5, 500
+		Delay 500
+		Touch intX + 5, intY + 5, 500
 	End If
 	
 	Delay 2000
