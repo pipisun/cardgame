@@ -328,7 +328,7 @@ Sub main()
 					cardInfoArr(i, 1) = cardInfoArr(j, 1)
 					cardInfoArr(i, 2) = cardInfoArr(j, 2)
 					
-					Delay 200
+					Delay 100
 					
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
 						'Delay 200
@@ -350,7 +350,7 @@ Sub main()
 //							Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime
 						Else 
 							Delay 100
-							Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 10, cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+							Swipe cardPosArr(j, 0) + 45, cardPosArr(j, 1) + 10, cardPosArr(i, 0)+ 10, cardPosArr(i, 1), delayTime + 50
 						End If
 					End If
 							
@@ -689,8 +689,6 @@ Sub checkTableauAndMoveForPile(index)
 //			If checkBottmCardPointForTableau(index) = True Then
 				If cardInfoArr(i,0) <> "0" Then
 					'Get info for bottom card
-					Delay 500
-					
 					TracePrint "cardInfoArr(i, 0):", cardInfoArr(i, 0)
 					Dim btmArr, btmElement, btmElementSuit, btmElementNumber
 					btmArr = Split(cardInfoArr(i, 0), "|")
