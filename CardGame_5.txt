@@ -819,7 +819,7 @@ Function getDelayTime(distance)
 //		delayTime = 1200
 //	End If
 	
-	getDelayTime = delayTime - 100
+	getDelayTime = delayTime - 120
 End Function
 Sub moveCardAgain()
 	Dim cardStrArr
@@ -1743,7 +1743,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				isFoundAnyCardMovedInACycle = True
 				moveKCard = True
 				Exit Function
-			ElseIf emptySpotCount = 1 And cycletimes >= 4 Then
+			ElseIf emptySpotCount = 1 And cycletimes >= 3 Then
 				TracePrint "cycletimes:", cycletimes
 				For m = 0 To 6
 					Dim arrElement,topElementValue, topElementSuit
