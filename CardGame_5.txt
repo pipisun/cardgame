@@ -689,7 +689,7 @@ Sub checkTableauAndMoveForPile(index)
 //			If checkBottmCardPointForTableau(index) = True Then
 				If cardInfoArr(i,0) <> "0" Then
 					'Get info for bottom card
-					TracePrint "cardInfoArr(i, 0):", cardInfoArr(i, 0)
+					'TracePrint "cardInfoArr(i, 0):", cardInfoArr(i, 0)
 					Dim btmArr, btmElement, btmElementSuit, btmElementNumber
 					btmArr = Split(cardInfoArr(i, 0), "|")
 					btmElement = btmArr(Len(btmArr) - 1)
@@ -710,8 +710,14 @@ Sub checkTableauAndMoveForPile(index)
 					Dim delayTime
 					If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElementNumber) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
 						delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
-						Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
-						Delay 300
+						
+						If cardPosArr(i, 0) > 360 Then 
+							Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0) + 40, cardPosArr(i, 1), delayTime
+						Else 
+							Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime	
+						End If
+						
+						Delay 100
 						If Right(btmElement, 1) <> "S" And Right(btmElement, 1) <> "H" And Right(btmElement, 1) <> "C" And Right(btmElement, 1) <> "D" Then
 							cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1)
 						Else 
@@ -1161,7 +1167,11 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 				Swipe cardPosArr(searchPos, 0), cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
 			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
 				TracePrint "Move right to left"
-				Swipe cardPosArr(searchPos, 0) + 15, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+				If cardPosArr(searchPos, 0)  > 500 Then
+					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+				Else
+					Swipe cardPosArr(searchPos, 0) + 15, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+				End If
 			Else 
 				If cardPosArr(searchPos, 0) > 530 Then
 					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
@@ -1657,7 +1667,10 @@ Sub identifyNewCard(j)
 		
 		isCardHasBeenIdentifed = True
 		
+		
 		isEverEmptyPos(j) = True
+		
+		TracePrint "j,isEverEmptyPos(j):", j, ",", isEverEmptyPos(j)
 		
 		emptySpotCount = emptySpotCount + 1
 		If emptySpotPos = "" Then 
@@ -1829,58 +1842,59 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				TracePrint "isEverEmptyPos(m):", isEverEmptyPos(m)
 				If isEverEmptyPos(m) <> True Then
 					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1) + 20, cardPosArr(emptySPA, 0), cardPosArr(emptySPA, 1), 1000
-				Else 
-					Exit For
-				End If
-//				ElseIf emptySpotCount >= 2 Then 	
-//				If isHavingPipe > 0 Then 
-//					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
-//				Else 
-//					Tap cardPosArr(m, 0), cardPosArr(m, 1)
-//				End If
-				If Right(cardInfoArr(m, 0), 1) = "S" Or Right(cardInfoArr(m, 0), 1) = "H" Or Right(cardInfoArr(m, 0), 1) = "C" Or Right(cardInfoArr(m, 0), 1) = "D" Then 
-					cardInfoArr(emptySPA, 0) = cardInfoArr(m, 0)
-				Else 
-					cardInfoArr(emptySPA, 0) = cardInfoArr(m, 0) & cardInfoArr(m, 1)
-				End If
-//				bottomCardPointArr(emptySPA) = cardInfoArr(m, 0)
-				cardInfoArr(emptySPA, 1) = cardInfoArr(m, 1)
-				cardInfoArr(emptySPA, 2) = cardInfoArr(m, 2)
-//				TracePrint "1emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
-				Delay 100
-				emptySpotCount = emptySpotCount - 1
-				TracePrint "after moving, emptySpotCount:", emptySpotCount
-//				If Len(emptySpotPosArr) <> 1 Then
-//					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0)) - 1)
-//				End If
-//				TracePrint "2emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
-								
-//				If emptySpotCount = 0 Then 
-//					emptySpotPos = ""
-//				End If
-				
-				Call updateSearchAreaRange(m, 5, "up")
-				Call updateCardPosition(m, -10)
-				
-				'Check if there is any card needed to identify
-				Call identifyNewCard(m)
-				
-				Dim oldPosition
-							
-				oldPosition = m
-				newPosition = m
-				
-				'Check if there is a match
-				While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
-					newPosition = moveCardAfterIdentify(oldPosition,"")
-					If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
-						oldPosition = newPosition
-						noSuitableCardMatch = True
-						Call identifyNewCard(newPosition)
+	//				Else 
+	//					Exit For
+					
+	//				ElseIf emptySpotCount >= 2 Then 	
+	//				If isHavingPipe > 0 Then 
+	//					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
+	//				Else 
+	//					Tap cardPosArr(m, 0), cardPosArr(m, 1)
+	//				End If
+					If Right(cardInfoArr(m, 0), 1) = "S" Or Right(cardInfoArr(m, 0), 1) = "H" Or Right(cardInfoArr(m, 0), 1) = "C" Or Right(cardInfoArr(m, 0), 1) = "D" Then 
+						cardInfoArr(emptySPA, 0) = cardInfoArr(m, 0)
 					Else 
-						Exit For
+						cardInfoArr(emptySPA, 0) = cardInfoArr(m, 0) & cardInfoArr(m, 1)
 					End If
-				Wend
+	//				bottomCardPointArr(emptySPA) = cardInfoArr(m, 0)
+					cardInfoArr(emptySPA, 1) = cardInfoArr(m, 1)
+					cardInfoArr(emptySPA, 2) = cardInfoArr(m, 2)
+	//				TracePrint "1emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
+					Delay 100
+					emptySpotCount = emptySpotCount - 1
+					TracePrint "after moving, emptySpotCount:", emptySpotCount
+	//				If Len(emptySpotPosArr) <> 1 Then
+	//					emptySpotPos = Right(emptySpotPos, Len(emptySpotPos) - Len(emptySpotPosArr(0)) - 1)
+	//				End If
+	//				TracePrint "2emptySpotCount:", emptySpotCount, ", emptySpotPos:", emptySpotPos
+									
+	//				If emptySpotCount = 0 Then 
+	//					emptySpotPos = ""
+	//				End If
+					
+					Call updateSearchAreaRange(m, 5, "up")
+					Call updateCardPosition(m, -10)
+					
+					'Check if there is any card needed to identify
+					Call identifyNewCard(m)
+					
+					Dim oldPosition
+								
+					oldPosition = m
+					newPosition = m
+					
+					'Check if there is a match
+					While cardInfoArr(newPosition, 0) <> "0" Or isCardHasBeenIdentifed = False
+						newPosition = moveCardAfterIdentify(oldPosition,"")
+						If newPosition <> oldPosition Or noSuitableCardMatch = False Then 
+							oldPosition = newPosition
+							noSuitableCardMatch = True
+							Call identifyNewCard(newPosition)
+						Else 
+							Exit While
+						End If
+					Wend
+				End If
 			End If
 		Next
 	End If
