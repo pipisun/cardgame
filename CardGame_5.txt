@@ -350,7 +350,7 @@ Sub main()
 //							Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime
 						Else 
 							Delay 100
-							Swipe cardPosArr(j, 0) + 45, cardPosArr(j, 1) + 10, cardPosArr(i, 0)+ 10, cardPosArr(i, 1), delayTime + 50
+							Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 10, cardPosArr(i, 0)+ 10, cardPosArr(i, 1), delayTime + 50
 						End If
 					End If
 							
@@ -362,7 +362,7 @@ Sub main()
 						Call updateCardPosition(j, -10)
 					End If
 					
-					Delay 200
+					Delay 100
 					compareCounter = compareCounter + 1
 					
 					TracePrint "AFTER SWIPING..."
@@ -1385,7 +1385,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 				delayTime = getDelayTime(Abs(cardPosArr(position, 0) - cardPosArr(searchPos, 0)))
 				TracePrint "Swipe again"
 				Swipe cardPosArr(searchPos, 0) + 5, cardPosArr(searchPos, 1), cardPosArr(position, 0), cardPosArr(position, 1), delayTime
-				cardInfoArr(searchPos, 0) = cardInfoArr(searchPos, 0) & cardInfoArr(searchPos, 1) & "|" & cardInfoArr(position, 0)
+				cardInfoArr(position, 0) = cardInfoArr(position, 0) & cardInfoArr(position, 1) & "|" & cardInfoArr(searchPos, 0)
 //				bottomCardPointArr(searchPos) = cardInfoArr(position, 0)
 				isPosCardChanged = False
 				'Update search area
