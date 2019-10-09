@@ -1177,7 +1177,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
 				Else 
 				 	If cardPosArr(searchPos, 0) < 320 Then 
-						Swipe cardPosArr(searchPos, 0), cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
+						Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
 					Else
 						Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
 					End If
@@ -1661,16 +1661,17 @@ Sub identifyNewCard(j)
 		End If 
 	Next
 	
+	Dim numberOfPosition
 	If noCard = True Then 
 		cardInfoArr(j, 0) = "0"
 //		bottomCardPointArr(j) = "0"
 		
 		isCardHasBeenIdentifed = True
 		
+		numberOfPosition = getActualPosition(cardSearchArea(j,0))
+		isEverEmptyPos(numberOfPosition) = True
 		
-		isEverEmptyPos(j) = True
-		
-		TracePrint "j,isEverEmptyPos(j):", j, ",", isEverEmptyPos(j)
+		TracePrint "numberOfPosition,isEverEmptyPos(numberOfPosition):", numberOfPosition, ",", isEverEmptyPos(numberOfPosition)
 		
 		emptySpotCount = emptySpotCount + 1
 		If emptySpotPos = "" Then 
@@ -1682,6 +1683,26 @@ Sub identifyNewCard(j)
 		noCard = False
 	End If
 End Sub
+
+Function getActualPosition(cardPosition)
+	If cardPosition = 0 Then 
+		getActualPosition = 0
+	ElseIf cardPosition = 92 Then
+		getActualPosition = 1
+	ElseIf cardPosition = 184 Then
+		getActualPosition = 2
+	ElseIf cardPosition = 276 Then
+		getActualPosition = 3
+	ElseIf cardPosition = 368 Then
+		getActualPosition = 4
+	ElseIf cardPosition = 460 Then
+		getActualPosition = 5
+	ElseIf cardPosition = 552 Then
+		getActualPosition = 6
+	Else 
+		getActualPosition = 0
+	End If	
+End Function
 
 Function moveKCard(emptyIndex, pileIndex, flag)
 	Dim emptySpotPosArr, newPosition, isHavingPipe, element, elementArr
