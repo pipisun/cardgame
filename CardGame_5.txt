@@ -6,6 +6,9 @@ Dim count, isFound
 'Record point for bottom card
 //Dim bottomCardPointArr(7)
 
+'Check Card K
+Dim isKAvailable
+
 'Save card info(point, suit,suitColor) and card position
 Dim cardInfoArr(7,3), cardPosArr(7,2)
 Dim allCardPicArr, suitPicArr
@@ -335,7 +338,7 @@ Sub main()
 						If cardPosArr(i, 0) > 363 Then 
 							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime + 100
 						Else
-							Swipe cardPosArr(j, 0) + 30 , cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+							Swipe cardPosArr(j, 0) + 30 , cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime + 50
 						End If
 					Else 
 						If cardPosArr(i, 0) < 50 Then 
@@ -528,7 +531,12 @@ Sub moveCardFromWastePile()
 //			timesinacycle = cycletimes
 			cycletimes = cycletimes + 1
 			If isFoundAnyCardMovedInACycle = False Then 
-				Exit Do
+			 	If isKAvailable = True And emptySpotCount > 0 Then 
+			 		'Go to next loop
+			 		isKAvailable = False
+			 	Else 
+					Exit Do
+				End If
 			End If
 			Tap 591, 163
 			isFirstGroupInACycle = True
@@ -539,7 +547,12 @@ Sub moveCardFromWastePile()
 			cycletimes = cycletimes + 1
 			If intX > 0 And intY > 0 Then 
 				If isFoundAnyCardMovedInACycle = False Then 
-					Exit Do
+			 		If isKAvailable = True And emptySpotCount > 0 Then 
+			 			'Go to next loop
+			 			isKAvailable = False
+			 		Else 
+						Exit Do
+					End If
 				End If	
 				Tap 591, 163
 				isFirstGroupInACycle = True
@@ -1532,9 +1545,13 @@ Sub identifyPileCard(index)
 			cardPoint = Mid(allCardPicArr(m), 2, InStr(1, allCardPicArr(m), ".") - 2)
 			TracePrint "Found card: ", cardPoint
 			
-		
+			If index = 0 And cardPoint = "13" Then 
+				isKAvailable = True	
+			End If
+			
 			pileCardInfoArr(index, 0) = cardPoint
 			TracePrint "index,pileCardInfoArr", index, pileCardInfoArr(index,0)
+			
 			
 			Delay 500
 			
@@ -1771,6 +1788,21 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 							moveKCard = True
 							Exit Function
 						End If
+					ElseIf isKAvailable = True And cycletimes = 2 Then
+						Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
+						aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
+						isEverEmptyPos(aPos) = True
+						
+						Delay 100
+						
+						cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0)
+						cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
+						cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
+						emptySpotCount = emptySpotCount - 1
+						
+						isKAvailable = False
+					Else 
+						isKAvailable = False
 					End If
 				Next
 			ElseIf emptySpotCount >= 2 Then
@@ -2105,6 +2137,7 @@ Sub finalCheck()
 End Sub
 
 Sub init()
+	isKAvailable = False
 	compareCounter = 1
 	emptySpotCount = 0
 	emptySpotPos = ""
