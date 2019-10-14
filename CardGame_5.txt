@@ -336,7 +336,7 @@ Sub main()
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
 						'Delay 200
 						If cardPosArr(i, 0) > 363 Then 
-							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime + 100
+							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime + 150
 						Else
 							Swipe cardPosArr(j, 0) + 30 , cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime + 50
 						End If
@@ -1725,6 +1725,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 	Dim emptySpotPosArr, newPosition, isHavingPipe, element, elementArr
 	Dim topElementForPile, topElementSuitForPile
 	Dim aPos
+	Dim topEleArr
 	
 	emptySpotPosArr = Split(emptySpotPos, "|")
 	If pileIndex <> "" Then 
@@ -1744,10 +1745,11 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 			ElseIf emptySpotCount = 1 Then
 				For t = 0 To 6
                     If t <> emptyIndex Then
-						topElementForPile = Left(cardInfoArr(t, 0), 2)
-						If Instr(1, cardInfoArr(t,0), "|") > 0 Or isExecutedAddSuitToCard = True Then
-							topElementSuitForPile = Mid(cardInfoArr(t, 0), 3, 1)
-						Else
+						topEleArr = Split(cardInfoArr(t, 0), "|")
+						topElementForPile = Left(topEleArr(0), Len(topEleArr(0)) - 1)
+						If InStr(1, cardInfoArr(t, 0), "|") > 0 Or isExecutedAddSuitToCard = True Then 
+							topElementSuitForPile = Right(topEleArr(0), 1)
+						Else 
 							topElementSuitForPile = cardInfoArr(t, 1)
 						End If
 													
@@ -2350,22 +2352,25 @@ Sub selectGame(gameOption)
 End Sub
 
 Sub startGame()
-	Dim count, intX, intY
+	Dim count, intX, intY, count2
 	'Tap Start Game
 	count = 15
+	count2 = 10
 	While count > 0 
 		FindPic 0, 0, 0, 0, "Attachment:startgame.png", "000000", 0, 0.4, intX, intY
 		If intX > 0 And intY > 0 Then 
 			TracePrint "Found Startgame button"
 			Tap intX, intY
 			
-			FindPic 0, 0, 0, 0, "Attachment:retry.png", "000000", 0, 0.4, intX, intY
-			If intX > 0 And intY > 0 Then
-				Tap intX + 10, intY + 10
-			End If
+			While count2 > 0
+				FindPic 0, 0, 0, 0, "Attachment:retry.png", "000000", 0, 0.4, intX, intY
+				If intX > 0 And intY > 0 Then
+					Tap intX + 10, intY + 10
+				End If
 			
-			Delay 6000
-			
+				Delay 1000
+				count2 = count2 - 1
+			Wend
 			Exit While
 		Else 
 			'TracePrint "Continue searching startgame..."	
