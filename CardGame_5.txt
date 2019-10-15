@@ -1096,6 +1096,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 	
 	If isSwapChecked = True Then 
 		intNewCardNumber = CInt(cardInfoArr(pos, 0))
+		strNewCardSuit = cardInfoArr(pos, 2)
 		TracePrint "isSwapChecked, intNewCardNumber", intNewCardNumber
 		'isSwapChecked = False
 	End If
