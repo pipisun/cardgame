@@ -1546,7 +1546,7 @@ Sub identifyPileCard(index)
 			cardPoint = Mid(allCardPicArr(m), 2, InStr(1, allCardPicArr(m), ".") - 2)
 			TracePrint "Found card: ", cardPoint
 			
-			If index = 0 And cardPoint = "13" Then 
+			If index = 0 And cardPoint = "13" And isFoundAnyCardMovedInACycle = False Then 
 				isKAvailable = True	
 			End If
 			
@@ -1686,10 +1686,10 @@ Sub identifyNewCard(j)
 		
 		isCardHasBeenIdentifed = True
 		
-		numberOfPosition = getActualPosition(cardSearchArea(j,0))
-		isEverEmptyPos(numberOfPosition) = True
+		'numberOfPosition = getActualPosition(cardSearchArea(j,0))
+		isEverEmptyPos(j) = True
 		
-		TracePrint "numberOfPosition,isEverEmptyPos(numberOfPosition):", numberOfPosition, ",", isEverEmptyPos(numberOfPosition)
+		'TracePrint "numberOfPosition,isEverEmptyPos(numberOfPosition):", numberOfPosition, ",", isEverEmptyPos(numberOfPosition)
 		
 		emptySpotCount = emptySpotCount + 1
 		If emptySpotPos = "" Then 
@@ -1733,8 +1733,8 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 		If pileCardInfoArr(pileIndex, 0) = "13" Then 
 			If flag = "FINAL" And emptySpotCount >=1 Then 
 				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
-				aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
-				isEverEmptyPos(aPos) = True
+//				aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
+				isEverEmptyPos(emptyIndex) = True
 				cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)	
@@ -1757,8 +1757,8 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 						TracePrint "moveKcard:topelement,topElementSuit, pileCardInfoArr(pileIndex, 1):", topElementForPile, topElementSuitForPile, pileCardInfoArr(pileIndex, 1)
 						If topElementForPile = "12" And getSuitColor(topElementSuitForPile) <> pileCardInfoArr(pileIndex, 2) Then 
 							Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
-							aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
-							isEverEmptyPos(aPos) = True
+//							aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
+							isEverEmptyPos(emptyIndex) = True
 							
 							Delay 100
 							If cardPosArr(t, 0) > 530 Then
@@ -1791,10 +1791,10 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 							moveKCard = True
 							Exit Function
 						End If
-					ElseIf isKAvailable = True And cycletimes = 2 Then
+					ElseIf isKAvailable = True Then
 						Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
-						aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
-						isEverEmptyPos(aPos) = True
+//						aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
+						isEverEmptyPos(emptyIndex) = True
 						
 						Delay 100
 						
@@ -1810,8 +1810,8 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 				Next
 			ElseIf emptySpotCount >= 2 Then
 				Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
-				aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
-				isEverEmptyPos(aPos) = True
+//				aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
+				isEverEmptyPos(emptyIndex) = True
 				cardInfoArr(emptyIndex, 0) = pileCardInfoArr(pileIndex, 0) & pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
 				cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
@@ -1841,7 +1841,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 					If CInt(pileCardInfoArr(pileIndex, 0)) - 1 = CInt(topElementValue) And pileCardInfoArr(pileIndex, 2) <> getSuitColor(topElementSuit) Then 
 						Swipe pilePosArr(pileIndex, 0), pilePosArr(pileIndex, 1), cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 500
 //						aPos = getActualPosition(cardSearchArea(emptyIndex, 0))
-//						isEverEmptyPos(aPos) = True
+						isEverEmptyPos(emptyIndex) = True
 						Delay 100
 						If cardPosArr(m, 0) > 530 Then
 							Swipe cardPosArr(m, 0) + 30, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 800
@@ -1910,7 +1910,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1) + 20, cardPosArr(emptySPA, 0), cardPosArr(emptySPA, 1), 1000
 	//				Else 
 	//					Exit For
-					
+					isEverEmptyPos(emptySPA) = True
 	//				ElseIf emptySpotCount >= 2 Then 	
 	//				If isHavingPipe > 0 Then 
 	//					Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1), cardPosArr(CInt(emptySpotPosArr(0)), 0), cardPosArr(CInt(emptySpotPos(0)), 1), 500
@@ -2013,6 +2013,7 @@ Sub sortMaxToMin()
 	Dim tempCardPointSearchArea(4), tempCardSuitSearchArea(4)
 	Dim arrA, arrB
 //	Dim tempBottomValue
+	Dim tempForEmpty
 	
 	For i = 0 To 5
 		For j = i + 1 To 6
@@ -2055,6 +2056,10 @@ Sub sortMaxToMin()
 				cardInfoArr(i, 0) = cardInfoArr(j, 0)
 				cardInfoArr(j, 0) = temp
 				
+				'Update empty position
+				tempForEmpty = isEverEmptyPos(i)
+				isEverEmptyPos(i) = isEverEmptyPos(j)
+				isEverEmptyPos(j) = tempForEmpty
 				'Update bottom value
 //				tempBottomValue = bottomCardPointArr(i)
 //				bottomCardPointArr(i) = bottomCardPointArr(j)
@@ -2112,8 +2117,8 @@ End Sub
 
 Sub finalCheck()
 	TracePrint "Starting final check..."
-	Call moveKCard("", "", "FINAL")
 	Call sortMaxToMin()
+	Call moveKCard("", "", "FINAL")
 	Call main()
 	Call moveCardToFoundation()
 	
