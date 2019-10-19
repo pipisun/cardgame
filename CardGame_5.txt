@@ -334,11 +334,11 @@ Sub main()
 					Delay 100
 					
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
-						'Delay 200
+						Delay 50
 						If cardPosArr(i, 0) > 363 Then 
-							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime + 150
+							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 160
 						Else
-							Swipe cardPosArr(j, 0) + 30 , cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime + 50
+							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime + 50
 						End If
 					Else 
 						If cardPosArr(i, 0) < 50 Then 
@@ -353,7 +353,11 @@ Sub main()
 //							Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime
 						Else 
 							Delay 100
-							Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 10, cardPosArr(i, 0)+ 10, cardPosArr(i, 1), delayTime + 50
+							If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 500 Then 
+								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 10, cardPosArr(i, 0)+ 10, cardPosArr(i, 1), delayTime + 150
+							Else
+								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 50
+							End If
 						End If
 					End If
 							
@@ -1244,6 +1248,8 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			TracePrint "cardInfoArr(pos,0)-card point:", cardInfoArr(searchPos,0)
 			TracePrint "cardInfoArr(pos,1)-card suit:", cardInfoArr(searchPos,1)
 			TracePrint "Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)):", Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0))
+			TracePrint "cardPosArr(pos, 0), cardPosArr(pos, 1):", cardPosArr(pos, 0), ",", cardPosArr(pos, 1)
+			TracePrint "cardPosArr(searchPos, 0), cardPosArr(searchPos, 1):", cardPosArr(searchPos, 0), ",", cardPosArr(searchPos, 1)
 			
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 			Delay 100
@@ -1254,8 +1260,10 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 					Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), delayTime
 				Else 
 					If cardPosArr(pos, 0) < 320 Then 
-						Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
-					Else
+					 	Delay 50
+						Swipe cardPosArr(pos, 0) + 50, cardPosArr(pos, 1) + 10, cardPosArr(searchPos, 0) + 5, cardPosArr(searchPos, 1), delayTime + 50
+					Else 
+						Delay 50
 						Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 					End If
 				End If
@@ -1803,6 +1811,8 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 						cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
 						emptySpotCount = emptySpotCount - 1
 						
+						isFoundInTableau = True
+						isFoundAnyCardMovedInACycle = True
 						isKAvailable = False
 					Else 
 						isKAvailable = False
@@ -2159,9 +2169,9 @@ Sub init()
 	Next
 	foundationPosArr(0,0) = 5
 	foundationPosArr(0,1) = 158
-	foundationPosArr(1,0) = 137
+	foundationPosArr(1,0) = 100
 	foundationPosArr(1,1) = 158
-	foundationPosArr(2,0) = 228
+	foundationPosArr(2,0) = 200
 	foundationPosArr(2,1) = 158
 	foundationPosArr(3,0) = 322
 	foundationPosArr(3, 1) = 158
@@ -2241,7 +2251,7 @@ Sub init()
 			If intX > 0 And intY > 0 Then 
 				'Get card point
 				cardPoint = Mid(allCardPicArr(j), 2, InStr(1, allCardPicArr(j), ".") - 2) 
-				TracePrint "Found card: ", cardPoint
+//				TracePrint "Found card: ", cardPoint
 				'Save card info
 				cardInfoArr(i, 0) = cardPoint
 //				bottomCardPointArr(i) = cardPoint
@@ -2258,12 +2268,12 @@ Sub init()
 					'Search suit
 					FindPic leftUpperCornerXForSuit, leftUpperCornerYForSuit, rightUpperCornerXForSuit, rightUpperCornerYForSuit, "Attachment:" & suitPicArr(m), "000000", 0, 0.4, intX, intY
 					If intX > 0 And intY > 0 Then 
-						TracePrint "Found suit: ", suitPicArr(m)
+//						TracePrint "Found suit: ", suitPicArr(m)
 						'Save suit info
 						cardInfoArr(i, 1) = convertSuitColorToSign(suitPicArr(m))
 						'Save suit color(Black/Red)
 						cardInfoArr(i, 2) = checkSuitBlackOrRed(suitPicArr(m))
-						TracePrint "Found suit color: ", cardInfoArr(i, 2)
+//						TracePrint "Found suit color: ", cardInfoArr(i, 2)
 						
 						suitSearchArea(i,0) = leftUpperCornerXForSuit
 						suitSearchArea(i,1) = leftUpperCornerYForSuit
