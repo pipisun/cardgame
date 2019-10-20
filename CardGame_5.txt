@@ -93,7 +93,60 @@ RunApp "com.tether.solitaire.klondike"
 
 Call playNow() 
 
-Call runTestScenarioForZ1(10)
+Call runTestScenarioForRealOneDollar(1)
+
+Sub runTestScenarioForRealOneDollar(timesOfExecution)
+	
+	For i = 1 To timesOfExecution
+		TracePrint "STARTING EXECUTION(TIMES):", i
+		Call selectGame("entry0.60.png")
+		Call startGame()
+		Call waitGameToStart()
+		
+		Call init()
+//		Call sortMaxToMin()
+		Call printOutCardInfoAndMoveAFirst()
+		Call sortMaxToMin()
+		'Main
+		Call main()
+		
+		'Sort again
+		Call sortMaxToMin()
+		
+		Call printOut()
+		
+		Call moveCardToFoundation()
+		
+		Call moveKCard("", "", "")
+		
+		Call printOut()
+		
+		'Call main again
+		Call sortMaxToMin()
+		
+		Call main()
+		
+		'Sort again
+		Call sortMaxToMin()
+		
+		Call moveCardToFoundation()
+		
+		'Call addSuitToCard()
+		
+		Call moveCardFromWastePile()
+		
+		Call finalCheck()
+		
+		'End game
+		Call endGame()
+		
+		Delay 8000
+		
+		TracePrint "END EXECUTION(TIMES):", i
+	Next
+End Sub
+
+'Call runTestScenarioForZ1(10)
 
 Sub runTestScenarioForZ1(timesOfExecution)
 	
@@ -842,7 +895,7 @@ Function getDelayTime(distance)
 //		delayTime = 1200
 //	End If
 	
-	getDelayTime = delayTime - 120
+	getDelayTime = delayTime - 130
 End Function
 Sub moveCardAgain()
 	Dim cardStrArr
@@ -2169,9 +2222,9 @@ Sub init()
 	Next
 	foundationPosArr(0,0) = 5
 	foundationPosArr(0,1) = 158
-	foundationPosArr(1,0) = 100
+	foundationPosArr(1,0) = 110
 	foundationPosArr(1,1) = 158
-	foundationPosArr(2,0) = 200
+	foundationPosArr(2,0) = 210
 	foundationPosArr(2,1) = 158
 	foundationPosArr(3,0) = 322
 	foundationPosArr(3, 1) = 158
@@ -2349,9 +2402,7 @@ Sub selectGame(gameOption)
 			Exit While
 		Else 
 			TracePrint "Continue searching z1..."
-			If gameOption = "entryz1.png" Then 
-				Swipe 358, 200 + offsetY1, 358, 100 + offsetY2, 800
-			End If
+			Swipe 358, 200 + offsetY1, 358, 100 + offsetY2, 800
 			offsetY1 = offsetY1 + 200
 			offsetY2 = offsetY2 + 100
 		End If
@@ -2379,6 +2430,7 @@ Sub startGame()
 			Tap intX, intY
 			
 			While count2 > 0
+				Delay 1000
 				FindPic 0, 0, 0, 0, "Attachment:retry.png", "000000", 0, 0.4, intX, intY
 				If intX > 0 And intY > 0 Then
 					Tap intX + 10, intY + 10
