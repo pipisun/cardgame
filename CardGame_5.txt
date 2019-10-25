@@ -91,9 +91,10 @@ TracePrint "Screen size:", screenX, screenY
 RunApp "com.tether.solitaire.klondike"
 //SetAppSpeed "com.tether.solitaire.klondike", 5
 
-Call playNow() 
-
-Call runTestScenarioForRealOneDollar(1)
+Call playNow()
+ 
+Call runTestScenarioForZ1(1)
+//Call runTestScenarioForRealOneDollar(1)
 
 Sub runTestScenarioForRealOneDollar(timesOfExecution)
 	
@@ -145,8 +146,6 @@ Sub runTestScenarioForRealOneDollar(timesOfExecution)
 		TracePrint "END EXECUTION(TIMES):", i
 	Next
 End Sub
-
-'Call runTestScenarioForZ1(10)
 
 Sub runTestScenarioForZ1(timesOfExecution)
 	
@@ -389,7 +388,7 @@ Sub main()
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
 						Delay 50
 						If cardPosArr(i, 0) > 363 Then 
-							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 160
+							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 170
 						Else
 							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime + 50
 						End If
@@ -397,9 +396,9 @@ Sub main()
 						If cardPosArr(i, 0) < 50 Then 
 						 	Delay 100
 							If cardPosArr(j, 0) > 550 Then 
-								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime + 50
 							Else
-								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 20, cardPosArr(i, 0)-10, cardPosArr(i, 1), delayTime
+								Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0)-10, cardPosArr(i, 1), delayTime + 50
 							End If
 //						ElseIf cardPosArr(j, 0) > 530 Then
 //							Delay 100
@@ -407,9 +406,9 @@ Sub main()
 						Else 
 							Delay 100
 							If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 500 Then 
-								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 10, cardPosArr(i, 0)+ 10, cardPosArr(i, 1), delayTime + 150
+								Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 170
 							Else
-								Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 50
+								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), 450
 							End If
 						End If
 					End If
@@ -543,18 +542,19 @@ Sub moveCardFromWastePile()
 		Delay 100
 		
 		'Check foundation area
-		Call checkFoundationForPile(0, "")
+		Call checkFoundationForPile(tmpIndex, "")
 		
 		Delay 200
 		
 		TracePrint "isMoved in pile:", isMoved
 		TracePrint "isFoundAnyCardMovedInACycle", isFoundAnyCardMovedInACycle
 		TracePrint "pos", pos
-
+		TracePrint "tmpIndex", tmpIndex
+		
 		If tmpIndex = Null Then 
 			tmpIndex = 0
 		End If
-		TracePrint "tmpIndex", tmpIndex
+//		TracePrint "tmpIndex", tmpIndex
 		
 //		TracePrint "Sort bottomCardPointArr"
 //		Call sortBottomArrayValue()
@@ -598,6 +598,7 @@ Sub moveCardFromWastePile()
 			Tap 591, 163
 			isFirstGroupInACycle = True
 			isFoundAnyCardMovedInACycle = False
+			tmpIndex = 0
 		Else 
 			FindPic 550, 110, 634, 224, "Attachment:" & "20points.png", "000000", 0, 0.5, intX, intY
 //			timesinacycle = cycletimes
@@ -614,6 +615,7 @@ Sub moveCardFromWastePile()
 				Tap 591, 163
 				isFirstGroupInACycle = True
 				isFoundAnyCardMovedInACycle = False
+				tmpIndex = 0
 			Else 
 				isFirstGroupInACycle = False
 			End If
@@ -667,41 +669,43 @@ Sub checkTableauForPile(tmpIndex, flag)
 	Next
 End Sub
 
-Sub checkFoundationForPile(tmpIndex, flag)
+Sub checkFoundationForPile(tmpIndexIn, flag)
 	Dim element, elementSuit
 	For pos = 0 To 2
-		TracePrint "tmpIndex", tmpIndex
+		TracePrint "tmpIndexIn", tmpIndexIn
 		
-		If tmpIndex = 3 Then 
+		If tmpIndexIn = 3 Then 
 			Exit Sub
 		End If
 		
-		If flag <> "AGAIN" Or tmpIndex = 2 Then 
-			Call identifyPileCard(tmpIndex)
+		If flag <> "AGAIN" Or tmpIndexIn = 2 Then 
+			Call identifyPileCard(tmpIndexIn)
 		End If
 		
 		
-		element = pileCardInfoArr(tmpIndex, 0)
-		elementSuit = pileCardInfoArr(tmpIndex, 1)
+		element = pileCardInfoArr(tmpIndexIn, 0)
+		elementSuit = pileCardInfoArr(tmpIndexIn, 1)
 		TracePrint "element,elementSuit:", element, elementSuit
 		TracePrint "isFirstGroupInACycle:", isFirstGroupInACycle
 		
-		isMoved = checkFoundationAndMove(tmpIndex, element, elementSuit)
+		isMoved = checkFoundationAndMove(tmpIndexIn, element, elementSuit)
 		If isMoved = False Then 
 //			 	If pos = 0 Then 
 //			 		isFoundAnyCardMovedInACycle = False	
 //			 	End If
 			Exit For
 		ElseIf isFirstGroupInACycle = False Then
-			TracePrint "pos-1:", tmpIndex
+			TracePrint "pos-1:", tmpIndexIn
 			tmpIndex = 0
+			tmpIndexIn = 0
 		Else 
+			tmpIndexIn = tmpIndexIn + 1
 			tmpIndex = tmpIndex + 1
 		End If
 		isFoundAnyCardMovedInACycle = True
 		
 		If flag = "AGAIN" Then 
-			Call checkTableauForPile(tmpIndex, "")
+			Call checkTableauForPile(tmpIndexIn, "")
 		End If
 		
 		Delay 200
@@ -747,6 +751,8 @@ End Function
 
 Sub checkTableauAndMoveForPile(index)
 	TracePrint "Check tableau for pile"
+	TracePrint "pileCardInfoArr(index, 0):", pileCardInfoArr(index, 0)
+		
 	Dim lastDigitValue
 //	For k = 0 To 2
 //		If isMoved = True Then
@@ -776,33 +782,40 @@ Sub checkTableauAndMoveForPile(index)
 					'lastDigitValue = Right(cardInfoArr(i,0),1)
 					'btmElementSuit = getSuitColor(lastDigitValue)
 					TracePrint "btmArr,btmElementNumber,lastDigitValue,btmElementSuit",btmArr,btmElementNumber,lastDigitValue,btmElementSuit
+//					TracePrint "pileCardInfoArr(index, 0):", pileCardInfoArr(index, 0)
 					
 					Dim delayTime
-					If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElementNumber) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
-						delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
-						
-						If cardPosArr(i, 0) > 360 Then 
-							Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0) + 40, cardPosArr(i, 1), delayTime
+					'If pileCardInfoArr(index, 0) <> "13" Then
+						If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElementNumber) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
+							delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
+							
+							If cardPosArr(i, 0) > 360 Then 
+								Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0) + 40, cardPosArr(i, 1), delayTime
+							Else 
+								Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime	
+							End If
+							
+							Delay 100
+							If Right(btmElement, 1) <> "S" And Right(btmElement, 1) <> "H" And Right(btmElement, 1) <> "C" And Right(btmElement, 1) <> "D" Then
+								cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1)
+							Else 
+								cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1) 
+							End If
+	//						bottomCardPointArr(i) = pileCardInfoArr(index, 0)
+							isFoundAnyCardMovedInACycle = True
+							isFoundInTableau = True
+							Exit For
 						Else 
-							Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime	
+							'isFoundAnyCardMovedInACycle = False
+							isFoundInTableau = False
 						End If
-						
-						Delay 100
-						If Right(btmElement, 1) <> "S" And Right(btmElement, 1) <> "H" And Right(btmElement, 1) <> "C" And Right(btmElement, 1) <> "D" Then
-							cardInfoArr(i, 0) = cardInfoArr(i, 0) & cardInfoArr(i, 1) & "|" & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1)
-						Else 
-							cardInfoArr(i, 0) = cardInfoArr(i, 0) & "|" & pileCardInfoArr(index, 0) & pileCardInfoArr(index, 1) 
-						End If
-//						bottomCardPointArr(i) = pileCardInfoArr(index, 0)
-						isFoundAnyCardMovedInACycle = True
-						isFoundInTableau = True
-						Exit For
-					Else 
-						'isFoundAnyCardMovedInACycle = False
-						isFoundInTableau = False
-					End If
+//					Else 
+//						isFoundInTableau = False
+//						Exit For 
+//					End If
 				Else 
-					If moveKCard(i, index, "") = True Then 
+				 	TracePrint "emptySpotCount", emptySpotCount
+					If moveKCard(i, index, "") = True Then
 						Delay 300
 						Exit For
 					End If
@@ -895,7 +908,7 @@ Function getDelayTime(distance)
 //		delayTime = 1200
 //	End If
 	
-	getDelayTime = delayTime - 130
+	getDelayTime = delayTime - 120
 End Function
 Sub moveCardAgain()
 	Dim cardStrArr
@@ -1239,13 +1252,13 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
 				TracePrint "Move right to left"
 				If cardPosArr(searchPos, 0)  > 500 Then
-					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+					Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), 450
 				Else
-					Swipe cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), 450
 				End If
 			Else 
 				If cardPosArr(searchPos, 0) > 530 Then
-					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
+					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), 450
 				Else 
 				 	If cardPosArr(searchPos, 0) < 320 Then 
 						Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
@@ -1307,17 +1320,17 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 			Delay 100
 			If cardPosArr(pos, 0) > 530 Then
-				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), delayTime
+				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), delayTime + 150
 			Else 
 				If cardPosArr(searchPos, 0) > 530 Then 
-					Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), delayTime
+					Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), delayTime + 50
 				Else 
 					If cardPosArr(pos, 0) < 320 Then 
 					 	Delay 50
 						Swipe cardPosArr(pos, 0) + 50, cardPosArr(pos, 1) + 10, cardPosArr(searchPos, 0) + 5, cardPosArr(searchPos, 1), delayTime + 50
 					Else 
 						Delay 50
-						Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
+						Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime + 50
 					End If
 				End If
 			End If
@@ -1784,6 +1797,7 @@ Function getActualPosition(cardPosition)
 End Function
 
 Function moveKCard(emptyIndex, pileIndex, flag)
+	TracePrint "Move K Card..."
 	Dim emptySpotPosArr, newPosition, isHavingPipe, element, elementArr
 	Dim topElementForPile, topElementSuitForPile
 	Dim aPos
@@ -2292,6 +2306,8 @@ Sub init()
 	offsetY1 = 10
 	offsetY2 = 30
 	
+	tmpIndex = 0
+	
 	For e = 0 To 6
 		isEverEmptyPos(e) = False
 	Next
@@ -2308,8 +2324,10 @@ Sub init()
 				'Save card info
 				cardInfoArr(i, 0) = cardPoint
 //				bottomCardPointArr(i) = cardPoint
-				cardPosArr(i, 0) = intX + 15
-				cardPosArr(i, 1) = intY + 15
+				cardPosArr(i, 0) = intX
+				cardPosArr(i, 1) = intY
+//				cardPosArr(i, 0) = intX + 15
+//				cardPosArr(i, 1) = intY + 15
 				cardSearchArea(i,0) = leftUpperCornerX
 				cardSearchArea(i,1) = leftUpperCornerY
 				cardSearchArea(i,2) = rightUpperCornerX
