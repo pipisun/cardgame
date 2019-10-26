@@ -405,8 +405,8 @@ Sub main()
 //							Swipe cardPosArr(j, 0) + 20, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime
 						Else 
 							Delay 100
-							If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 500 Then 
-								Swipe cardPosArr(j, 0) + 10, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 170
+							If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 450 Then 
+								Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), 600
 							Else
 								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), 450
 							End If
@@ -981,7 +981,7 @@ Sub moveCardToFoundation()
 					End If
 					isMoved = False
 					TracePrint "After identifyNew, m=",m
-					m = m + 1
+					'm = m + 1
 				Else 
 					Exit For
 				End If
@@ -1110,7 +1110,7 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 			End If
 		End If
 	Else 
-		Delay 200
+		Delay 400
 		TracePrint "Tap card to foundation:", cardInfoArr(pos,0), cardInfoArr(pos,1)
 		Tap cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 50 * offset + 5
 	End If
@@ -1252,18 +1252,18 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
 				TracePrint "Move right to left"
 				If cardPosArr(searchPos, 0)  > 500 Then
-					Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), 450
+					Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), 500
 				Else
 					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), 450
 				End If
 			Else 
 				If cardPosArr(searchPos, 0) > 530 Then
-					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), 450
+					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), 500
 				Else 
 				 	If cardPosArr(searchPos, 0) < 320 Then 
-						Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
+						Swipe cardPosArr(searchPos, 0) + 20, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), 450
 					Else
-						Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), delayTime
+						Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 10, cardPosArr(pos, 1), 450
 					End If
 				End If
 			End If
@@ -1320,17 +1320,17 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 			Delay 100
 			If cardPosArr(pos, 0) > 530 Then
-				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), delayTime + 150
+				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), 650
 			Else 
 				If cardPosArr(searchPos, 0) > 530 Then 
 					Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), delayTime + 50
 				Else 
 					If cardPosArr(pos, 0) < 320 Then 
 					 	Delay 50
-						Swipe cardPosArr(pos, 0) + 50, cardPosArr(pos, 1) + 10, cardPosArr(searchPos, 0) + 5, cardPosArr(searchPos, 1), delayTime + 50
+						Swipe cardPosArr(pos, 0) + 50, cardPosArr(pos, 1) + 10, cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1), 450
 					Else 
 						Delay 50
-						Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime + 50
+						Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), 450
 					End If
 				End If
 			End If
