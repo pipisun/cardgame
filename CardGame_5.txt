@@ -388,17 +388,17 @@ Sub main()
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then 
 						Delay 50
 						If cardPosArr(i, 0) > 363 Then 
-							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), delayTime + 170
+							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 10, cardPosArr(i, 1), 600
 						Else
-							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime + 50
+							Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0) + 20, cardPosArr(i, 1), 500
 						End If
 					Else 
 						If cardPosArr(i, 0) < 50 Then 
 						 	Delay 100
 							If cardPosArr(j, 0) > 550 Then 
-								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), delayTime + 50
+								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 20, cardPosArr(i, 0), cardPosArr(i, 1), 700
 							Else
-								Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 20, cardPosArr(i, 0)-10, cardPosArr(i, 1), delayTime + 50
+								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 20, cardPosArr(i, 0)+10, cardPosArr(i, 1) + 20, 600
 							End If
 //						ElseIf cardPosArr(j, 0) > 530 Then
 //							Delay 100
@@ -408,7 +408,7 @@ Sub main()
 							If Abs(cardPosArr(j, 0) - cardPosArr(i, 0)) > 450 Then 
 								Swipe cardPosArr(j, 0) + 30, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), 600
 							Else
-								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 10, cardPosArr(i, 1), 450
+								Swipe cardPosArr(j, 0) + 40, cardPosArr(j, 1) + 10, cardPosArr(i, 0) + 20, cardPosArr(i, 1), 450
 							End If
 						End If
 					End If
@@ -1079,7 +1079,7 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 				Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
 			Else 
 				Delay 100
-				Swipe cardPosArr(pos, 0) + 15, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime
+				Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(0, 0), foundationPosArr(0, 1), delayTime+50
 			End If
 		ElseIf elementSuit = "H" Then
 			TracePrint "Moving the H card..."
@@ -1088,7 +1088,7 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 			ElseIf cardPosArr(pos, 0) > 360 Then
 				Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1, 0), foundationPosArr(1, 1), delayTime
 			Else
-				Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1, 0), foundationPosArr(1, 1), delayTime
+				Swipe cardPosArr(pos, 0) + 30, cardPosArr(pos, 1) + 70 * offset + 5, foundationPosArr(1, 0), foundationPosArr(1, 1), delayTime + 100
 			End If
 		ElseIf elementSuit = "C" Then
 			TracePrint "Moving the C card..."
@@ -1837,9 +1837,9 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 							
 							Delay 100
 							If cardPosArr(t, 0) > 530 Then
-								Swipe cardPosArr(t, 0) + 30, cardPosArr(t, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 800
+								Swipe cardPosArr(t, 0) + 40, cardPosArr(t, 1) + 20, cardPosArr(emptyIndex, 0) + 10, cardPosArr(emptyIndex, 1), 800
 							Else 
-							 	Swipe cardPosArr(t, 0) + 25, cardPosArr(t, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 600
+							 	Swipe cardPosArr(t, 0) + 30, cardPosArr(t, 1) + 20, cardPosArr(emptyIndex, 0) + 10, cardPosArr(emptyIndex, 1), 600
 							End If
 							Delay 100
 							
@@ -1921,9 +1921,9 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 						isEverEmptyPos(emptyIndex) = True
 						Delay 100
 						If cardPosArr(m, 0) > 530 Then
-							Swipe cardPosArr(m, 0) + 30, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 800
+							Swipe cardPosArr(m, 0) + 40, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0) + 10, cardPosArr(emptyIndex, 1), 800
 						Else 
-							Swipe cardPosArr(m, 0) + 20, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0), cardPosArr(emptyIndex, 1), 600
+							Swipe cardPosArr(m, 0) + 30, cardPosArr(m, 1) + 20, cardPosArr(emptyIndex, 0) + 10, cardPosArr(emptyIndex, 1), 600
 						End If
 							
 						Delay 100
