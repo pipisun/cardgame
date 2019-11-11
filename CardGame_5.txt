@@ -892,7 +892,7 @@ Function getDelayTimeForR2L(distance)
 	ElseIf distance < 358 Then
 		delayTime = 300
 	ElseIf distance < 450 Then
-		delayTime = 7650
+		delayTime = 750
 	ElseIf distance < 540 Then
 		delayTime = 1000
 	Else 
@@ -1347,22 +1347,30 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			TracePrint "cardPosArr(searchPos, 0), cardPosArr(searchPos, 1):", cardPosArr(searchPos, 0), ",", cardPosArr(searchPos, 1)
 			
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
+			delayTime2 = getDelayTimeForR2L(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
+			
 			Delay 100
-			If cardPosArr(pos, 0) > 530 Then
-				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), delayTime
+			
+			If cardPosArr(pos, 0) < cardPosArr(searchPos, 0) Then
+				Swipe cardPosArr(pos, 0), cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime
 			Else 
-				If cardPosArr(searchPos, 0) > 530 Then 
-					Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), delayTime
-				Else 
-					If cardPosArr(pos, 0) < 320 Then 
-					 	Delay 50
-						Swipe cardPosArr(pos, 0) + 50, cardPosArr(pos, 1) + 10, cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1), delayTime
-					Else 
-						Delay 50
-						Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), delayTime
-					End If
-				End If
+				Swipe cardPosArr(pos, 0) + 50, cardPosArr(pos, 1), cardPosArr(searchPos, 0), cardPosArr(searchPos, 1), delayTime2
 			End If
+//			If cardPosArr(pos, 0) > 530 Then
+//				Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), delayTime
+//			Else 
+//				If cardPosArr(searchPos, 0) > 530 Then 
+//					Swipe cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 30, cardPosArr(searchPos, 1), delayTime + 100
+//				Else 
+//					If cardPosArr(pos, 0) < 320 Then 
+//					 	Delay 50
+//						Swipe cardPosArr(pos, 0) + 50, cardPosArr(pos, 1) + 10, cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1), delayTime
+//					Else 
+//						Delay 50
+//						Swipe cardPosArr(pos, 0) + 40, cardPosArr(pos, 1) + 20, cardPosArr(searchPos, 0) + 10, cardPosArr(searchPos, 1), delayTime
+//					End If
+//				End If
+//			End If
 			
 			'Update search area
 			Call updateSearchAreaRange(pos, 30, "up")
