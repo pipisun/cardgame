@@ -909,9 +909,9 @@ Function getDelayTime(distance)
 	If distance < 176 Then 
 		delayTime = 50
 	ElseIf distance < 268 Then
-		delayTime = 200
+		delayTime = 240
 	ElseIf distance < 358 Then
-		delayTime = 200
+		delayTime = 240
 	ElseIf distance < 450 Then
 		delayTime = 650
 	ElseIf distance < 540 Then
