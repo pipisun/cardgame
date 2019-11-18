@@ -383,7 +383,7 @@ Sub main()
 					cardInfoArr(i, 1) = cardInfoArr(j, 1)
 					cardInfoArr(i, 2) = cardInfoArr(j, 2)
 					
-					Delay 100
+					Delay 200
 					
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then
 						Swipe cardPosArr(j, 0), cardPosArr(j, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
@@ -435,7 +435,7 @@ Sub main()
 					number1 = cardInfoArr(i, 0)
 					
 					'Waiting for new card appears
-					Delay 500
+					Delay 800
 					
 					'Identify the new card
 					Call identifyNewCard(j)
@@ -886,17 +886,17 @@ Function getDelayTimeForR2L(distance)
 	
 	Dim delayTime
 	If distance < 176 Then 
-		delayTime = 150
+		delayTime = 260
 	ElseIf distance < 268 Then
-		delayTime = 300
+		delayTime = 700
 	ElseIf distance < 358 Then
-		delayTime = 300
+		delayTime = 800
 	ElseIf distance < 450 Then
-		delayTime = 750
-	ElseIf distance < 540 Then
 		delayTime = 1000
-	Else 
+	ElseIf distance < 540 Then
 		delayTime = 1200
+	Else 
+		delayTime = 1400
 	End If
 	
 	getDelayTimeForR2L = delayTime
@@ -907,7 +907,7 @@ Function getDelayTime(distance)
 	
 	Dim delayTime
 	If distance < 176 Then 
-		delayTime = 50
+		delayTime = 150
 	ElseIf distance < 268 Then
 		delayTime = 240
 	ElseIf distance < 358 Then
