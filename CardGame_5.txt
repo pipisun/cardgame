@@ -93,8 +93,8 @@ RunApp "com.tether.solitaire.klondike"
 
 Call playNow()
  
-Call runTestScenarioForZ1(1)
-//Call runTestScenarioForRealOneDollar(1)
+//Call runTestScenarioForZ1(1)
+Call runTestScenarioForRealOneDollar(1)
 
 Sub runTestScenarioForRealOneDollar(timesOfExecution)
 	
@@ -423,7 +423,7 @@ Sub main()
 					
 					'Update search area
 					If cardPosArr(j, 0) > 91 Then
-						Call updateSearchAreaRange(j, 30, "up")
+						Call updateSearchAreaRange(j, 15, "up")
 						Call updateCardPosition(j, -10)
 					End If
 					
@@ -793,6 +793,7 @@ Sub checkTableauAndMoveForPile(index)
 					Dim delayTime
 					'If pileCardInfoArr(index, 0) <> "13" Then
 						If CInt(pileCardInfoArr(index, 0)) + 1 = CInt(btmElementNumber) And pileCardInfoArr(index, 2) <> btmElementSuit Then 
+							TracePrint "pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1)", pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1)
 							delayTime = getDelayTime(Abs(pilePosArr(index, 0) - cardPosArr(i, 0)))
 							
 							If cardPosArr(i, 0) > 360 Then 
@@ -911,7 +912,7 @@ Function getDelayTime(distance)
 	ElseIf distance < 268 Then
 		delayTime = 240
 	ElseIf distance < 358 Then
-		delayTime = 240
+		delayTime = 300
 	ElseIf distance < 450 Then
 		delayTime = 650
 	ElseIf distance < 540 Then
@@ -1163,7 +1164,7 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 		End If
 		
 		'Update search area range
-		Call updateSearchAreaRange(pos, 30, "up")
+		Call updateSearchAreaRange(pos, 15, "up")
 		
 		
 	End If
@@ -1274,6 +1275,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			Delay 100
 			
 			delayTime = getDelayTime(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
+			delayTime2 = getDelayTimeForR2L(Abs(cardPosArr(searchPos, 0) - cardPosArr(pos, 0)))
 			TracePrint cardPosArr(searchPos, 0), cardPosArr(pos, 0)
 			If cardPosArr(searchPos, 0) < 320 And cardPosArr(pos, 0) > 320 Then 
 			 	TracePrint "Move left to right"
@@ -1281,9 +1283,9 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			ElseIf cardPosArr(searchPos, 0) > 320 And cardPosArr(pos, 0) < 320 Then
 				TracePrint "Move right to left"
 				If cardPosArr(searchPos, 0)  > 500 Then
-					Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+					Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime2
 				Else
-					Swipe cardPosArr(searchPos, 0) + 40, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime
+					Swipe cardPosArr(searchPos, 0) + 50, cardPosArr(searchPos, 1) + 20, cardPosArr(pos, 0) + 30, cardPosArr(pos, 1), delayTime2
 				End If
 			Else 
 				If cardPosArr(searchPos, 0) > 530 Then
@@ -1298,7 +1300,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 			End If
 			
 			'Update search area
-			Call updateSearchAreaRange(searchPos, 30, "up")
+			Call updateSearchAreaRange(searchPos, 15, "up")
 			
 			'Update card position
 			'Call updateCardPosition(searchPos, -10)
@@ -1373,7 +1375,7 @@ Function moveCardRule(pos, searchPos, intNewCardNumber, strNewCardSuit)
 //			End If
 			
 			'Update search area
-			Call updateSearchAreaRange(pos, 30, "up")
+			Call updateSearchAreaRange(pos, 15, "up")
 			Delay 300
 			'Update card position
 			'Call updateCardPosition(pos, -10)
@@ -1441,7 +1443,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 //				bottomCardPointArr(position) = cardInfoArr(searchPos, 0)
 				isSearchPosCardChanged = False
 				'Update search area
-				Call updateSearchAreaRange(searchPos, 30, "up")
+				Call updateSearchAreaRange(searchPos, 15, "up")
 			Else 
 				isSwapChecked = True
 				
@@ -1514,7 +1516,7 @@ Sub checkCardAfterMoveCardRule(searchPos, position, flag)
 //				bottomCardPointArr(searchPos) = cardInfoArr(position, 0)
 				isPosCardChanged = False
 				'Update search area
-				Call updateSearchAreaRange(position, 30, "up")
+				Call updateSearchAreaRange(position, 15, "up")
 //				'Swap position and searchPos
 //				Dim tmp
 //				tmp = position
@@ -1893,7 +1895,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 							cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
 							emptySpotCount = emptySpotCount - 1
 							
-							Call updateSearchAreaRange(t, 30, "up")
+							Call updateSearchAreaRange(t, 15, "up")
 							Call updateCardPosition(t, -10)
 							
 							Call identifyNewCard(t)
@@ -1978,7 +1980,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 						cardInfoArr(emptyIndex, 1) = pileCardInfoArr(pileIndex, 1)
 						cardInfoArr(emptyIndex, 2) = pileCardInfoArr(pileIndex, 2)
 						
-						Call updateSearchAreaRange(m, 30, "up")
+						Call updateSearchAreaRange(m, 15, "up")
 						Call updateCardPosition(m, -10)
 						
 						Call identifyNewCard(m)
@@ -2054,7 +2056,7 @@ Function moveKCard(emptyIndex, pileIndex, flag)
 					
 					Delay 200
 					
-					Call updateSearchAreaRange(m, 30, "up")
+					Call updateSearchAreaRange(m, 15, "up")
 					Call updateCardPosition(m, -10)
 					
 					'Check if there is any card needed to identify
