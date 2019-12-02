@@ -6,6 +6,8 @@ Dim count, isFound
 'Record point for bottom card
 //Dim bottomCardPointArr(7)
 
+Dim retryTimes
+
 'Check Card K
 Dim isKAvailable
 
@@ -1712,7 +1714,7 @@ Sub identifyNewCard(j)
 	Dim intX, intY
 	Dim cardPoint
 	Dim noCard
-	
+
 	noCard = False
 	
 	Delay 500
@@ -1794,6 +1796,20 @@ Sub identifyNewCard(j)
 	
 	Dim numberOfPosition
 	If noCard = True Then 
+		FindPic cardSearchArea(j, 0) - 10, cardSearchArea(j, 1) - 20, suitSearchArea(j,2), suitSearchArea(j,3), "Attachment:" & "emptySlot.png", "000000", 0, 0.4, intX, intY
+	 	TracePrint cardSearchArea(j, 0) - 10, cardSearchArea(j, 1) - 20, suitSearchArea(j,2), suitSearchArea(j,3)
+	 	
+	 	Delay 500
+	 	If intX > 0 And intY > 0 Then 
+		 	TracePrint "There is no card in the slot"
+	 	ElseIf retryTimes = 0 Then
+			TracePrint "Trying to identify the card again"
+			Call updateWholeArea(j, 10, 10, 10, 10)
+			retryTimes = retryTimes + 1
+			Call identifyNewCard(j)
+			Exit Sub
+		End If
+		
 		cardInfoArr(j, 0) = "0"
 //		bottomCardPointArr(j) = "0"
 		
@@ -1813,6 +1829,19 @@ Sub identifyNewCard(j)
 		TracePrint "emptySpotCount:", emptySpotCount, ",emptySpotPos:", emptySpotPos
 		noCard = False
 	End If
+	retryTimes = 0
+End Sub
+
+Sub updateWholeArea(pos, upPos, downPos, leftPos, rightPos)
+	cardSearchArea(pos,0) = cardSearchArea(pos, 0) - leftPos
+	cardSearchArea(pos,1) = cardSearchArea(pos,1) - upPos
+	cardSearchArea(pos,2) = cardSearchArea(pos,2) + rightPos
+	cardSearchArea(pos,3) = cardSearchArea(pos,3) + downPos
+	
+	suitSearchArea(pos,0) = suitSearchArea(pos,0)  - leftPos
+	suitSearchArea(pos,1) = suitSearchArea(pos, 1) - upPos
+	suitSearchArea(pos,2) = suitSearchArea(pos,2) + rightPos
+	suitSearchArea(pos,3) = suitSearchArea(pos, 3) + downPos
 End Sub
 
 Function getActualPosition(cardPosition)
@@ -2261,6 +2290,7 @@ Sub finalCheck()
 End Sub
 
 Sub init()
+	retryTimes = 0
 	isKAvailable = False
 	compareCounter = 1
 	emptySpotCount = 0
