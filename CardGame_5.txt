@@ -1,4 +1,4 @@
-Dim screenX, screenY
+ï»¿Dim screenX, screenY
 Dim intX, intY
 
 Dim count, isFound 
@@ -89,14 +89,16 @@ screenX = GetScreenX()
 screenY = GetScreenY()
 TracePrint "Screen size:", screenX, screenY
 
+Dim WIN_RECORD 
+
 'Run app
 RunApp "com.tether.solitaire.klondike"
 //SetAppSpeed "com.tether.solitaire.klondike", 5
 
 Call playNow()
  
-//Call runTestScenarioForZ1(1)
-Call runTestScenarioForRealOneDollar(1)
+Call runTestScenarioForZ1(10)
+//Call runTestScenarioForRealOneDollar(1)
 
 Sub runTestScenarioForRealOneDollar(timesOfExecution)
 	
@@ -198,6 +200,7 @@ Sub runTestScenarioForZ1(timesOfExecution)
 		
 		TracePrint "END EXECUTION(TIMES):", i
 	Next
+	TracePrint "You won ", WIN_RECORD, " out of ", timesOfExecution
 End Sub	
 
 //Call init()
@@ -215,9 +218,6 @@ Sub printOutCardInfoAndMoveAFirst()
 End Sub
 
 //Call sortMaxToMin()
-
-
-
 'Move A first
 Sub moveAFirst(index)
 	'Move it to foundation if the card is A
@@ -246,7 +246,7 @@ Sub main()
 				Dim ifPipeChar
 				ifPipeChar = InStr(1, CStr(number1), "|")
 				
-				TracePrint "cint(number1£©:", number1
+				TracePrint "cint(number1Â£Â©:", number1
 				If number1 = 0 Then 
 					number1Arr = Split(cardInfoArr(i, 0), "|")
 					TracePrint "Len(number1Arr):", Len(number1Arr)
@@ -388,7 +388,7 @@ Sub main()
 					Delay 200
 					
 					If cardPosArr(j, 0) < cardPosArr(i, 0) Then
-						Swipe cardPosArr(j, 0), cardPosArr(j, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime
+						Swipe cardPosArr(j, 0), cardPosArr(j, 1), cardPosArr(i, 0) + 20, cardPosArr(i, 1), delayTime
 					Else 
 					 	Swipe cardPosArr(j, 0) + 50, cardPosArr(j, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime2
 					End If
@@ -801,7 +801,7 @@ Sub checkTableauAndMoveForPile(index)
 							If cardPosArr(i, 0) > 360 Then 
 								Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0) + 40, cardPosArr(i, 1), delayTime
 							Else 
-								Swipe pilePosArr(index, 0), pilePosArr(index, 1), cardPosArr(i, 0), cardPosArr(i, 1), delayTime	
+								Swipe pilePosArr(index, 0) + 5, pilePosArr(index, 1) + 5, cardPosArr(i, 0), cardPosArr(i, 1), delayTime	
 							End If
 							
 							Delay 100
@@ -846,6 +846,13 @@ Function checkFoundationAndMove(pos, element, elementSuit)
 	Dim index, isMoved
 	index = getSuitPosition(elementSuit)
 	isMoved = False
+	TracePrint "index=", index
+	'TracePrint "foundationInfoArr(index, 0)=", foundationInfoArr(index, 0)
+	
+	If index = -1 Then 
+		moveCardFromWastePile()
+		Exit Function
+	End If
 	
 	If foundationInfoArr(index, 0) <> "0" Then 
 		Dim splitArr, lastElementCombination, lastElement, lastElementSuit
@@ -902,7 +909,35 @@ Function getDelayTimeForR2L(distance)
 		delayTime = 1400
 	End If
 	
-	getDelayTimeForR2L = delayTime
+	getDelayTimeForR2L = delayTime + getDelayTimePositiveOffset()
+End Function
+
+//Function getDelayTime(distance)
+//	TracePrint "distance:", distance
+//	
+//	Dim delayTime
+//	If distance < 176 Then 
+//		delayTime = 150
+//	ElseIf distance < 268 Then
+//		delayTime = 240
+//	ElseIf distance < 358 Then
+//		delayTime = 300
+//	ElseIf distance < 450 Then
+//		delayTime = 650
+//	ElseIf distance < 540 Then
+//		delayTime = 900
+//	Else 
+//		delayTime = 1000
+//	End If
+//
+//	getDelayTime = delayTime
+//End Function
+Function getDelayTimeOffset()
+	getDelayTimeOffset = -20
+End Function
+
+Function getDelayTimePositiveOffset()
+	getDelayTimePositiveOffset = 20
 End Function
 
 Function getDelayTime(distance)
@@ -923,25 +958,9 @@ Function getDelayTime(distance)
 		delayTime = 1000
 	End If
 
-//	If distance >= 500 Then 
-//		delayTime = 5500							
-//	ElseIf distance >= 430 Then 
-//		delayTime = 5000							
-//	ElseIf distance >= 400 Then 
-//		delayTime = 4800
-//	ElseIf distance >= 360 Then
-//		TracePrint "delaying..."
-//		delayTime = 5500
-//	ElseIf distance >= 270 Then 
-//		delayTime = 500
-//	ElseIf distance >= 180 Then
-//		delayTime = 1500
-//	Else 
-//		delayTime = 1200
-//	End If
-	
-	getDelayTime = delayTime
+	getDelayTime = delayTime + getDelayTimeOffset()
 End Function
+
 Sub moveCardAgain()
 	Dim cardStrArr
 	For m = 0 To 6
@@ -1042,7 +1061,7 @@ Function checkIfMoveCardToFoundation(pos, element, elementSuit, arrLength)
 	Dim index
 	index = getSuitPosition(elementSuit)
 	TracePrint "index:", index
-	TracePrint "foundationInfoArr£¨index,0):", foundationInfoArr(index, 0)
+	TracePrint "foundationInfoArrÂ£Â¨index,0):", foundationInfoArr(index, 0)
 	TracePrint "pos,element,elementSuit", pos, " ", element, " ", elementSuit
 	
 	If foundationInfoArr(index, 0) = "0" Then
@@ -1141,8 +1160,17 @@ Sub moveToSpecificFoundationAreaAndUpdate(pos, index, element, elementSuit, arrL
 				Swipe cardPosArr(pos, 0) + 10, cardPosArr(pos, 1) + 70 * offset + 10, foundationPosArr(3, 0), foundationPosArr(3, 1), delayTime
 			End If
 		End If
+	ElseIf isAFlag = "MOVE" Then
+		Delay 100
+		TracePrint "Tap card to foundation:", cardInfoArr(pos,0), cardInfoArr(pos,1)
+		Tap cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 50 * offset + 5
+	ElseIf isAFlag = "PILEMOVE" Then
+		Delay 100
+		TracePrint "Tap pile card to foundation:", pileCardInfoArr(pos,0), pileCardInfoArr(pos,1)
+		TracePrint "pilePosArr(pos, 0),pilePosArr(pos, 1)", pilePosArr(pos, 0), pilePosArr(pos, 1)
+		Tap pilePosArr(pos, 0), pilePosArr(pos,1)
 	Else 
-		Delay 400
+		Delay 200
 		TracePrint "Tap card to foundation:", cardInfoArr(pos,0), cardInfoArr(pos,1)
 		Tap cardPosArr(pos, 0) + 20, cardPosArr(pos, 1) + 50 * offset + 5
 	End If
@@ -1668,7 +1696,6 @@ Sub identifyPileCard(index)
 			pileCardInfoArr(index, 0) = cardPoint
 			TracePrint "index,pileCardInfoArr", index, pileCardInfoArr(index,0)
 			
-			
 			Delay 500
 			
 			'Search suit
@@ -1684,9 +1711,26 @@ Sub identifyPileCard(index)
 					TracePrint "Found suit color:", pileCardInfoArr(index,2)
 					
 					'Move it to foundation if the card is A
+//					If pileCardInfoArr(index, 0) = "1" Then 
+//						TracePrint "=1"
+//						Call moveToSpecificFoundationAreaAndUpdate(index, getSuitPosition(pileCardInfoArr(index, 1)), pileCardInfoArr(index, 0), pileCardInfoArr(index, 1), 1, "PILE")
+//						Delay 200
+//						isFoundAnyCardMovedInACycle = True
+//						Call identifyPileCard(index)
+//					End If
+					
+					'Move it to foundation if the card is A
+					Dim cardPilePointCheck
+					cardPilePointCheck = getLastCardPointInFoundationBySuitColor(getSuitPosition(pileCardInfoArr(index, 1)))
+					TracePrint "CARDPILEPOINTCHECK:", cardPilePointCheck
 					If pileCardInfoArr(index, 0) = "1" Then 
 						TracePrint "=1"
 						Call moveToSpecificFoundationAreaAndUpdate(index, getSuitPosition(pileCardInfoArr(index, 1)), pileCardInfoArr(index, 0), pileCardInfoArr(index, 1), 1, "PILE")
+						Delay 200
+						isFoundAnyCardMovedInACycle = True
+						Call identifyPileCard(index)
+					ElseIf CInt(cardPilePointCheck) = CInt(pileCardInfoArr(index, 0)) - 1 Then
+						Call moveToSpecificFoundationAreaAndUpdate(index, getSuitPosition(pileCardInfoArr(index, 1)), pileCardInfoArr(index, 0), pileCardInfoArr(index, 1), 1, "PILEMOVE")
 						Delay 200
 						isFoundAnyCardMovedInACycle = True
 						Call identifyPileCard(index)
@@ -1759,9 +1803,22 @@ Sub identifyNewCard(j)
 					TracePrint "Found suit:", cardInfoArr(j,1)
 					TracePrint "Found suit color:", cardInfoArr(j,2)
 					
-					'Move it to foundation if the card is A
+//					'Move it to foundation if the card is A
+//					If cardInfoArr(j, 0) = "1" Then 
+//						Call moveToSpecificFoundationAreaAndUpdate(j, getSuitPosition(cardInfoArr(j, 1)), cardInfoArr(j, 0), cardInfoArr(j, 1), 1, "")
+//						Delay 200
+//						Call identifyNewCard(j)
+//					End If
+					
+					'Move it to foundation if the card can be placed on foundation area
+					Dim cardPointCheck
+					cardPointCheck = getLastCardPointInFoundationBySuitColor(getSuitPosition(cardInfoArr(j, 1)))
 					If cardInfoArr(j, 0) = "1" Then 
 						Call moveToSpecificFoundationAreaAndUpdate(j, getSuitPosition(cardInfoArr(j, 1)), cardInfoArr(j, 0), cardInfoArr(j, 1), 1, "")
+						Delay 200
+						Call identifyNewCard(j)
+					ElseIf CInt(cardPointCheck) = CInt(cardInfoArr(j, 0)) - 1 Then
+						Call moveToSpecificFoundationAreaAndUpdate(j, getSuitPosition(cardInfoArr(j, 1)), cardInfoArr(j, 0), cardInfoArr(j, 1), 1, "MOVE")
 						Delay 200
 						Call identifyNewCard(j)
 					End If
@@ -2540,7 +2597,7 @@ Sub waitGameToStart()
 	Dim count, intX, intY
 	count = 15
 	While count > 0 
-		FindPic 0, 0, 0, 0, "Attachment:endbutton.png", "000000", 0, 0.7, intX, intY
+		FindPic 0, 0, 0, 0, "Attachment:finishbutton.png", "000000", 0, 0.7, intX, intY
 		If intX > 0 And intY > 0 Then 
 			TracePrint "Found Endbutton button"
 			
@@ -2573,52 +2630,86 @@ Sub endGame()
 			Tap intX + 5, intY + 5
 			
 			Delay 2000
-			Exit While
-//			'Find End Now button
-//			FindPic 335, 625, 575, 718, "Attachment:endnowbutton.png", "000000", 0, 0.4, intX, intY
-//			If intX > 0 And intY > 0 Then 
-//				TracePrint "Hit End Now button"
-//				Tap intX + 20, intY + 10
-//				
-//				Delay 5000
-//				
-//				FindPic 65, 732, 485, 826, "Attachment:submitbutton.png", "000000", 0, 0.4, intX, intY
-//				If intX > 0 And intY > 0 Then 
-//					TracePrint "Hit Submit button"
-//					Tap intX + 20, intY + 10
-//				End If
-//					
-//				Delay 7000
-//				
-//			End If
-//			
-//			Dim countForNext
-//			countForNext = 15
-//			'Hit Next
-//			While countForNext > 0
-//				FindPic 12, 500, 580, 1058, "Attachment:nextbutton.png", "000000", 0, 0.6, intX, intY
-//				If intX > 0 And intY > 0 Then 
-//					TracePrint "Hit Next button"
-//					Tap intX + 20, intY + 20
-//					
-//					Delay 2000
-//					
-//					FindPic 529, 0, 633, 100, "Attachment:xbutton.png", "000000", 0, 0.3, intX, intY
-//					If intX > 0 And intY > 0 Then 
-//						TracePrint "Hit X button"
-//						Tap intX + 5, intY + 5
-//						Delay 1000
+			'Exit While
+			'Find End Now button
+			FindPic 335, 625, 575, 718, "Attachment:endnowbutton.png", "000000", 0, 0.4, intX, intY
+			If intX > 0 And intY > 0 Then 
+				TracePrint "Hit End Now button"
+				Tap intX + 20, intY + 10
+				
+				Delay 5000
+				
+				FindPic 65, 732, 485, 826, "Attachment:submitbutton.png", "000000", 0, 0.4, intX, intY
+				If intX > 0 And intY > 0 Then 
+					TracePrint "Hit Submit button"
+					Tap intX + 20, intY + 10
+				End If
+					
+				Delay 7000
+				
+			End If
+			
+			Dim countForNext
+			countForNext = 15
+			'Check if winning
+			Delay 5000
+			FindPic 62, 59, 582, 404, "Attachment:1stposition.png", "000000", 0, 0.6, intX, intY
+			If intX > 0 And intY > 0 Then 
+				TracePrint "You Won!"
+				WIN_RECORD = WIN_RECORD + 1
+			End If
+			
+			Dim nextBtnFound, nextTileBtnFound
+			'Hit Next
+			While countForNext > 0
+				nextBtnFound = false
+				nextTileBtnFound = false
+				FindPic 12, 500, 580, 1058, "Attachment:nextbutton.png", "000000", 0, 0.6, intX, intY
+				If intX > 0 And intY > 0 Then 
+					TracePrint "Hit Next button"
+					Tap intX + 20, intY + 20
+					Tap intX + 20, intY + 20
+					nextBtnFound = true
+				End If
+				
+				If nextBtnFound = false Then
+					FindPic 72, 846, 567, 926, "Attachment:nextbuttonfortie.png", "000000", 0, 0.6, intX, intY
+					If intX > 0 And intY > 0 Then 
+						TracePrint "Hit Next button when a tie"
+						Tap intX + 20, intY + 20
+						Tap intX + 20, intY + 20
+						nextTileBtnFound = true
+					End If
+				End If
+				
+				If nextBtnFound = true Or nextTileBtnFound = true Then 
+
+					Delay 5000
+					
+					FindPic 529, 0, 633, 100, "Attachment:xbutton.png", "000000", 0, 0.3, intX, intY
+					If intX > 0 And intY > 0 Then 
+						TracePrint "Hit X button"
+						Tap intX + 5, intY + 5
+						Delay 1000
+						
+//						FindPic 160, 1016, 318, 1130, "Attachment:2ndtab.png", "000000", 0, 0.3, intX, intY
+//						If intX > 0 And intY > 0 Then 
+//							TracePrint "Switch to 2nd tab"
+//							Tap intX + 5, intY + 5
+//							Delay 1000
+//						End If
 //						Exit Sub
-//					End If
-//				Else 
-//					'Swipe the page
-//					Swipe 22, 1049 + offsetY1, 22, 619 + offsetY2, 500
-//					offsetY1 = offsetY1 + 50
-//					offsetY1 = offsetY2 + 20
-//				End If
-//				countForNext = countForNext - 1
-//				Delay 200
-//			Wend
+					End If
+					Exit Sub
+				Else 
+					'Swipe the page
+					Swipe 22, 1049 + offsetY1, 22, 619 + offsetY2, 500
+					offsetY1 = offsetY1 + 50
+					offsetY1 = offsetY2 + 20
+				End If
+				countForNext = countForNext - 1
+				Delay 200
+			Wend
 			
 		Else 
 			'TracePrint "Continue searching Endbutton..."	
@@ -2627,3 +2718,14 @@ Sub endGame()
 		Delay 1000
 	Wend
 End Sub
+
+
+/* ------------------------------------------ */
+Function getLastCardPointInFoundationBySuitColor(index)
+	Dim lastNumberArr, lastNumber, lastPoint 
+	lastNumberArr = Split(foundationInfoArr(index,0), "|")
+	lastNumber = lastNumberArr(Len(lastNumberArr) - 1)
+	lastPoint = Left(lastNumber, Len(lastNumber) - 1)
+	TracePrint "Last point:", lastPoint
+	getLastCardPointInFoundationBySuitColor = lastPoint
+End Function
